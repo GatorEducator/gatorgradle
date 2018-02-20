@@ -1,0 +1,11 @@
+# use Java
+language: Java
+
+# install junit?
+# install mdl for checking Markdown
+before_install:
+  - gem install mdl
+
+# need to run junit test
+script:
+  - mdl README.md
