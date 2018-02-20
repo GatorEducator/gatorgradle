@@ -24,7 +24,7 @@ checkstyle {
   ignoreFailures = false
     maxWarnings = 0
     maxErrors = 0
-    configFile = new File(rootDir, "config/checkstyle/google_checks.xml")
+    configFile = new File(rootDir, ".checks.xml")
 }
 
 test {

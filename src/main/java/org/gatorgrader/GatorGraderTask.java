@@ -6,6 +6,9 @@ import org.gradle.api.tasks.TaskAction;
 public class GatorGraderTask extends DefaultTask {
     private String args;
 
+    /**
+     * Runs GatorGrader with specific arguments.
+     */
     public GatorGraderTask() {
         super.dependsOn("build");
         super.dependsOn("check");
