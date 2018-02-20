@@ -1,3 +1,6 @@
+group = artifact_group
+version = "${artifact_version}.${build_number}"
+
 apply plugin: 'java'
 apply plugin: 'maven'
 
