@@ -20,6 +20,5 @@ script:
   - gradle --version
   - gradle clean check
   - gradle build
-  - gradle test
   # other linting
   - mdl README.md
