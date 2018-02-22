@@ -35,10 +35,12 @@ public class GatorGraderPlugin implements Plugin<Project> {
     private Iterable<Command> compileGatorGraderCalls() {
         List<Command> cmds = new ArrayList<>();
 
-        for (int i = 0; i < 100; i++) {
-            cmds.add(new Command("echo").with("" + i).outputToSysOut(true));
-            cmds.add(new Command("sleep").with("0.33"));
-        }
+        cmds.add(new Command("./gatorgrader.sh").with("--check").outputToSysOut(true));
+
+        // for (int i = 0; i < 100; i++) {
+        //     cmds.add(new Command("echo").with("" + i).outputToSysOut(true));
+        //     cmds.add(new Command("sleep").with("0.33"));
+        // }
 
         return cmds;
     }
