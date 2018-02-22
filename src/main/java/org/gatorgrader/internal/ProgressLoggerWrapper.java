@@ -18,11 +18,11 @@
 
 package org.gatorgrader.internal;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 /**
  * Wraps around Gradle's internal progress logger. Uses reflection
@@ -33,21 +33,21 @@ import org.gradle.api.logging.Logger;
  * @author Saejin Mahlau-Heinert
  */
 public class ProgressLoggerWrapper {
-    private final Logger logger;
-    private final Object progressLogger;
+    private Logger logger;
+    private Object progressLogger;
 
     /**
-     * Create a progress logger wrapper
+     * Create a progress logger wrapper.
      * @param project the current Gradle project
      * @param src the URL to the file to be downloaded
      * @throws ClassNotFoundException if one of Gradle's internal classes
-     * could not be found
+     *      could not be found
      * @throws NoSuchMethodException if the interface of one of Gradle's
-     * internal classes has changed
+     *      internal classes has changed
      * @throws InvocationTargetException if a method from one of Gradle's
-     * internal classes could not be invoked
+     *      internal classes could not be invoked
      * @throws IllegalAccessException if a method from one of Gradle's
-     * internal classes is not accessible
+     *      internal classes is not accessible
      */
     public ProgressLoggerWrapper(Project project, String src) {
         logger = project.getLogger();
@@ -56,25 +56,38 @@ public class ProgressLoggerWrapper {
         // as much compatibility to different Gradle versions as possible
 
         // get ProgressLoggerFactory class
-        Class<?> progressLoggerFactoryClass;
-        progressLoggerFactoryClass =
-            Class.forName("org.gradle.internal.logging.progress.ProgressLoggerFactory");
+        Class<?> progressLoggerFactoryClass = null;
+        try {
+            progressLoggerFactoryClass =
+                Class.forName("org.gradle.internal.logging.progress.ProgressLoggerFactory");
+        } catch (ClassNotFoundException ex) {
+            System.err.println("ProgressLoggerWrapper Error: " + ex);
+        }
 
         // get ProgressLoggerFactory service
-        Object serviceFactory        = invoke(project, "getServices");
-        Object progressLoggerFactory = invoke(serviceFactory, "get", progressLoggerFactoryClass);
-
-        // get actual progress logger
-        progressLogger = invoke(progressLoggerFactory, "newOperation", getClass());
+        Object serviceFactory        = null;
+        Object progressLoggerFactory = null;
+        try {
+            serviceFactory        = invoke(project, "getServices");
+            progressLoggerFactory = invoke(serviceFactory, "get", progressLoggerFactoryClass);
+            // get actual progress logger
+            progressLogger = invoke(progressLoggerFactory, "newOperation", getClass());
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
+            System.err.println("ProgressLoggerWrapper Error: " + ex);
+        }
 
         // configure progress logger
         String desc = "Download " + src;
-        invoke(progressLogger, "setDescription", desc);
-        invoke(progressLogger, "setLoggingHeader", desc);
+        try {
+            invoke(progressLogger, "setDescription", desc);
+            invoke(progressLogger, "setLoggingHeader", desc);
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
+            System.err.println("ProgressLoggerWrapper Error: " + ex);
+        }
     }
 
     /**
-     * Invoke a method using reflection
+     * Invoke a method using reflection.
      * @param obj the object whose method should be invoked
      * @param method the name of the method to invoke
      * @param args the arguments to pass to the method
@@ -82,21 +95,21 @@ public class ProgressLoggerWrapper {
      * @throws NoSuchMethodException if the method was not found
      * @throws InvocationTargetException if the method could not be invoked
      * @throws IllegalAccessException if the method could not be accessed
-     */
+    */
     private static Object invoke(Object obj, String method, Object... args)
         throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Class<?>[] argumentTypes = new Class[args.length];
         for (int i = 0; i < args.length; ++i) {
             argumentTypes[i] = args[i].getClass();
         }
-        Method m = obj.getClass().getMethod(method, argumentTypes);
-        m.setAccessible(true);
-        return m.invoke(obj, args);
+        Method met = obj.getClass().getMethod(method, argumentTypes);
+        met.setAccessible(true);
+        return met.invoke(obj, args);
     }
 
     /**
      * Invoke a method using reflection but don't throw any exceptions.
-     * Just log errors instead.
+     *  Just log errors instead.
      * @param obj the object whose method should be invoked
      * @param method the name of the method to invoke
      * @param args the arguments to pass to the method
@@ -104,31 +117,31 @@ public class ProgressLoggerWrapper {
     private void invokeIgnoreExceptions(Object obj, String method, Object... args) {
         try {
             invoke(obj, method, args);
-        } catch (NoSuchMethodException e) {
-            logger.trace("Unable to log progress", e);
-        } catch (InvocationTargetException e) {
-            logger.trace("Unable to log progress", e);
-        } catch (IllegalAccessException e) {
-            logger.trace("Unable to log progress", e);
+        } catch (NoSuchMethodException ex) {
+            logger.trace("Unable to log progress", ex);
+        } catch (InvocationTargetException ex) {
+            logger.trace("Unable to log progress", ex);
+        } catch (IllegalAccessException ex) {
+            logger.trace("Unable to log progress", ex);
         }
     }
 
     /**
-     * Start on operation
+     * Start on operation.
      */
     public void started() {
         invokeIgnoreExceptions(progressLogger, "started");
     }
 
     /**
-     * Complete an operation
+     * Complete an operation.
      */
     public void completed() {
         invokeIgnoreExceptions(progressLogger, "completed");
     }
 
     /**
-     * Set the current operation's progress
+     * Set the current operation's progress.
      * @param msg the progress message
      */
     public void progress(String msg) {
