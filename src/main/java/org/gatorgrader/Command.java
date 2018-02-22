@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 public class Command implements Runnable {
     private List<String> command;
-    private boolean outputToSysOut = false;
+    private boolean outputToSysOut = true;
 
     private StringBuilder output = new StringBuilder();
     private Thread thread;
@@ -22,8 +22,8 @@ public class Command implements Runnable {
         this.command = new ArrayList<>(Arrays.asList(command));
     }
 
-    public Command(List<String> args) {
-        this.command = args;
+    public Command(List<String> command) {
+        this.command = command;
     }
 
     public Command() {
@@ -31,16 +31,21 @@ public class Command implements Runnable {
     }
 
     public Command with(String... command) {
-        this.command.addAll(Arrays.asList(command));
+        return with(Arrays.asList(command));
+    }
+
+    public Command with(List<String> command) {
+        this.command.addAll(command);
+        return this;
+    }
+
+    public Command outputToSysOut(boolean out) {
+        outputToSysOut = out;
         return this;
     }
 
     public String getOutput() {
         return output.toString();
-    }
-
-    public void outputToSysOut(boolean val) {
-        outputToSysOut = val;
     }
 
     /**
@@ -66,8 +71,10 @@ public class Command implements Runnable {
 
     /**
      * Wait for the command to finish.
+     *
+     * @return the Command that ran/is running
      */
-    public void waitFor() {
+    public Command waitFor() {
         if (thread != null) {
             try {
                 thread.join();
@@ -75,20 +82,25 @@ public class Command implements Runnable {
                 System.err.println("Error waiting for command to finish: " + ex);
             }
         }
+        return this;
     }
 
     /**
      * Execute the Command.
      *
-     * @param block should this method block until the command finishes?
+     * @param  block should execution block until finished?
+     * @return the Command that ran/is running
      */
-    public void execute(boolean block) {
+    public Command execute(boolean block) {
         if (block) {
+            fin = false;
             run();
         } else {
+            fin    = false;
             thread = new Thread(this);
             thread.start();
         }
+        return this;
     }
 
     /**
@@ -128,7 +140,9 @@ public class Command implements Runnable {
                     .append(command.stream().collect(Collectors.joining(" ")))
                     .append("\'\n");
                 if (outputToSysOut) {
-                    System.out.println("Error: Command not found!");
+                    System.out.print("Error: Command not found: \'");
+                    System.out.print(command.stream().collect(Collectors.joining(" ")));
+                    System.out.print("\'\n");
                 }
                 // command not found exit code
                 exitVal = 127;
