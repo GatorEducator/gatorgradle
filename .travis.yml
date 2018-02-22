@@ -17,8 +17,7 @@ cache:
 # need to run junit tests?
 script:
   # java checks
-  - gradle --version
-  - gradle clean check
+  - gradle clean
   - gradle build
   # other linting
   - mdl README.md
