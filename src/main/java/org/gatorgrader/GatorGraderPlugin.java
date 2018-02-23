@@ -30,6 +30,7 @@ public class GatorGraderPlugin implements Plugin<Project> {
         }
 
         // ensure dependencies are run sequentially if scheduled at the same time
+        // this is probably done elsewhere as well, but might as well be sure
         project.getTasks().getByName("build").mustRunAfter("clean");
     }
 

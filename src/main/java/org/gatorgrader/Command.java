@@ -28,10 +28,6 @@ public class Command implements Runnable {
         this.command = command;
     }
 
-    public Command() {
-        this.command = new ArrayList<>();
-    }
-
     public Command with(String... command) {
         return with(Arrays.asList(command));
     }
