@@ -1,6 +1,7 @@
 package org.gatorgrader;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.stream.Collectors;
 public class Command implements Runnable {
     private List<String> command;
     private boolean outputToSysOut = true;
+    private String workingDir      = ".";
 
     private StringBuilder output = new StringBuilder();
     private Thread thread;
@@ -41,6 +43,11 @@ public class Command implements Runnable {
 
     public Command outputToSysOut(boolean out) {
         outputToSysOut = out;
+        return this;
+    }
+
+    public Command workingDir(String dir) {
+        this.workingDir = dir;
         return this;
     }
 
@@ -113,6 +120,7 @@ public class Command implements Runnable {
         }
 
         ProcessBuilder pb = new ProcessBuilder(command);
+        pb.directory(new File(workingDir));
         pb.redirectErrorStream(true);
         try {
             Process proc = pb.start();

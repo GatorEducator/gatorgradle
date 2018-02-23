@@ -1,6 +1,7 @@
 package org.gatorgrader;
 
 import org.gradle.api.Action;
+import org.gradle.api.DefaultTask;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
@@ -16,7 +17,7 @@ public class GatorGraderPlugin implements Plugin<Project> {
      * @param project the project to apply GatorGrader to
      */
     public void apply(Project project) {
-        GradeTask grade = project.getTasks().create("grade", GradeTask.class);
+        Task grade = project.getTasks().create("grade", DefaultTask.class);
 
         Iterable<Command> commands = compileGatorGraderCalls();
 
