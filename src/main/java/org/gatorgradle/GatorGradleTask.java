@@ -14,8 +14,6 @@ public class GatorGradleTask extends DefaultTask {
 
     protected Map<String, String> grading;
 
-    protected boolean showWelcomeMessage = false;
-
     /**
      * Create the default, empty GatorGradleTask.
      */
@@ -66,6 +64,11 @@ public class GatorGradleTask extends DefaultTask {
         return this;
     }
 
+    /**
+     * Derive a new GatorGradleTask from this one.
+     *
+     * @return a new GatorGradleTask based on this one.
+     */
     public GatorGradleTask derive() {
         return new GatorGradleTask(this);
     }
@@ -75,10 +78,8 @@ public class GatorGradleTask extends DefaultTask {
      */
     @TaskAction
     public void grade() {
+        // use different command subclasses if needed
         Command com = new GatorGraderCommand();
-        if (!showWelcomeMessage) {
-            com.with("--nowelcome");
-        }
         for (String check : grading.keySet()) {
             com.with("--" + check);
             if (!NO_VALUE.equals(grading.get(check))) {

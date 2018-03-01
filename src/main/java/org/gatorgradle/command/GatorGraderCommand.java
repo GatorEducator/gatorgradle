@@ -24,7 +24,7 @@ public class GatorGraderCommand extends Command {
     }
 
     public GatorGraderCommand(List<String> command) {
-        super(pythonPath, gatorgraderPath);
+        super(pythonPath, gatorgraderPath, "--nowelcome");
         command.addAll(command);
     }
 }
