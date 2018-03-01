@@ -1,5 +1,8 @@
 package org.gatorgrader.config;
 
+import static org.gatorgrader.GatorGraderPlugin.F_SEP;
+import static org.gatorgrader.GatorGraderPlugin.GATORGRADER_HOME;
+
 import org.gatorgrader.Command;
 
 import java.util.Arrays;
@@ -15,7 +18,7 @@ public class GatorGraderCommand extends Command {
 
     static {
         pythonPath      = "python3";
-        gatorgraderPath = "gatorgrader/gatorgrader.py";
+        gatorgraderPath = GATORGRADER_HOME + F_SEP + "gatorgrader.py";
     }
 
     public GatorGraderCommand(String... command) {

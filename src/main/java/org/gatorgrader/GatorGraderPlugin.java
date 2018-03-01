@@ -1,13 +1,15 @@
 package org.gatorgrader;
 
+import org.gatorgrader.internal.Dependency;
+import org.gatorgrader.internal.DependencyManager;
+
 import org.gradle.api.Action;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -33,23 +35,8 @@ public class GatorGraderPlugin implements Plugin<Project> {
             OS = "unsupported";
         }
 
-        // Temporary gatorgrader home for manual installation
-        GATORGRADER_HOME = USER_HOME + F_SEP + ".gatorgrader";
-
-        // quick git pull installation
-        Command updateOrInstall = new Command().workingDir(USER_HOME);
-        if (Files.exists(Paths.get(GATORGRADER_HOME))) {
-            // gatorgrader repo exists (most likely)
-            updateOrInstall.with("git", "pull");
-        } else {
-            updateOrInstall.with("git", "clone", "https://github.com/gkapfham/gatorgrader.git", GATORGRADER_HOME);
-        }
-
-        // install gatorgrader, and block until complete (FIXME: this needs to be better)
-        updateOrInstall.run(true);
-        if (updateOrInstall.exitValue() != Command.SUCCESS) {
-            System.err.println("ERROR! updateOrInstall failed! Output:");
-            System.err.println(updateOrInstall.getOutput());
+        if (!DependencyManager.installOrUpdate(Dependency.GATORGRADER)) {
+            throw new RuntimeException("Failed to install gatorgrader!");
         }
     }
 
@@ -61,14 +48,17 @@ public class GatorGraderPlugin implements Plugin<Project> {
     public void apply(Project project) {
         Task grade = project.getTasks().create("grade", DefaultTask.class);
 
-        Iterable<Command> commands = compileGatorGraderCalls();
+        // TODO: locate config file
+        String configFileLocation = "config/gatorgrader.yml";
+        File configFile           = new File(configFileLocation);
+        GatorGraderConfig config  = new GatorGraderConfig(configFile);
 
-        for (Command cmd : commands) {
-            grade.doLast(new Action<Task>() {
-                public void execute(Task task) {
-                    cmd.execute(true);
-                }
-            });
+        for (Command cmd : config) {
+            // grade.doLast(new Action<Task>() {
+            //     public void execute(Task task) {
+            //         cmd.execute(true);
+            //     }
+            // });
         }
 
         // ensure dependencies are run sequentially if scheduled at the same time

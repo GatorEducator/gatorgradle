@@ -25,8 +25,13 @@ public class GatorGraderConfig implements Iterable<Command> {
     public GatorGraderConfig(File configFile) {
         this();
         // TODO: parse configFile to build gradingCommands
+        parseConfigFile(configFile);
+    }
+
+    private void parseConfigFile(File file) {
         for (int i = 0; i < 100; i++) {
-            this.with(new Command("echo").with("-e").with("" + i + "!").outputToSysOut(true));
+            with(new Command("echo").with("-e").with("" + i + "!").outputToSysOut(true));
+            with(new Command("sleep").with("0.5"));
         }
     }
 
