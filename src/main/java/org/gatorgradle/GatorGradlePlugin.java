@@ -35,9 +35,8 @@ public class GatorGradlePlugin implements Plugin<Project> {
             OS = "unsupported";
         }
 
-        if (!DependencyManager.installOrUpdate(Dependency.GATORGRADER)) {
-            throw new RuntimeException("Failed to install gatorgrader!");
-        }
+        // TODO: is this a sensible default for gg home?
+        GATORGRADER_HOME = USER_HOME + F_SEP + ".gatorgrader";
     }
 
     /**
@@ -53,7 +52,16 @@ public class GatorGradlePlugin implements Plugin<Project> {
         File configFile           = new File(configFileLocation);
         GatorGradleConfig config  = new GatorGradleConfig(configFile);
 
+        System.out.println(config);
+
+        grade.doFirst((task) -> {
+            if (!DependencyManager.installOrUpdate(Dependency.GATORGRADER)) {
+                throw new RuntimeException("Failed to install gatorgrader!");
+            }
+        });
+
         for (Command cmd : config) {
+            System.out.println(cmd);
             grade.doLast((task) -> cmd.run(true));
         }
 

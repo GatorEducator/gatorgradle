@@ -35,10 +35,11 @@ public class DependencyManager {
         }
 
         // Temporary gatorgrader home for manual installation
-        GATORGRADER_HOME = USER_HOME + F_SEP + ".gatorgrader";
+        GATORGRADER_HOME = USER_HOME + F_SEP + ".local" + F_SEP + "share"
+                           + "gatorgrader";
 
         // quick git pull installation
-        Command updateOrInstall = new Command().workingDir(USER_HOME);
+        Command updateOrInstall = new Command().workingDir(USER_HOME).outputToSysOut(false);
         if (Files.exists(Paths.get(GATORGRADER_HOME))) {
             // gatorgrader repo exists (most likely)
             updateOrInstall.with("git", "pull");
@@ -49,7 +50,7 @@ public class DependencyManager {
         // install gatorgrader, and block until complete (FIXME: this needs to be better)
         updateOrInstall.run(true);
         if (updateOrInstall.exitValue() != Command.SUCCESS) {
-            System.err.println("ERROR! updateOrInstall failed! Output:");
+            System.err.println("ERROR! GatorGrader management failed! Output:");
             System.err.println(updateOrInstall.getOutput());
             return false;
         } else {
