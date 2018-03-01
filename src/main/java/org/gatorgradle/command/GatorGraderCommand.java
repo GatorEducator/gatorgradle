@@ -10,7 +10,7 @@ import java.util.List;
  * GatorGraderCommand automatically adds the python and gatorgrader path to the beginning of the
  * command.
  */
-public class GatorGraderCommand extends Command {
+public class GatorGraderCommand extends BasicCommand {
     static String pythonPath;
     static String gatorgraderPath;
 

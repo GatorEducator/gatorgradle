@@ -1,8 +1,10 @@
 package org.gatorgradle;
 
 import org.gatorgradle.command.Command;
+import org.gatorgradle.config.GatorGradleConfig;
 import org.gatorgradle.internal.Dependency;
 import org.gatorgradle.internal.DependencyManager;
+import org.gatorgradle.task.GatorGradleTask;
 
 import org.gradle.api.Action;
 import org.gradle.api.DefaultTask;
@@ -17,6 +19,7 @@ import java.util.List;
 
 public class GatorGradlePlugin implements Plugin<Project> {
     public static String GATORGRADER_HOME;
+    public static String CONFIG_FILE_LOCATION;
     public static final String USER_HOME;
     public static final String F_SEP;
     public static final String OS;
@@ -38,7 +41,12 @@ public class GatorGradlePlugin implements Plugin<Project> {
 
         // TODO: is this a sensible default for gg home?
         GATORGRADER_HOME = USER_HOME + F_SEP + ".gatorgrader";
+
+        // TODO: is this a sensible default for config location?
+        CONFIG_FILE_LOCATION = "config/gatorgrader.yml";
     }
+
+    private static GatorGradleConfig config;
 
     /**
      * Applies the GatorGrader plugin to the given project.
@@ -46,34 +54,27 @@ public class GatorGradlePlugin implements Plugin<Project> {
      * @param project the project to apply GatorGrader to
      */
     public void apply(Project project) {
+        // set config file location, then generate config
+        // TODO: what should we do for config file location?
+        config = new GatorGradleConfig(new File(CONFIG_FILE_LOCATION));
+
+        // create gatorgradle 'grade' task
         GatorGradleTask grade = project.getTasks().create("grade", GatorGradleTask.class);
-        addDynamicTasks(grade);
+
+        System.out.println("applied");
 
         // ensure dependencies are run sequentially if scheduled at the same time
         // this is probably done elsewhere as well, but might as well be sure
         project.getTasks().getByName("build").mustRunAfter("clean");
+        project.getTasks().getByName("grade").mustRunAfter("build");
     }
 
-    private void addDynamicTasks(GatorGradleTask gradeTask) {
-        // TODO: locate config file
-        String configFileLocation = "config/gatorgrader.yml";
-        File configFile           = new File(configFileLocation);
-        GatorGradleConfig config  = new GatorGradleConfig(configFile);
-
-        System.out.println("Building grade task!");
-        System.out.println(config);
-
-        gradeTask.doFirst((task) -> {
-            System.out.println("test");
-            if (!DependencyManager.installOrUpdate(Dependency.GATORGRADER)) {
-                throw new RuntimeException("Failed to install gatorgrader!");
-            }
-        });
-
-        for (Command cmd : config) {
-            System.out.println(cmd);
-            gradeTask.doLast((task) -> cmd.run(true));
-        }
-        // return task;
+    /**
+     * Get the current GatorGradleConfig.
+     *
+     * @return the current configuration
+     */
+    public static GatorGradleConfig getConfig() {
+        return config;
     }
 }

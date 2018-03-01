@@ -6,6 +6,7 @@ apply plugin: 'maven'
 
 repositories {
 	mavenCentral()
+    mavenLocal()
 }
 
 dependencies {
@@ -14,7 +15,7 @@ dependencies {
 }
 
 task wrapper(type: Wrapper) {
-	gradleVersion = "4.1"
+	gradleVersion = "4.6"
 }
 
 // perform checkstyle checking with the "gradle check" command

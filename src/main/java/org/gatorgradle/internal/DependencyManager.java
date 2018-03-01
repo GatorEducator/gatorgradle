@@ -5,6 +5,7 @@ import static org.gatorgradle.GatorGradlePlugin.GATORGRADER_HOME;
 import static org.gatorgradle.GatorGradlePlugin.OS;
 import static org.gatorgradle.GatorGradlePlugin.USER_HOME;
 
+import org.gatorgradle.command.BasicCommand;
 import org.gatorgradle.command.Command;
 
 import java.io.File;
@@ -35,16 +36,17 @@ public class DependencyManager {
         }
 
         // Temporary gatorgrader home for manual installation
-        GATORGRADER_HOME = USER_HOME + F_SEP + ".local" + F_SEP + "share"
-                           + "gatorgrader";
+        GATORGRADER_HOME = USER_HOME + F_SEP + ".local" + F_SEP + "share" + F_SEP + "gatorgrader";
 
         // quick git pull installation
-        Command updateOrInstall = new Command().workingDir(USER_HOME).outputToSysOut(false);
+        BasicCommand updateOrInstall = new BasicCommand();
+        updateOrInstall.workingDir(GATORGRADER_HOME).outputToSysOut(false);
         if (Files.exists(Paths.get(GATORGRADER_HOME))) {
             // gatorgrader repo exists (most likely)
             updateOrInstall.with("git", "pull");
         } else {
-            updateOrInstall.with("git", "clone", "https://github.com/gkapfham/gatorgrader.git", GATORGRADER_HOME);
+            updateOrInstall.with(
+                "git", "clone", "https://github.com/gkapfham/gatorgrader.git", GATORGRADER_HOME);
         }
 
         // install gatorgrader, and block until complete (FIXME: this needs to be better)

@@ -1,5 +1,6 @@
-package org.gatorgradle;
+package org.gatorgradle.config;
 
+import org.gatorgradle.command.BasicCommand;
 import org.gatorgradle.command.Command;
 import org.gatorgradle.command.GatorGraderCommand;
 
@@ -8,6 +9,7 @@ import java.io.File;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.stream.Collectors;
 
 /**
  * GatorGradleConfig holds the configuration for this assignment.
@@ -32,9 +34,9 @@ public class GatorGradleConfig implements Iterable<Command> {
     }
 
     private void parseConfigFile(File file) {
-        for (int i = 0; i < 100; i++) {
-            with(new Command("echo").with("-e").with("" + i + "!").outputToSysOut(true));
-            with(new Command("sleep").with("0.5"));
+        for (int i = 0; i < 5000; i++) {
+            with(new BasicCommand("echo").with("-e").with("" + i + "!").outputToSysOut(true));
+            // with(new BasicCommand("sleep").with("0.5"));
         }
     }
 
@@ -43,23 +45,12 @@ public class GatorGradleConfig implements Iterable<Command> {
         return this;
     }
 
-    public Iterator<Command> iterator() {
-        return new ConfigIterator();
+    public String toString() {
+        return String.join(" -> ",
+            gradingCommands.stream().map(com -> com.description()).collect(Collectors.toList()));
     }
 
-    class ConfigIterator implements Iterator<Command> {
-        int index;
-
-        public ConfigIterator() {
-            index = 0;
-        }
-
-        public Command next() {
-            return gradingCommands.get(index++);
-        }
-
-        public boolean hasNext() {
-            return index >= gradingCommands.size();
-        }
+    public Iterator<Command> iterator() {
+        return gradingCommands.iterator();
     }
 }
