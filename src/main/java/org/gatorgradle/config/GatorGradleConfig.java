@@ -1,4 +1,4 @@
-package org.gatorgrader;
+package org.gatorgradle;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -7,22 +7,22 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
- * GatorGraderConfig holds the configuration for this assignment.
+ * GatorGradleConfig holds the configuration for this assignment.
  * TODO: make this configurable via DSL blocks in build.gradle
  */
-public class GatorGraderConfig implements Iterable<Command> {
+public class GatorGradleConfig implements Iterable<Command> {
     ArrayList<Command> gradingCommands;
 
-    public GatorGraderConfig() {
+    public GatorGradleConfig() {
         gradingCommands = new ArrayList<>();
     }
 
     /**
-     * Create a GatorGraderConfig based on the provided file.
+     * Create a GatorGradleConfig based on the provided file.
      *
      * @param configFile the file to base this configuration on
      */
-    public GatorGraderConfig(File configFile) {
+    public GatorGradleConfig(File configFile) {
         this();
         // TODO: parse configFile to build gradingCommands
         parseConfigFile(configFile);
@@ -35,7 +35,7 @@ public class GatorGraderConfig implements Iterable<Command> {
         }
     }
 
-    public GatorGraderConfig with(Command com) {
+    public GatorGradleConfig with(Command com) {
         gradingCommands.add(com);
         return this;
     }

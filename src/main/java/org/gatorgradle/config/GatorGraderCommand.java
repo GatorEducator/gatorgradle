@@ -1,9 +1,9 @@
-package org.gatorgrader.config;
+package org.gatorgradle.config;
 
-import static org.gatorgrader.GatorGraderPlugin.F_SEP;
-import static org.gatorgrader.GatorGraderPlugin.GATORGRADER_HOME;
+import static org.gatorgradle.GatorGradlePlugin.F_SEP;
+import static org.gatorgradle.GatorGradlePlugin.GATORGRADER_HOME;
 
-import org.gatorgrader.Command;
+import org.gatorgradle.Command;
 
 import java.util.Arrays;
 import java.util.List;

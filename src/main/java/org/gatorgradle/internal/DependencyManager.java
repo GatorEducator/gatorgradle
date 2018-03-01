@@ -1,10 +1,11 @@
-package org.gatorgrader.internal;
+package org.gatorgradle.internal;
 
-import static org.gatorgrader.GatorGraderPlugin.F_SEP;
-import static org.gatorgrader.GatorGraderPlugin.GATORGRADER_HOME;
-import static org.gatorgrader.GatorGraderPlugin.USER_HOME;
+import static org.gatorgradle.GatorGradlePlugin.F_SEP;
+import static org.gatorgradle.GatorGradlePlugin.GATORGRADER_HOME;
+import static org.gatorgradle.GatorGradlePlugin.OS;
+import static org.gatorgradle.GatorGradlePlugin.USER_HOME;
 
-import org.gatorgrader.Command;
+import org.gatorgradle.Command;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -28,6 +29,11 @@ public class DependencyManager {
     }
 
     private static boolean doGatorGrader() {
+        if (!OS.equals("linux")) {
+            System.err.println("Automated installation unsupported for non-Linux OSes");
+            return false;
+        }
+
         // Temporary gatorgrader home for manual installation
         GATORGRADER_HOME = USER_HOME + F_SEP + ".gatorgrader";
 

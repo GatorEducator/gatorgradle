@@ -1,7 +1,7 @@
-package org.gatorgrader;
+package org.gatorgradle;
 
-import org.gatorgrader.internal.Dependency;
-import org.gatorgrader.internal.DependencyManager;
+import org.gatorgradle.internal.Dependency;
+import org.gatorgradle.internal.DependencyManager;
 
 import org.gradle.api.Action;
 import org.gradle.api.DefaultTask;
@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class GatorGraderPlugin implements Plugin<Project> {
+public class GatorGradlePlugin implements Plugin<Project> {
     public static String GATORGRADER_HOME;
     public static final String USER_HOME;
     public static final String F_SEP;
@@ -51,14 +51,10 @@ public class GatorGraderPlugin implements Plugin<Project> {
         // TODO: locate config file
         String configFileLocation = "config/gatorgrader.yml";
         File configFile           = new File(configFileLocation);
-        GatorGraderConfig config  = new GatorGraderConfig(configFile);
+        GatorGradleConfig config  = new GatorGradleConfig(configFile);
 
         for (Command cmd : config) {
-            // grade.doLast(new Action<Task>() {
-            //     public void execute(Task task) {
-            //         cmd.execute(true);
-            //     }
-            // });
+            grade.doLast((task) -> cmd.run(true));
         }
 
         // ensure dependencies are run sequentially if scheduled at the same time

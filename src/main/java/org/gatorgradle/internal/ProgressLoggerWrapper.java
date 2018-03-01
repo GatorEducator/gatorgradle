@@ -16,7 +16,7 @@
 //
 // MODIFIED FROM ORIGINAL BY Saejin Mahlau-Heinert
 
-package org.gatorgrader.internal;
+package org.gatorgradle.internal;
 
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
