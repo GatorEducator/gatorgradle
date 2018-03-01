@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Command implements Runnable {
+    public static final int SUCCESS = 0;
+
     private List<String> command;
     private boolean outputToSysOut = true;
     private String workingDir      = ".";
@@ -104,6 +106,10 @@ public class Command implements Runnable {
             thread.start();
         }
         return this;
+    }
+
+    public Command run(boolean block) {
+        return execute(block);
     }
 
     /**
