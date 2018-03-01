@@ -1,5 +1,8 @@
 package org.gatorgradle;
 
+import org.gatorgradle.command.Command;
+import org.gatorgradle.command.GatorGraderCommand;
+
 import java.io.BufferedReader;
 import java.io.File;
 

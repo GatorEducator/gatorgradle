@@ -5,7 +5,7 @@ import static org.gatorgradle.GatorGradlePlugin.GATORGRADER_HOME;
 import static org.gatorgradle.GatorGradlePlugin.OS;
 import static org.gatorgradle.GatorGradlePlugin.USER_HOME;
 
-import org.gatorgradle.Command;
+import org.gatorgradle.command.Command;
 
 import java.io.File;
 import java.nio.file.Files;

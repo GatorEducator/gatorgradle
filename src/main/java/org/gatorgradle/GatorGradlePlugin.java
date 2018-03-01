@@ -1,5 +1,6 @@
 package org.gatorgradle;
 
+import org.gatorgradle.command.Command;
 import org.gatorgradle.internal.Dependency;
 import org.gatorgradle.internal.DependencyManager;
 
@@ -55,6 +56,7 @@ public class GatorGradlePlugin implements Plugin<Project> {
         System.out.println(config);
 
         grade.doFirst((task) -> {
+            System.out.println("test");
             if (!DependencyManager.installOrUpdate(Dependency.GATORGRADER)) {
                 throw new RuntimeException("Failed to install gatorgrader!");
             }

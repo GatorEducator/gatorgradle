@@ -1,4 +1,4 @@
-package org.gatorgradle;
+package org.gatorgradle.command;
 
 import java.io.BufferedReader;
 import java.io.File;

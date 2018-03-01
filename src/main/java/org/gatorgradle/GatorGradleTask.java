@@ -1,5 +1,8 @@
 package org.gatorgradle;
 
+import org.gatorgradle.command.Command;
+import org.gatorgradle.command.GatorGraderCommand;
+
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 
@@ -72,7 +75,7 @@ public class GatorGradleTask extends DefaultTask {
      */
     @TaskAction
     public void grade() {
-        Command com = new Command("python3").with("gatorgrader/gatorgrader.py");
+        Command com = new GatorGraderCommand();
         if (!showWelcomeMessage) {
             com.with("--nowelcome");
         }
