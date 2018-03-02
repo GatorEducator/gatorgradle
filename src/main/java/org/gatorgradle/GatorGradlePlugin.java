@@ -17,6 +17,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * GatorGradlePlugin applies the plugin to a project, registers
+ * the grade task, and sets up some sensible defaults.
+ * TODO: allow DSL configuration block to specify
+ *        CONFIG_FILE_LOCATION and GATORGRADER_HOME.
+ */
 public class GatorGradlePlugin implements Plugin<Project> {
     public static String GATORGRADER_HOME;
     public static String CONFIG_FILE_LOCATION;
@@ -46,8 +52,6 @@ public class GatorGradlePlugin implements Plugin<Project> {
         CONFIG_FILE_LOCATION = "config/gatorgrader.yml";
     }
 
-    private static GatorGradleConfig config;
-
     /**
      * Applies the GatorGrader plugin to the given project.
      *
@@ -56,25 +60,15 @@ public class GatorGradlePlugin implements Plugin<Project> {
     public void apply(Project project) {
         // set config file location, then generate config
         // TODO: what should we do for config file location?
-        config = new GatorGradleConfig(new File(CONFIG_FILE_LOCATION));
+        GatorGradleConfig config = new GatorGradleConfig(new File(CONFIG_FILE_LOCATION));
 
         // create gatorgradle 'grade' task
-        GatorGradleTask grade = project.getTasks().create("grade", GatorGradleTask.class);
-
-        System.out.println("applied");
+        GatorGradleTask grade = project.getTasks().create(
+            "grade", GatorGradleTask.class, task -> task.setConfig(config));
 
         // ensure dependencies are run sequentially if scheduled at the same time
         // this is probably done elsewhere as well, but might as well be sure
         project.getTasks().getByName("build").mustRunAfter("clean");
         project.getTasks().getByName("grade").mustRunAfter("build");
-    }
-
-    /**
-     * Get the current GatorGradleConfig.
-     *
-     * @return the current configuration
-     */
-    public static GatorGradleConfig getConfig() {
-        return config;
     }
 }

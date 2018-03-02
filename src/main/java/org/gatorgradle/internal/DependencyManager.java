@@ -40,7 +40,7 @@ public class DependencyManager {
 
         // quick git pull installation
         BasicCommand updateOrInstall = new BasicCommand();
-        updateOrInstall.workingDir(GATORGRADER_HOME).outputToSysOut(false);
+        updateOrInstall.outputToSysOut(false).setWorkingDir(new File(GATORGRADER_HOME));
         if (Files.exists(Paths.get(GATORGRADER_HOME))) {
             // gatorgrader repo exists (most likely)
             updateOrInstall.with("git", "pull");

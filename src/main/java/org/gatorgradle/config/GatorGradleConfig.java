@@ -6,16 +6,23 @@ import org.gatorgradle.command.GatorGraderCommand;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * GatorGradleConfig holds the configuration for this assignment.
  * TODO: make this configurable via DSL blocks in build.gradle
  */
 public class GatorGradleConfig implements Iterable<Command> {
+    private static final Pattern commandPattern = Pattern.compile("([^\"]\\S*|\".+?\")\\s*");
+
     ArrayList<Command> gradingCommands;
 
     public GatorGradleConfig() {
@@ -33,21 +40,40 @@ public class GatorGradleConfig implements Iterable<Command> {
         parseConfigFile(configFile);
     }
 
+    /**
+     * Utility method to convert a line of text to a Command.
+     *
+     * @param  line a line to parse
+     * @return      a command
+     */
+    private static Command lineToCommand(String line) {
+        BasicCommand cmd = new BasicCommand();
+        Matcher mtc      = commandPattern.matcher(line);
+        while (mtc.find()) {
+            cmd.with(mtc.group(1).replace("\"", ""));
+        }
+        return cmd.outputToSysOut(true);
+    }
+
     private void parseConfigFile(File file) {
-        for (int i = 0; i < 5000; i++) {
-            with(new BasicCommand("echo").with("-e").with("" + i + "!").outputToSysOut(true));
-            // with(new BasicCommand("sleep").with("0.5"));
+        try (Stream<String> lines = Files.lines(file.toPath())) {
+            lines.filter(line -> line.trim().length() > 0)
+                .map(GatorGradleConfig::lineToCommand)
+                .forEach((this)::with);
+        } catch (IOException ex) {
+            // System.err.println("Failed to read in config file!");
+            throw new RuntimeException("Failed to read config file " + file);
         }
     }
 
-    public GatorGradleConfig with(Command com) {
-        gradingCommands.add(com);
+    public GatorGradleConfig with(Command cmd) {
+        gradingCommands.add(cmd);
         return this;
     }
 
     public String toString() {
         return String.join(" -> ",
-            gradingCommands.stream().map(com -> com.description()).collect(Collectors.toList()));
+            gradingCommands.stream().map(cmd -> cmd.getDescription()).collect(Collectors.toList()));
     }
 
     public Iterator<Command> iterator() {

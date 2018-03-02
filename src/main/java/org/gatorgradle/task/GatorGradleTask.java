@@ -10,6 +10,8 @@ import org.gatorgradle.internal.Dependency;
 import org.gatorgradle.internal.DependencyManager;
 
 import org.gradle.api.DefaultTask;
+import org.gradle.api.tasks.Input;
+import org.gradle.api.tasks.InputDirectory;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.workers.IsolationMode;
 import org.gradle.workers.WorkerExecutor;
@@ -22,11 +24,32 @@ import javax.inject.Inject;
 
 public class GatorGradleTask extends DefaultTask {
     // The executor to use to execute the grading
-    final WorkerExecutor executor;
+    private final WorkerExecutor executor;
+
+    private GatorGradleConfig config;
+    private File workingDir;
 
     @Inject
     public GatorGradleTask(WorkerExecutor executor) {
         this.executor = executor;
+    }
+
+    public void setConfig(GatorGradleConfig config) {
+        this.config = config;
+    }
+
+    @Input
+    public GatorGradleConfig getConfig() {
+        return config;
+    }
+
+    public void setWorkingDir(File dir) {
+        this.workingDir = dir;
+    }
+
+    @InputDirectory
+    public File getWorkingDir() {
+        return workingDir;
     }
 
     /**
@@ -39,16 +62,20 @@ public class GatorGradleTask extends DefaultTask {
             throw new RuntimeException("Failed to install gatorgrader!");
         }
 
-        System.out.println("getting configuration");
-
-        // get commands to run with GatorGradleConfig
-        GatorGradleConfig config = GatorGradlePlugin.getConfig();
+        // ensure we have a configuration
+        if (config == null) {
+            throw new RuntimeException(
+                "GatorGradle grade task's configuration was not specified correctly!");
+        }
 
         // submit commands to executor
         for (Command cmd : config) {
             executor.submit(CommandExecutor.class, (conf) -> {
+                if (cmd.getWorkingDir() == null) {
+                    cmd.setWorkingDir(workingDir);
+                }
                 conf.setIsolationMode(IsolationMode.NONE);
-                conf.setDisplayName(cmd.description());
+                conf.setDisplayName(cmd.getDescription());
                 conf.setParams(cmd);
             });
         }

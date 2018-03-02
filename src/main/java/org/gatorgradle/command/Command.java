@@ -1,5 +1,6 @@
 package org.gatorgradle.command;
 
+import java.io.File;
 import java.io.Serializable;
 
 public interface Command extends Runnable, Serializable {
@@ -11,5 +12,9 @@ public interface Command extends Runnable, Serializable {
 
     public abstract Command waitFor();
 
-    public abstract String description();
+    public abstract String getDescription();
+
+    public abstract File getWorkingDir();
+
+    public abstract void setWorkingDir(File dir);
 }

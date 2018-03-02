@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 public class BasicCommand implements Command {
     private List<String> command;
     private boolean outputToSysOut = true;
-    private String workingDir      = ".";
+    private File workingDir;
 
     private StringBuilder output = new StringBuilder();
     private Thread thread;
@@ -44,17 +44,24 @@ public class BasicCommand implements Command {
         return this;
     }
 
-    public BasicCommand workingDir(String dir) {
+    public File getWorkingDir() {
+        return workingDir;
+    }
+
+    public void setWorkingDir(File dir) {
         this.workingDir = dir;
-        return this;
     }
 
     public String getOutput() {
         return output.toString();
     }
 
-    public String description() {
+    public String getDescription() {
         return String.join(" ", command);
+    }
+
+    public int elements() {
+        return command.size();
     }
 
     /**
@@ -121,7 +128,9 @@ public class BasicCommand implements Command {
         }
 
         ProcessBuilder pb = new ProcessBuilder(command);
-        pb.directory(new File(workingDir));
+        if (workingDir != null) {
+            pb.directory(workingDir);
+        }
         pb.redirectErrorStream(true);
         try {
             Process proc = pb.start();
