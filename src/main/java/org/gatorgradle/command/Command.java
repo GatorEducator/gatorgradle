@@ -17,4 +17,6 @@ public interface Command extends Runnable, Serializable {
     public abstract File getWorkingDir();
 
     public abstract void setWorkingDir(File dir);
+
+    public abstract void setCallback(Runnable callback);
 }

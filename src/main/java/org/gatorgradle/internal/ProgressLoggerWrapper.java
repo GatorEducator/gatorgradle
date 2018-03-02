@@ -21,6 +21,7 @@ package org.gatorgradle.internal;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
 
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -32,14 +33,14 @@ import java.lang.reflect.Method;
  * @author Michel Kraemer
  * @author Saejin Mahlau-Heinert
  */
-public class ProgressLoggerWrapper {
+public class ProgressLoggerWrapper implements Serializable {
     private Logger logger;
     private Object progressLogger;
 
     /**
      * Create a progress logger wrapper.
      * @param project the current Gradle project
-     * @param src the URL to the file to be downloaded
+     * @param description the description for the logging
      * @throws ClassNotFoundException if one of Gradle's internal classes
      *      could not be found
      * @throws NoSuchMethodException if the interface of one of Gradle's
@@ -49,7 +50,7 @@ public class ProgressLoggerWrapper {
      * @throws IllegalAccessException if a method from one of Gradle's
      *      internal classes is not accessible
      */
-    public ProgressLoggerWrapper(Project project, String src) {
+    public ProgressLoggerWrapper(Project project, String description) {
         logger = project.getLogger();
 
         // we are about to access an internal class. Use reflection here to provide
@@ -76,11 +77,9 @@ public class ProgressLoggerWrapper {
             System.err.println("ProgressLoggerWrapper Error: " + ex);
         }
 
-        // configure progress logger
-        String desc = "Download " + src;
         try {
-            invoke(progressLogger, "setDescription", desc);
-            invoke(progressLogger, "setLoggingHeader", desc);
+            invoke(progressLogger, "setDescription", description);
+            invoke(progressLogger, "setLoggingHeader", description);
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
             System.err.println("ProgressLoggerWrapper Error: " + ex);
         }
@@ -127,7 +126,7 @@ public class ProgressLoggerWrapper {
     }
 
     /**
-     * Start on operation.
+     * Start an operation.
      */
     public void started() {
         invokeIgnoreExceptions(progressLogger, "started");

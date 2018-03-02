@@ -47,8 +47,14 @@ public class GatorGradleConfig implements Iterable<Command> {
      * @return      a command
      */
     private static Command lineToCommand(String line) {
-        BasicCommand cmd = new BasicCommand();
-        Matcher mtc      = commandPattern.matcher(line);
+        BasicCommand cmd;
+        if (line.toLowerCase().startsWith("gg: ")) {
+            line = line.substring(3);
+            cmd  = new GatorGraderCommand();
+        } else {
+            cmd = new BasicCommand();
+        }
+        Matcher mtc = commandPattern.matcher(line);
         while (mtc.find()) {
             cmd.with(mtc.group(1).replace("\"", ""));
         }
@@ -62,7 +68,7 @@ public class GatorGradleConfig implements Iterable<Command> {
                 .forEach((this)::with);
         } catch (IOException ex) {
             // System.err.println("Failed to read in config file!");
-            throw new RuntimeException("Failed to read config file " + file);
+            throw new RuntimeException("Failed to read config file \"" + file + "\"");
         }
     }
 
@@ -78,5 +84,9 @@ public class GatorGradleConfig implements Iterable<Command> {
 
     public Iterator<Command> iterator() {
         return gradingCommands.iterator();
+    }
+
+    public int size() {
+        return gradingCommands.size();
     }
 }

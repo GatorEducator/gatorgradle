@@ -16,6 +16,7 @@ public class BasicCommand implements Command {
 
     private StringBuilder output = new StringBuilder();
     private Thread thread;
+    private Runnable callback;
 
     private boolean fin = false;
     private int exitVal = 0;
@@ -50,6 +51,10 @@ public class BasicCommand implements Command {
 
     public void setWorkingDir(File dir) {
         this.workingDir = dir;
+    }
+
+    public void setCallback(Runnable callback) {
+        this.callback = callback;
     }
 
     public String getOutput() {
@@ -173,6 +178,9 @@ public class BasicCommand implements Command {
             }
         } finally {
             fin = true;
+            if (callback != null) {
+                callback.run();
+            }
         }
     }
 

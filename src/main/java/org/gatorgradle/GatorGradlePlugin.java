@@ -47,9 +47,6 @@ public class GatorGradlePlugin implements Plugin<Project> {
 
         // TODO: is this a sensible default for gg home?
         GATORGRADER_HOME = USER_HOME + F_SEP + ".gatorgrader";
-
-        // TODO: is this a sensible default for config location?
-        CONFIG_FILE_LOCATION = "config/gatorgrader.yml";
     }
 
     /**
@@ -60,11 +57,16 @@ public class GatorGradlePlugin implements Plugin<Project> {
     public void apply(Project project) {
         // set config file location, then generate config
         // TODO: what should we do for config file location?
+        CONFIG_FILE_LOCATION = project.file("config/gatorgrader.yml").getAbsolutePath();
+
         GatorGradleConfig config = new GatorGradleConfig(new File(CONFIG_FILE_LOCATION));
 
         // create gatorgradle 'grade' task
-        GatorGradleTask grade = project.getTasks().create(
-            "grade", GatorGradleTask.class, task -> task.setConfig(config));
+        GatorGradleTask grade = project.getTasks().create("grade", GatorGradleTask.class, task -> {
+            // default grade task uses config from above and project dir as grade
+            task.setConfig(config);
+            task.setWorkingDir(project.getProjectDir());
+        });
 
         // ensure dependencies are run sequentially if scheduled at the same time
         // this is probably done elsewhere as well, but might as well be sure
