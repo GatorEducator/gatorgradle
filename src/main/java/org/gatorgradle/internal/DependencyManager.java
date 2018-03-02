@@ -35,9 +35,6 @@ public class DependencyManager {
             return false;
         }
 
-        // Temporary gatorgrader home for manual installation
-        GATORGRADER_HOME = USER_HOME + F_SEP + ".local" + F_SEP + "share" + F_SEP + "gatorgrader";
-
         // quick git pull installation
         BasicCommand updateOrInstall = new BasicCommand();
         updateOrInstall.outputToSysOut(false).setWorkingDir(new File(GATORGRADER_HOME));

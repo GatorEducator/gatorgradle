@@ -1,5 +1,6 @@
 package org.gatorgradle.config;
 
+import org.gatorgradle.GatorGradlePlugin;
 import org.gatorgradle.command.BasicCommand;
 import org.gatorgradle.command.Command;
 import org.gatorgradle.command.GatorGraderCommand;
@@ -47,9 +48,12 @@ public class GatorGradleConfig implements Iterable<Command> {
      * @return      a command
      */
     private static Command lineToCommand(String line) {
+        // TODO: this needs major work
+        // TODO: parse config file lines, perhaps in a different way than this
+
         BasicCommand cmd;
         if (line.toLowerCase().startsWith("gg: ")) {
-            line = line.substring(3);
+            line = line.substring(4);
             cmd  = new GatorGraderCommand();
         } else {
             cmd = new BasicCommand();
@@ -72,6 +76,12 @@ public class GatorGradleConfig implements Iterable<Command> {
         }
     }
 
+    /**
+     * Add a command to this config.
+     *
+     * @param  cmd the command to add
+     * @return     the current config after adding
+     */
     public GatorGradleConfig with(Command cmd) {
         gradingCommands.add(cmd);
         return this;

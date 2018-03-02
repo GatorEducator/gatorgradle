@@ -62,7 +62,7 @@ public class BasicCommand implements Command {
     }
 
     public String getDescription() {
-        return String.join(" ", command);
+        return "\'" + String.join("\' \'", command) + "\'";
     }
 
     public int elements() {

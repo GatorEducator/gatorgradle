@@ -11,6 +11,7 @@ import org.gradle.api.DefaultTask;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
+import org.gradle.api.logging.Logger;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -30,6 +31,8 @@ public class GatorGradlePlugin implements Plugin<Project> {
     public static final String F_SEP;
     public static final String OS;
 
+    public static Logger logger;
+
     static {
         F_SEP     = System.getProperty("file.separator");
         USER_HOME = System.getProperty("user.home");
@@ -45,8 +48,13 @@ public class GatorGradlePlugin implements Plugin<Project> {
             OS = "unsupported";
         }
 
-        // TODO: is this a sensible default for gg home?
-        GATORGRADER_HOME = USER_HOME + F_SEP + ".gatorgrader";
+        // TODO: is this a sensible default for gg home? - probably only on linux
+        if (OS.equals("linux")) {
+            GATORGRADER_HOME =
+                USER_HOME + F_SEP + ".local" + F_SEP + "share" + F_SEP + "gatorgrader";
+        } else {
+            GATORGRADER_HOME = USER_HOME + F_SEP + ".gatorgrader";
+        }
     }
 
     /**
@@ -55,6 +63,7 @@ public class GatorGradlePlugin implements Plugin<Project> {
      * @param project the project to apply GatorGrader to
      */
     public void apply(Project project) {
+        logger = project.getLogger();
         // set config file location, then generate config
         // TODO: what should we do for config file location?
         CONFIG_FILE_LOCATION = project.file("config/gatorgrader.yml").getAbsolutePath();
