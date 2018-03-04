@@ -3,6 +3,7 @@ package org.gatorgradle.task;
 import static org.gatorgradle.GatorGradlePlugin.CONFIG_FILE_LOCATION;
 
 import org.gatorgradle.GatorGradlePlugin;
+import org.gatorgradle.command.BasicCommand;
 import org.gatorgradle.command.Command;
 import org.gatorgradle.command.GatorGraderCommand;
 import org.gatorgradle.config.GatorGradleConfig;
@@ -121,6 +122,14 @@ public class GatorGradleTask extends DefaultTask {
 
         // make sure tasks have ended
         executor.await();
+
+        for (Command cmd : config) {
+            System.out.println("COMMAND " + cmd.getDescription());
+            System.out.println("EXIT VALUE: " + cmd.exitValue());
+            if (cmd instanceof BasicCommand) {
+                System.out.println("OUTPUT: " + ((BasicCommand) cmd).getOutput());
+            }
+        }
 
         // complete task submission
         progLog.completed();

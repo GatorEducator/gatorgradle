@@ -49,7 +49,7 @@ public class GatorGradleConfig implements Iterable<Command> {
      */
     private static Command lineToCommand(String line) {
         // TODO: this needs major work
-        // TODO: parse config file lines, perhaps in a different way than this
+        // TODO: parse config file lines, probably in a different way than this
 
         BasicCommand cmd;
         if (line.toLowerCase().startsWith("gg: ")) {
