@@ -5,7 +5,18 @@ language: Java
 # install mdl for checking Markdown
 before_install:
   - gem install mdl
-  - jdk_switcher use oraclejdk8
+
+
+# ensure the use of the latest version of gradle - much faster to download just the bin
+# instead of using a ppa -- travis probably caches this gradle zip folder somewhere.
+before_script:
+  - wget https://services.gradle.org/distributions/gradle-4.6-bin.zip
+  - unzip -d $HOME gradle-4.6-bin.zip
+  # probably don't need this but just to be sure
+  - rm -rf gradle-4.6-bin.zip
+  # add gradle bin to path at the beginning to ensure it overwrites old gradle
+  - export PATH="$HOME/gradle-4.6/bin:$PATH"
+
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
