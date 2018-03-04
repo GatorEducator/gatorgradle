@@ -18,15 +18,18 @@ before_script:
   - export PATH="$HOME/gradle-4.6/bin:$PATH"
 
 
-#before_cache:
-#  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-#  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
-#cache:
-#  directories:
-#    - $HOME/.gradle/caches
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+cache:
+  directories:
+    - $HOME/.gradle/caches/4.6
+    - $HOME/.gradle/caches/jars-3
+    - $HOME/.gradle/caches/modules-2
 
 # need to run unit tests
 script:
+  - ls $HOME/.gradle
   # java checks
   - gradle clean
   - gradle build

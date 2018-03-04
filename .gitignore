@@ -14,4 +14,4 @@ gradle-app.setting
 build
 *.sw[op]
 *.tmp
-
+.python-version
