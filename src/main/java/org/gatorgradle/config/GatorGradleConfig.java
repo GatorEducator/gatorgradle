@@ -67,7 +67,7 @@ public class GatorGradleConfig implements Iterable<Command> {
 
     private void parseConfigFile(File file) {
         try (Stream<String> lines = Files.lines(file.toPath())) {
-            lines.filter(line -> line.trim().length() > 0)
+            lines.filter(line -> line.trim().length() > 0 && !line.startsWith("#"))
                 .map(GatorGradleConfig::lineToCommand)
                 .forEach((this)::with);
         } catch (IOException ex) {
