@@ -62,7 +62,7 @@ public class GatorGradleConfig implements Iterable<Command> {
         while (mtc.find()) {
             cmd.with(mtc.group(1).replace("\"", ""));
         }
-        return cmd.outputToSysOut(true);
+        return cmd.outputToSysOut(false);
     }
 
     private void parseConfigFile(File file) {

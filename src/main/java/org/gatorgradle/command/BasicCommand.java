@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class BasicCommand implements Command {
@@ -16,7 +17,7 @@ public class BasicCommand implements Command {
 
     private StringBuilder output = new StringBuilder();
     private Thread thread;
-    private Runnable callback;
+    private Consumer<Command> callback;
 
     private boolean fin = false;
     private int exitVal = 0;
@@ -53,7 +54,7 @@ public class BasicCommand implements Command {
         this.workingDir = dir;
     }
 
-    public void setCallback(Runnable callback) {
+    public void setCallback(Consumer<Command> callback) {
         this.callback = callback;
     }
 
@@ -179,7 +180,7 @@ public class BasicCommand implements Command {
         } finally {
             fin = true;
             if (callback != null) {
-                callback.run();
+                callback.accept(this);
             }
         }
     }

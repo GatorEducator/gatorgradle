@@ -7,6 +7,7 @@ import org.gatorgradle.command.BasicCommand;
 import org.gatorgradle.command.Command;
 import org.gatorgradle.command.GatorGraderCommand;
 import org.gatorgradle.config.GatorGradleConfig;
+import org.gatorgradle.display.CommandOutputSummary;
 import org.gatorgradle.internal.Dependency;
 import org.gatorgradle.internal.DependencyManager;
 import org.gatorgradle.internal.ProgressLoggerWrapper;
@@ -24,8 +25,11 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import javax.inject.Inject;
 
@@ -61,12 +65,13 @@ public class GatorGradleTask extends DefaultTask {
 
     // because of Java serialization limitations, along with
     // how gradle implements logging, these must be static
-    private static int numTasksCompleted;
     private static int totalTasks;
     private static int percentComplete;
+    private static List<Command> completedTasks;
 
-    public static synchronized void completedTask() {
-        numTasksCompleted += 1;
+    public static synchronized void completedTask(Command complete) {
+        completedTasks.add(complete);
+        // System.out.println("FINISHED " + complete.getDescription());
     }
 
     /**
@@ -90,13 +95,13 @@ public class GatorGradleTask extends DefaultTask {
 
         // start task submission
         progLog.started();
-        totalTasks        = config.size();
-        numTasksCompleted = 0;
-        percentComplete   = 0;
+        totalTasks      = config.size();
+        completedTasks  = new ArrayList<>(totalTasks);
+        percentComplete = 0;
         // submit commands to executor
         for (Command cmd : config) {
             // configure command
-            cmd.setCallback((Runnable & Serializable) GatorGradleTask::completedTask);
+            cmd.setCallback((Consumer<Command> & Serializable) GatorGradleTask::completedTask);
             if (cmd.getWorkingDir() == null) {
                 cmd.setWorkingDir(workingDir);
             }
@@ -109,9 +114,9 @@ public class GatorGradleTask extends DefaultTask {
             });
         }
 
-        while (totalTasks > numTasksCompleted) {
-            percentComplete = (numTasksCompleted * 100) / totalTasks;
-            progLog.progress("Finished " + (numTasksCompleted) + " / " + totalTasks
+        while (percentComplete < 100) {
+            percentComplete = (completedTasks.size() * 100) / totalTasks;
+            progLog.progress("Finished " + (completedTasks.size()) + " / " + totalTasks
                              + " checks  --  " + percentComplete + "% complete!");
             try {
                 Thread.sleep(100);
@@ -123,13 +128,7 @@ public class GatorGradleTask extends DefaultTask {
         // make sure tasks have ended
         executor.await();
 
-        for (Command cmd : config) {
-            System.out.println("COMMAND " + cmd.getDescription());
-            System.out.println("EXIT VALUE: " + cmd.exitValue());
-            if (cmd instanceof BasicCommand) {
-                System.out.println("OUTPUT: " + ((BasicCommand) cmd).getOutput());
-            }
-        }
+        CommandOutputSummary outSum = new CommandOutputSummary(completedTasks, this.getProject());
 
         // complete task submission
         progLog.completed();

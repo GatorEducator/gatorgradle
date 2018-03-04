@@ -2,6 +2,7 @@ package org.gatorgradle.command;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.function.Consumer;
 
 public interface Command extends Runnable, Serializable {
     public static final int SUCCESS = 0;
@@ -18,5 +19,5 @@ public interface Command extends Runnable, Serializable {
 
     public abstract void setWorkingDir(File dir);
 
-    public abstract void setCallback(Runnable callback);
+    public abstract void setCallback(Consumer<Command> callback);
 }
