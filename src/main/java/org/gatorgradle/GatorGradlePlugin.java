@@ -1,22 +1,13 @@
 package org.gatorgradle;
 
-import org.gatorgradle.command.Command;
 import org.gatorgradle.config.GatorGradleConfig;
-import org.gatorgradle.internal.Dependency;
-import org.gatorgradle.internal.DependencyManager;
 import org.gatorgradle.task.GatorGradleTask;
 
-import org.gradle.api.Action;
-import org.gradle.api.DefaultTask;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-import org.gradle.api.Task;
 import org.gradle.api.logging.Logger;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * GatorGradlePlugin applies the plugin to a project, registers
@@ -25,8 +16,8 @@ import java.util.List;
  *        CONFIG_FILE_LOCATION and GATORGRADER_HOME.
  */
 public class GatorGradlePlugin implements Plugin<Project> {
-    public static String GATORGRADER_HOME;
-    public static String CONFIG_FILE_LOCATION;
+    public static final String GATORGRADER_HOME;
+    public static final String CONFIG_FILE_LOCATION;
     public static final String USER_HOME;
     public static final String F_SEP;
     public static final String OS;
@@ -55,6 +46,8 @@ public class GatorGradlePlugin implements Plugin<Project> {
         } else {
             GATORGRADER_HOME = USER_HOME + F_SEP + ".gatorgrader";
         }
+
+        CONFIG_FILE_LOCATION = "config/gatorgrader.yml";
     }
 
     /**
@@ -66,9 +59,9 @@ public class GatorGradlePlugin implements Plugin<Project> {
         logger = project.getLogger();
         // set config file location, then generate config
         // TODO: what should we do for config file location?
-        CONFIG_FILE_LOCATION = project.file("config/gatorgrader.yml").getAbsolutePath();
+        File conFile = project.file(CONFIG_FILE_LOCATION);
 
-        GatorGradleConfig config = new GatorGradleConfig(new File(CONFIG_FILE_LOCATION));
+        GatorGradleConfig config = new GatorGradleConfig(conFile);
 
         // create gatorgradle 'grade' task
         GatorGradleTask grade = project.getTasks().create("grade", GatorGradleTask.class, task -> {

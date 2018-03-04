@@ -2,7 +2,13 @@ plugins {
     id "java-gradle-plugin"
     id "maven-publish"
     id "com.gradle.plugin-publish" version "0.9.10"
+    id "ru.vyarus.quality" version "2.4.0"
 }
+
+def artifact_name = "gatorgradle"
+def artifact_group = "org.gatored"
+def artifact_version = "0.1"
+
 
 ext.gitVersioner = [
         /* defaultBranch           : "master",  // default "master" */
@@ -17,17 +23,6 @@ apply from: "versioner.gradle"
 def version = "${artifact_version}.${gitVersionName}"
 
 println("\u001B[1;36mVERSION ${version}\u001B[0m")
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            version = "${version}"
-            groupId = "${artifact_group}"
-            artifactId = "${artifact_name}"
-            from components.java
-        }
-    }
-}
 
 pluginBundle {
     website = "http://www.cs.allegheny.edu/sites/gatored"
@@ -44,22 +39,23 @@ pluginBundle {
   }
 }
 
+/* gradlePlugin {
+    plugins {
+        gatorgradle {
+            group = "${group}"
+            id = "${artifact_name}"
+            implementationClass = 'org.gatorgradle.GatorGradlePlugin'
+            version = "${version}"
+        }
+    }
+} */
+
 repositories {
     mavenLocal()
     mavenCentral()
 }
 
-// perform checkstyle checking with the "gradle check" command
-apply plugin: "checkstyle"
-checkstyle.toolVersion = "8.1"
-checkstyle {
-    ignoreFailures = false
-        maxWarnings = 0
-        maxErrors = 0
-        configFile = new File(rootDir, ".checks.xml")
-}
-
-test {
+/* test {
     // always run tests
     outputs.upToDateWhen { false }
 
@@ -70,7 +66,7 @@ test {
         stackTraceFilters "entryPoint"
     }
 
-}
+} */
 
 task createClasspathManifest {
     def outputDir = file("$buildDir/$name")
@@ -87,6 +83,15 @@ task createClasspathManifest {
 // add classpath file to test runtime classpath
 dependencies {
     testRuntime files(createClasspathManifest)
+}
+
+tasks.whenTaskAdded { task ->
+    if (task.getName().contains("PluginMavenPublication")) {
+        task.setDependsOn([])
+        task.setMustRunAfter([])
+        task.setShouldRunAfter([])
+        task.setEnabled(false)
+    }
 }
 
 sourceCompatibility = 1.8
