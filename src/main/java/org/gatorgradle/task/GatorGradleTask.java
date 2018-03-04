@@ -69,9 +69,17 @@ public class GatorGradleTask extends DefaultTask {
     private static int percentComplete;
     private static List<Command> completedTasks;
 
+    /**
+     * Static handler to call when a subtask completes.
+     *
+     * @param complete the command that was run
+     */
     public static synchronized void completedTask(Command complete) {
         completedTasks.add(complete);
         // System.out.println("FINISHED " + complete.getDescription());
+
+        // To break the build if wanted, throw a GradleException here
+        // throw new GradleException(this);
     }
 
     /**
@@ -128,7 +136,7 @@ public class GatorGradleTask extends DefaultTask {
         // make sure tasks have ended
         executor.await();
 
-        CommandOutputSummary outSum = new CommandOutputSummary(completedTasks, this.getProject());
+        CommandOutputSummary outSum = new CommandOutputSummary(completedTasks, this.getLogger());
 
         // complete task submission
         progLog.completed();

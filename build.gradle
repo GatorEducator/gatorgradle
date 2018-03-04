@@ -1,61 +1,79 @@
+plugins {
+    id "java"
+    id "maven"
+    id "com.gradle.plugin-publish" version "0.9.10"
+}
+
 group = artifact_group
 version = "${artifact_version}.${build_number}"
 
-apply plugin: 'java'
-apply plugin: 'maven'
+pluginBundle {
+    website = "http://www.cs.allegheny.edu/sites/gatored"
+    vcsUrl = "https://github.com/gatored/gatorgradle"
+
+    plugins {
+      gatorgradle {
+          id = "org.gatorgradle"
+          displayName = "GatorGradle"
+          description = "Gradle plugin for integrating GatorGrader as a grading task"
+          tags = ["grading", "allegheny", "gatorgrader", "mdl", "proselint"]
+          version = "1.0"
+      }
+  }
+}
 
 repositories {
-	mavenCentral()
+    mavenCentral()
     mavenLocal()
 }
 
 dependencies {
-	compile gradleApi()
-	testCompile gradleTestKit()
+    compile gradleApi()
+    testCompile gradleTestKit()
 }
 
 task wrapper(type: Wrapper) {
-	gradleVersion = "4.6"
+    gradleVersion = "4.6"
 }
 
 // perform checkstyle checking with the "gradle check" command
-apply plugin: 'checkstyle'
-checkstyle.toolVersion = '8.1'
+apply plugin: "checkstyle"
+checkstyle.toolVersion = "8.1"
 checkstyle {
-  ignoreFailures = false
-    maxWarnings = 0
-    maxErrors = 0
-    configFile = new File(rootDir, ".checks.xml")
+    ignoreFailures = false
+        maxWarnings = 0
+        maxErrors = 0
+        configFile = new File(rootDir, ".checks.xml")
 }
 
 test {
-	// always run tests
-	outputs.upToDateWhen { false }
+    // always run tests
+    outputs.upToDateWhen { false }
 
-	// turn on console logging
-	testLogging {
-		events "passed", "skipped", "failed"
-		exceptionFormat "full"
-		stackTraceFilters "entryPoint"
-	}
+    // turn on console logging
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+        stackTraceFilters "entryPoint"
+    }
 
 }
 
 task createClasspathManifest {
-	def outputDir = file("$buildDir/$name")
+    def outputDir = file("$buildDir/$name")
 
-	inputs.files sourceSets.main.runtimeClasspath
-	outputs.dir outputDir
+    inputs.files sourceSets.main.runtimeClasspath
+    outputs.dir outputDir
 
-	doLast {
-		outputDir.mkdirs()
-		file("$outputDir/plugin-classpath.txt").text = sourceSets.main.runtimeClasspath.join("\n")
+    doLast {
+        outputDir.mkdirs()
+        file("$outputDir/plugin-classpath.txt").text = sourceSets.main.runtimeClasspath.join("\n")
     }
 }
 
 // add classpath file to test runtime classpath
 dependencies {
-	testRuntime files(createClasspathManifest)
+    testRuntime files(createClasspathManifest)
 }
 
 sourceCompatibility = 1.8
