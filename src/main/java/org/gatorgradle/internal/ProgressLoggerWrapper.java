@@ -41,14 +41,6 @@ public class ProgressLoggerWrapper implements Serializable {
      * Create a progress logger wrapper.
      * @param project the current Gradle project
      * @param description the description for the logging
-     * @throws ClassNotFoundException if one of Gradle's internal classes
-     *      could not be found
-     * @throws NoSuchMethodException if the interface of one of Gradle's
-     *      internal classes has changed
-     * @throws InvocationTargetException if a method from one of Gradle's
-     *      internal classes could not be invoked
-     * @throws IllegalAccessException if a method from one of Gradle's
-     *      internal classes is not accessible
      */
     public ProgressLoggerWrapper(Project project, String description) {
         logger = project.getLogger();
