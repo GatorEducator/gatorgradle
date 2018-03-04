@@ -1,11 +1,33 @@
 plugins {
-    id "java"
-    id "maven"
+    id "java-gradle-plugin"
+    id "maven-publish"
     id "com.gradle.plugin-publish" version "0.9.10"
 }
 
-group = artifact_group
-version = "${artifact_version}.${build_number}"
+ext.gitVersioner = [
+        /* defaultBranch           : "master",  // default "master" */
+        stableBranches          : ["master"], // the feature branch postfix (-dm4(6)) will not be appended on stable branches
+        yearFactor              : 500, 	  // default "1000", increasing every 8.57h
+        snapshotEnabled         : false,      // default false, the "-SNAPSHOT" postfix
+        localChangesCountEnabled: true,       // default false, the (<commitCount>) before -SNAPSHOT
+]
+// import the script which runs the version generation
+apply from: "versioner.gradle"
+
+def version = "${artifact_version}-${gitVersionName}"
+
+println("\u001B[1;36mVERSION ${version}\u001B[0m")
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            version = "${version}"
+            groupId = "${artifact_group}"
+            artifactId = "${artifact_name}"
+            from components.java
+        }
+    }
+}
 
 pluginBundle {
     website = "http://www.cs.allegheny.edu/sites/gatored"
@@ -13,22 +35,18 @@ pluginBundle {
 
     plugins {
       gatorgradle {
-          id = "org.gatorgradle"
+          id = "${group}.${artifact_name}"
           displayName = "GatorGradle"
           description = "Gradle plugin for integrating GatorGrader as a grading task"
           tags = ["grading", "allegheny", "gatorgrader", "mdl", "proselint"]
-          version = "1.0"
+          version = "${version}"
       }
   }
 }
 
-dependencies {
-    compile gradleApi()
-    testCompile gradleTestKit()
-}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = "4.6"
+repositories {
+    mavenLocal()
+    mavenCentral()
 }
 
 // perform checkstyle checking with the "gradle check" command
