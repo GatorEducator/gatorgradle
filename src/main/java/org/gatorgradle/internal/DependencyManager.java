@@ -29,47 +29,27 @@ public class DependencyManager {
         }
     }
 
-    // TODO: should we install git if it isn't available?
-
-    private static String getGitExecutable() {
-        if (OS.equals("linux")) {
-            BasicCommand cmd = new BasicCommand().outputToSysOut(false);
-            cmd.with("which", "git");
-            cmd.run();
-            if (cmd.exitValue() == 0) {
-                return cmd.getOutput();
-            } else {
-                System.err.println("Could not find git!");
-                return "git";
-            }
-        } else {
-            // what are some sensible defaults?
-            // can we test homebrew on mac?
-            // what about windows?
-            // for now lets try for just in the path
-            System.err.println("Finding git is not supported on " + OS + "!");
-            return "git";
-        }
-    }
-
     private static boolean doGatorGrader() {
         if (!OS.equals("linux")) {
             System.err.println("Automated installation unsupported for non-Linux OSes");
             return false;
         }
 
-        String git = getGitExecutable();
+        File workingDir = new File(GATORGRADER_HOME);
 
         // quick git pull installation
         BasicCommand updateOrInstall = new BasicCommand();
-        updateOrInstall.outputToSysOut(false).setWorkingDir(new File(GATORGRADER_HOME));
+        updateOrInstall.outputToSysOut(false).setWorkingDir(workingDir);
         if (Files.exists(Paths.get(GATORGRADER_HOME))) {
             // gatorgrader repo exists (most likely)
-            updateOrInstall.with(git, "pull");
+            updateOrInstall.with("git", "pull");
         } else {
+            // make dirs
+            workingDir.mkdirs();
+
             // FIXME: will need to update url
             updateOrInstall.with(
-                git, "clone", "https://github.com/gkapfham/gatorgrader.git", GATORGRADER_HOME);
+                "git", "clone", "https://github.com/gkapfham/gatorgrader.git", GATORGRADER_HOME);
         }
 
         // install gatorgrader, and block until complete (FIXME: this needs to be better)
