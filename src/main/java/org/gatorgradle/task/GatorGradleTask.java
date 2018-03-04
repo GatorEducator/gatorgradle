@@ -66,7 +66,6 @@ public class GatorGradleTask extends DefaultTask {
     // because of Java serialization limitations, along with
     // how gradle implements logging, these must be static
     private static int totalTasks;
-    private static int percentComplete;
     private static List<Command> completedTasks;
 
     /**
@@ -80,6 +79,11 @@ public class GatorGradleTask extends DefaultTask {
 
         // To break the build if wanted, throw a GradleException here
         // throw new GradleException(this);
+    }
+
+    private static synchronized void initTasks(int total) {
+        totalTasks     = total;
+        completedTasks = new ArrayList<>(total);
     }
 
     /**
@@ -103,13 +107,11 @@ public class GatorGradleTask extends DefaultTask {
 
         // start task submission
         progLog.started();
-        totalTasks      = config.size();
-        completedTasks  = new ArrayList<>(totalTasks);
-        percentComplete = 0;
+        initTasks(config.size());
         // submit commands to executor
         for (Command cmd : config) {
             // configure command
-            cmd.setCallback((Consumer<Command> & Serializable) GatorGradleTask::completedTask);
+            cmd.setCallback((Command.Callback) GatorGradleTask::completedTask);
             if (cmd.getWorkingDir() == null) {
                 cmd.setWorkingDir(workingDir);
             }
@@ -122,6 +124,7 @@ public class GatorGradleTask extends DefaultTask {
             });
         }
 
+        int percentComplete = 0;
         while (percentComplete < 100) {
             percentComplete = (completedTasks.size() * 100) / totalTasks;
             progLog.progress("Finished " + (completedTasks.size()) + " / " + totalTasks

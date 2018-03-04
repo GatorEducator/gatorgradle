@@ -50,6 +50,13 @@ pluginBundle {
     }
 } */
 
+quality {
+    checkstyleVersion = "8.1"
+
+    // disable PMD for now (100+ issues to fix)
+    pmd = false;
+}
+
 repositories {
     mavenLocal()
     mavenCentral()

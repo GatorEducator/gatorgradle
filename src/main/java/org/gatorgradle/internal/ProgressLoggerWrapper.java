@@ -33,7 +33,7 @@ import java.lang.reflect.Method;
  * @author Michel Kraemer
  * @author Saejin Mahlau-Heinert
  */
-public class ProgressLoggerWrapper implements Serializable {
+public class ProgressLoggerWrapper {
     private Logger logger;
     private Object progressLogger;
 

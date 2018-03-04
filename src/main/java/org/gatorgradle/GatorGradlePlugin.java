@@ -5,7 +5,6 @@ import org.gatorgradle.task.GatorGradleTask;
 
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-import org.gradle.api.logging.Logger;
 
 import java.io.File;
 
@@ -21,8 +20,6 @@ public class GatorGradlePlugin implements Plugin<Project> {
     public static final String USER_HOME;
     public static final String F_SEP;
     public static final String OS;
-
-    public static Logger logger;
 
     static {
         F_SEP     = System.getProperty("file.separator");
@@ -40,7 +37,7 @@ public class GatorGradlePlugin implements Plugin<Project> {
         }
 
         // TODO: is this a sensible default for gg home? - probably only on linux
-        if (OS.equals("linux")) {
+        if ("linux".equals(OS)) {
             GATORGRADER_HOME =
                 USER_HOME + F_SEP + ".local" + F_SEP + "share" + F_SEP + "gatorgrader";
         } else {
@@ -55,8 +52,8 @@ public class GatorGradlePlugin implements Plugin<Project> {
      *
      * @param project the project to apply GatorGrader to
      */
-    public void apply(Project project) {
-        logger = project.getLogger();
+    public void apply(final Project project) {
+        // Logger logger = project.getLogger();
         // set config file location, then generate config
         // TODO: what should we do for config file location?
         File conFile = project.file(CONFIG_FILE_LOCATION);
@@ -64,7 +61,7 @@ public class GatorGradlePlugin implements Plugin<Project> {
         GatorGradleConfig config = new GatorGradleConfig(conFile);
 
         // create gatorgradle 'grade' task
-        GatorGradleTask grade = project.getTasks().create("grade", GatorGradleTask.class, task -> {
+        project.getTasks().create("grade", GatorGradleTask.class, task -> {
             // default grade task uses config from above and project dir as grade
             task.setConfig(config);
             task.setWorkingDir(project.getProjectDir());

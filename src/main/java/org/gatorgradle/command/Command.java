@@ -5,6 +5,8 @@ import java.io.Serializable;
 import java.util.function.Consumer;
 
 public interface Command extends Runnable, Serializable {
+    public static interface Callback extends Consumer<Command>, Serializable {}
+
     public static final int SUCCESS = 0;
 
     public abstract int exitValue();
@@ -19,5 +21,5 @@ public interface Command extends Runnable, Serializable {
 
     public abstract void setWorkingDir(File dir);
 
-    public abstract void setCallback(Consumer<Command> callback);
+    public abstract void setCallback(Callback callback);
 }

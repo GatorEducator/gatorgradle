@@ -76,8 +76,10 @@ public class DependencyManager {
             System.out.println("Updating GatorGrader...");
         } else {
             // make dirs
-            workingDir.mkdirs();
-
+            boolean suc = workingDir.mkdirs();
+            if (!suc) {
+                System.err.println("Failed to make directories: " + workingDir);
+            }
             // FIXME: will need to update url
             updateOrInstall.with(
                 "git", "clone", "https://github.com/gkapfham/gatorgrader.git", GATORGRADER_HOME);

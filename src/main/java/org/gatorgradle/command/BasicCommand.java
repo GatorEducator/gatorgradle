@@ -1,6 +1,6 @@
 package org.gatorgradle.command;
 
-import org.gradle.api.logging.Logger;
+import org.gradle.api.GradleException;
 import org.gradle.api.logging.Logging;
 
 import java.io.BufferedReader;
@@ -10,42 +10,39 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public class BasicCommand implements Command {
-    private List<String> command;
-    private boolean outputToSysOut;
+    private static final long serialVersionUID = 6412L;
+    private final List<String> command;
+    private boolean outSys;
     private File workingDir;
 
-    private StringBuilder output = new StringBuilder();
-    private Thread thread;
-    private Consumer<Command> callback;
+    private String output;
+    private transient Thread thread;
+    private Callback callback;
 
-    private boolean fin = false;
+    private boolean fin;
     private int exitVal = -1;
 
-    protected BasicCommand() {}
-
-    public BasicCommand(String... command) {
+    public BasicCommand(final String... command) {
         this.command = new ArrayList<>(Arrays.asList(command));
     }
 
-    public BasicCommand(List<String> command) {
+    public BasicCommand(final List<String> command) {
         this.command = command;
     }
 
-    public BasicCommand with(String... command) {
+    public BasicCommand with(final String... command) {
         return with(Arrays.asList(command));
     }
 
-    public BasicCommand with(List<String> command) {
+    public BasicCommand with(final List<String> command) {
         this.command.addAll(command);
         return this;
     }
 
-    public BasicCommand outputToSysOut(boolean out) {
-        outputToSysOut = out;
+    public BasicCommand outputToSysOut(final boolean flag) {
+        outSys = flag;
         return this;
     }
 
@@ -53,16 +50,16 @@ public class BasicCommand implements Command {
         return workingDir;
     }
 
-    public void setWorkingDir(File dir) {
+    public void setWorkingDir(final File dir) {
         this.workingDir = dir;
     }
 
-    public void setCallback(Consumer<Command> callback) {
+    public void setCallback(final Callback callback) {
         this.callback = callback;
     }
 
     public String getOutput() {
-        return output.toString();
+        return output;
     }
 
     public String getDescription() {
@@ -80,7 +77,7 @@ public class BasicCommand implements Command {
      */
     public int exitValue() {
         if (!fin) {
-            throw new RuntimeException("Command not finished, no exit value available!");
+            throw new GradleException("Command not finished, no exit value available!") {};
         }
         return exitVal;
     }
@@ -141,25 +138,28 @@ public class BasicCommand implements Command {
             pb.directory(workingDir);
         }
         pb.redirectErrorStream(true);
+        BufferedReader in = null;
         try {
             Process proc = pb.start();
 
-            BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+            in = new BufferedReader(new InputStreamReader(proc.getInputStream(), "UTF-8"));
 
+            StringBuilder out = new StringBuilder();
             int newChar;
             while (true) {
                 newChar = in.read();
                 if (!(newChar > 0)) {
                     break;
                 }
-                output.append((char) newChar);
-                if (outputToSysOut) {
+                out.append((char) newChar);
+                if (outSys) {
                     System.out.print((char) newChar);
                 }
             }
 
             proc.waitFor();
             exitVal = proc.exitValue();
+            output  = out.toString().trim();
 
         } catch (InterruptedException | IOException ex) {
             // don't do anything fancy with logs
@@ -167,7 +167,7 @@ public class BasicCommand implements Command {
             //     output.append("Error: Command not found: \'")
             //         .append(command.stream().collect(Collectors.joining(" ")))
             //         .append("\'\n");
-            //     if (outputToSysOut) {
+            //     if (outSys) {
             //         System.out.print("Error: Command not found: \'");
             //         System.out.print(command.stream().collect(Collectors.joining(" ")));
             //         System.out.print("\'\n");
@@ -188,6 +188,13 @@ public class BasicCommand implements Command {
             fin = true;
             if (callback != null) {
                 callback.accept(this);
+            }
+            try {
+                if (in != null) {
+                    in.close();
+                }
+            } catch (IOException ex) {
+                System.err.println("Failed to close command input stream!");
             }
         }
     }
