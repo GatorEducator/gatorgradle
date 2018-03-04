@@ -22,11 +22,6 @@ pluginBundle {
   }
 }
 
-repositories {
-    mavenCentral()
-    mavenLocal()
-}
-
 dependencies {
     compile gradleApi()
     testCompile gradleTestKit()

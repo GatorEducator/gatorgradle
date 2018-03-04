@@ -93,7 +93,7 @@ public class DependencyManager {
             System.err.println(
                 "ERROR! GatorGrader management failed! Perhaps we couldn't find git?");
             System.err.println("Command run: " + updateOrInstall.getDescription());
-            System.err.println("OUTPUT: " + updateOrInstall.getOutput());
+            System.err.println("OUTPUT: " + updateOrInstall.getOutput().trim());
             return false;
         }
 
@@ -126,7 +126,7 @@ public class DependencyManager {
                 return false;
             }
         }
-
+        System.out.println();
         System.out.println("    ----    ");
         return true;
     }

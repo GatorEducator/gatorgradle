@@ -74,7 +74,7 @@ public class GatorGradleTask extends DefaultTask {
      *
      * @param complete the command that was run
      */
-    public static synchronized void completedTask(Command complete) {
+    private static synchronized void completedTask(Command complete) {
         completedTasks.add(complete);
         // System.out.println("FINISHED " + complete.getDescription());
 
