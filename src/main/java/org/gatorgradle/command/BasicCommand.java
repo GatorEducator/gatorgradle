@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 public class BasicCommand implements Command {
     private List<String> command;
-    private boolean outputToSysOut = true;
+    private boolean outputToSysOut;
     private File workingDir;
 
     private StringBuilder output = new StringBuilder();

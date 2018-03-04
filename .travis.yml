@@ -31,7 +31,7 @@ cache:
 script:
   - ls $HOME/.gradle/caches
   # java checks
-  - gradle clean
+  - gradle clean check
   - gradle build
   # other linting
   - mdl README.md

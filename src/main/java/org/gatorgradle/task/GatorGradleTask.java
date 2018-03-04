@@ -125,7 +125,7 @@ public class GatorGradleTask extends DefaultTask {
         while (percentComplete < 100) {
             percentComplete = (completedTasks.size() * 100) / totalTasks;
             progLog.progress("Finished " + (completedTasks.size()) + " / " + totalTasks
-                             + " checks  --  " + percentComplete + "% complete!");
+                             + " checks  >  " + percentComplete + "% complete!");
             try {
                 Thread.sleep(100);
             } catch (InterruptedException ex) {
@@ -136,7 +136,12 @@ public class GatorGradleTask extends DefaultTask {
         // make sure tasks have ended
         executor.await();
 
+        progLog.progress("Finished " + (completedTasks.size()) + " / " + totalTasks + " checks  >  "
+                         + percentComplete + "% complete!  >  Compiling Report...");
+
         CommandOutputSummary outSum = new CommandOutputSummary(completedTasks, this.getLogger());
+
+        outSum.showOutputSummary();
 
         // complete task submission
         progLog.completed();

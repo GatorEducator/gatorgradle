@@ -71,7 +71,6 @@ public class ProgressLoggerWrapper implements Serializable {
 
         try {
             invoke(progressLogger, "setDescription", description);
-            invoke(progressLogger, "setLoggingHeader", description);
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
             System.err.println("ProgressLoggerWrapper Error: " + ex);
         }

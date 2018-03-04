@@ -54,15 +54,16 @@ public class GatorGradleConfig implements Iterable<Command> {
         BasicCommand cmd;
         if (line.toLowerCase().startsWith("gg: ")) {
             line = line.substring(4);
-            cmd  = new GatorGraderCommand();
+            cmd  = new GatorGraderCommand().outputToSysOut(false);
         } else {
-            cmd = new BasicCommand();
+            cmd = new BasicCommand().outputToSysOut(false);
         }
         Matcher mtc = commandPattern.matcher(line);
         while (mtc.find()) {
             cmd.with(mtc.group(1).replace("\"", ""));
         }
-        return cmd.outputToSysOut(false);
+
+        return cmd;
     }
 
     private void parseConfigFile(File file) {
