@@ -29,7 +29,7 @@ cache:
 
 # need to run unit tests
 script:
-  - ls $HOME/.gradle/cache
+  - ls $HOME/.gradle/caches
   # java checks
   - gradle clean
   - gradle build
