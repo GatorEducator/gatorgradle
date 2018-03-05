@@ -7,6 +7,7 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 
 import java.io.File;
+import java.util.Locale;
 
 /**
  * GatorGradlePlugin applies the plugin to a project, registers
@@ -25,7 +26,7 @@ public class GatorGradlePlugin implements Plugin<Project> {
         F_SEP     = System.getProperty("file.separator");
         USER_HOME = System.getProperty("user.home");
 
-        String os = System.getProperty("os.name").toLowerCase();
+        String os = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
         if (os.contains("linux")) {
             OS = "linux";
         } else if (os.contains("windows")) {

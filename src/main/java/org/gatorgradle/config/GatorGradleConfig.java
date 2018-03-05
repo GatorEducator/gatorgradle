@@ -12,6 +12,7 @@ import java.nio.file.Files;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -52,7 +53,7 @@ public class GatorGradleConfig implements Iterable<Command> {
         // TODO: parse config file lines, probably in a different way than this
 
         BasicCommand cmd;
-        if (line.toLowerCase().startsWith("gg: ")) {
+        if (line.toLowerCase(Locale.ENGLISH).startsWith("gg: ")) {
             line = line.substring(4);
             cmd  = new GatorGraderCommand().outputToSysOut(false);
         } else {

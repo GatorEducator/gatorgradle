@@ -77,7 +77,7 @@ public class BasicCommand implements Command {
      */
     public int exitValue() {
         if (!fin) {
-            throw new GradleException("Command not finished, no exit value available!") {};
+            throw new GradleException("Command not finished, no exit value available!");
         }
         return exitVal;
     }

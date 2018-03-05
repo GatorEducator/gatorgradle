@@ -13,6 +13,8 @@ import java.util.List;
  * DependencyManager
  */
 public class GatorGraderCommand extends BasicCommand {
+    private static final long serialVersionUID = 2142L;
+
     public GatorGraderCommand(String... command) {
         this(Arrays.asList(command));
     }

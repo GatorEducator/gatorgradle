@@ -55,6 +55,8 @@ quality {
 
     // disable PMD for now (100+ issues to fix)
     pmd = false;
+
+    findbugsLevel = "low"
 }
 
 repositories {
