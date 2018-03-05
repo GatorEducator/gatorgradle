@@ -21,7 +21,7 @@ version = "${artifact_release}.${gitVersionName}"
 println("\u001B[1;36mVERSION ${version}\u001B[0m")
 
 pluginBundle {
-    website = "http://www.cs.allegheny.edu/sites/gatored"
+    website = "http://github.com/gatored/gatorgradle"
     vcsUrl = "https://github.com/gatored/gatorgradle"
     description = "Gradle plugin for integrating the grading tool GatorGrader as a runnable, configurable task"
     tags = ["grading", "allegheny", "gatorgrader", "mdl", "proselint"]
@@ -51,6 +51,10 @@ uploadArchives {
         }
     }
 }
+
+// send javadocs to docs folder
+tasks.findByName("javadoc").destinationDir = file("docs")
+
 
 quality {
     checkstyleVersion = "8.1"
