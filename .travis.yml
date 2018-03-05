@@ -3,13 +3,10 @@ language: Java
 
 # install junit?
 # install mdl for checking Markdown
-before_install:
-  - gem install mdl
-
-
 # ensure the use of the latest version of gradle - much faster to download just the bin
 # instead of using a ppa -- travis probably caches this gradle zip folder somewhere.
-before_script:
+before_install:
+  - gem install mdl
   - wget https://services.gradle.org/distributions/gradle-4.6-bin.zip
   - unzip -d $HOME gradle-4.6-bin.zip
   # probably don't need this but just to be sure
