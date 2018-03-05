@@ -62,15 +62,12 @@ public class GatorGradlePlugin implements Plugin<Project> {
         GatorGradleConfig config = new GatorGradleConfig(conFile);
 
         // create gatorgradle 'grade' task
-        project.getTasks().create("grade", GatorGradleTask.class, task -> {
+        GatorGradleTask grade = project.getTasks().create("grade", GatorGradleTask.class, task -> {
             // default grade task uses config from above and project dir as grade
             task.setConfig(config);
             task.setWorkingDir(project.getProjectDir());
         });
 
-        // ensure dependencies are run sequentially if scheduled at the same time
-        // this is probably done elsewhere as well, but might as well be sure
-        project.getTasks().getByName("build").mustRunAfter("clean");
-        project.getTasks().getByName("grade").mustRunAfter("build");
+        grade.dependsOn("build");
     }
 }
