@@ -52,6 +52,10 @@ uploadArchives {
     }
 }
 
+// send javadocs to docs folder
+tasks.findByName("javadoc").destinationDir = file("docs")
+
+
 quality {
     checkstyleVersion = "8.1"
 

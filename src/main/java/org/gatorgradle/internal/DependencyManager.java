@@ -129,7 +129,7 @@ public class DependencyManager {
             }
         }
         System.out.println();
-        System.out.println("    ----    ");
+        System.out.println();
         return true;
     }
 }
