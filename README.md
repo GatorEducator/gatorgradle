@@ -26,7 +26,7 @@ will be run as such. Non-prefixed lines will be executed in `bash`. Execution
 of checks is parallelized, so no ordering is guaranteed. Generally, commands
 which run faster are finished earlier, however.
 
-We have plans to improve the configuration file format -- issue #1 describes with
+We have plans to improve the configuration file format -- issue [#1](https://github.com/gatored/gatorgradle/issues/1) describes with
 this task. If you feel up to help, go for it!
 
 An example of a configuration file is given below.
@@ -49,7 +49,7 @@ errors or other information are given to the user in an easy to understand
 format. Currently, only simple highlighting and detecting an error are
 supported. In the future, this could be expanded to an even shorter list of
 just errors, or to some other summary format that would be easier to read.
-Issue #3 details this task. Feel free to help with suggestions or pull requests
+Issue [#3](https://github.com/gatored/gatorgradle/issues/3) details this task. Feel free to help with suggestions or pull requests
 if you have any ideas.
 
 ### Including GatorGradle in your project
