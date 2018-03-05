@@ -50,7 +50,7 @@ public class CommandOutputSummary {
                 // }
             }
 
-            log.warn("\n ~-~-~ \n");
+            log.lifecycle("\n ~-~-~ \n");
         }
 
         log.warn("\u001B[1;33mOverall, are there any mistakes in the assignment? {}\u001B[0m",

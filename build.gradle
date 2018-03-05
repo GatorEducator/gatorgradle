@@ -1,14 +1,8 @@
 plugins {
-    id "java-gradle-plugin"
-    id "maven-publish"
+    id "maven"
     id "com.gradle.plugin-publish" version "0.9.10"
     id "ru.vyarus.quality" version "2.4.0"
 }
-
-def artifact_name = "gatorgradle"
-def artifact_group = "org.gatored"
-def artifact_version = "0.1"
-
 
 ext.gitVersioner = [
         /* defaultBranch           : "master",  // default "master" */
@@ -20,7 +14,11 @@ ext.gitVersioner = [
 // import the script which runs the version generation
 apply from: "versioner.gradle"
 
-def version = "${artifact_version}.${gitVersionName}"
+def id = "gatorgradle"
+group = "org.gatored"
+def release = "0.1"
+
+version = "${release}.${gitVersionName}"
 
 println("\u001B[1;36mVERSION ${version}\u001B[0m")
 
@@ -30,7 +28,7 @@ pluginBundle {
 
     plugins {
       gatorgradle {
-          id = "${group}.${artifact_name}"
+          id = "${group}.${id}"
           displayName = "GatorGradle"
           description = "Gradle plugin for integrating GatorGrader as a grading task"
           tags = ["grading", "allegheny", "gatorgrader", "mdl", "proselint"]
@@ -39,16 +37,13 @@ pluginBundle {
   }
 }
 
-/* gradlePlugin {
-    plugins {
-        gatorgradle {
-            group = "${group}"
-            id = "${artifact_name}"
-            implementationClass = 'org.gatorgradle.GatorGradlePlugin'
-            version = "${version}"
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "file://${System.properties['user.home']}/.m2/repository")
         }
     }
-} */
+}
 
 quality {
     checkstyleVersion = "8.1"
@@ -61,7 +56,13 @@ quality {
 
 repositories {
     mavenLocal()
+    jcenter()
     mavenCentral()
+}
+
+dependencies {
+    compile gradleApi()
+    testCompile gradleTestKit()
 }
 
 /* test {
