@@ -1,6 +1,7 @@
 plugins {
     id "maven"
-    id "com.gradle.plugin-publish" version "0.9.10"
+    id "java-gradle-plugin"
+    id "com.gradle.plugin-publish" version "0.9.7"
     id "ru.vyarus.quality" version "2.4.0"
 }
 
@@ -14,27 +15,32 @@ ext.gitVersioner = [
 // import the script which runs the version generation
 apply from: "versioner.gradle"
 
-def id = "gatorgradle"
-group = "org.gatored"
-def release = "0.1"
-
-version = "${release}.${gitVersionName}"
+group = "${artifact_group}"
+version = "${artifact_release}.${gitVersionName}"
 
 println("\u001B[1;36mVERSION ${version}\u001B[0m")
 
 pluginBundle {
     website = "http://www.cs.allegheny.edu/sites/gatored"
     vcsUrl = "https://github.com/gatored/gatorgradle"
+    description = "Gradle plugin for integrating the auto-grading tool GatorGrader as a runnable, configurable task"
+    tags = ["grading", "allegheny", "gatorgrader", "mdl", "proselint"]
 
     plugins {
-      gatorgradle {
-          id = "${group}.${id}"
-          displayName = "GatorGradle"
-          description = "Gradle plugin for integrating GatorGrader as a grading task"
-          tags = ["grading", "allegheny", "gatorgrader", "mdl", "proselint"]
-          version = "${version}"
+        gatorgradle {
+            id = "${artifact_name}"
+            displayName = "GatorGradle"
       }
   }
+}
+
+gradlePlugin {
+    plugins {
+        gatorgradle {
+            id = "${artifact_name}"
+            implementationClass = "org.gatorgradle.GatorGradlePlugin"
+        }
+    }
 }
 
 uploadArchives {
@@ -60,10 +66,10 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
+/* dependencies {
     compile gradleApi()
     testCompile gradleTestKit()
-}
+} */
 
 /* test {
     // always run tests
@@ -78,7 +84,7 @@ dependencies {
 
 } */
 
-task createClasspathManifest {
+/* task createClasspathManifest {
     def outputDir = file("$buildDir/$name")
 
     inputs.files sourceSets.main.runtimeClasspath
@@ -88,12 +94,12 @@ task createClasspathManifest {
         outputDir.mkdirs()
         file("$outputDir/plugin-classpath.txt").text = sourceSets.main.runtimeClasspath.join("\n")
     }
-}
+} */
 
 // add classpath file to test runtime classpath
-dependencies {
+/* dependencies {
     testRuntime files(createClasspathManifest)
-}
+} */
 
 tasks.whenTaskAdded { task ->
     if (task.getName().contains("PluginMavenPublication")) {
