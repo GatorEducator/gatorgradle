@@ -3,7 +3,6 @@
 [![Build Status](https://travis-ci.org/gatored/gatorgradle.svg?branch=master)](https://travis-ci.org/gatored/gatorgradle)
 [![Javadocs](https://www.javadoc.io/badge/gradle.plugin.org.gatored/gatorgradle.svg)](https://www.javadoc.io/doc/gradle.plugin.org.gatored/gatorgradle)
 
-
 GatorGradle integrates [GatorGrader](https://github.com/gkapfham/gatorgrader)
 into a Gradle project.
 
