@@ -1,16 +1,15 @@
 # GatorGradle: GatorGrader Gradle Integration
 
-[![Build Status](https://travis-ci.org/gatored/gatorgradle.svg?branch=master)](https://travis-ci.org/gatored/gatorgradle)
-[![javadocs](https://gatored.github.io/gatorgradle/docs/docs-status-badge.svg)](https://gatored.github.io/gatorgradle/docs)
-
 GatorGradle integrates [GatorGrader](https://github.com/gkapfham/gatorgrader)
 into a Gradle project.
+
+[![Build Status](https://travis-ci.org/gatored/gatorgradle.svg?branch=master)](https://travis-ci.org/gatored/gatorgradle)
+[![javadocs](https://gatored.github.io/gatorgradle/docs/docs-status-badge.svg)](https://gatored.github.io/gatorgradle/docs)
 
 ## Running Checks
 
 Grading checks can be performed as specified in a configuration file. To run
-the GatorGrader checks, use the `grade` task, like
-so:
+the GatorGrader checks, use the `grade` task, like so:
 
 ```bash
 gradle grade
