@@ -52,7 +52,7 @@ uploadArchives {
     }
 }
 
-def gitBranch() {
+def getBranch() {
     def branch = ""
     def proc = "git rev-parse --abbrev-ref HEAD".execute()
     proc.in.eachLine { line -> branch = line }
@@ -61,31 +61,86 @@ def gitBranch() {
     return branch
 }
 
-println gitBranch()
+def switchToBranch(String branch) {
+    def err = false
+    def proc = "git checkout ${branch}".execute()
+    proc.in.eachLine { line -> println line }
+    proc.err.eachLine { line ->
+        println line
+        err = true
+    }
+    proc.waitFor()
+    if(getBranch() != branch) {
+        err = true
+    }
+
+    if(err) {
+        throw new GradleException("Could not checkout ${branch}!")
+    }
+}
+
+/* # Update the index
+    git update-index -q --ignore-submodules --refresh
+    err=0
+
+    # Disallow unstaged changes in the working tree
+    if ! git diff-files --quiet --ignore-submodules --
+    then
+        echo >&2 "cannot $1: you have unstaged changes."
+        git diff-files --name-status -r --ignore-submodules -- >&2
+        err=1
+    fi
+
+    # Disallow uncommitted changes in the index
+    if ! git diff-index --cached --quiet HEAD --ignore-submodules --
+    then
+        echo >&2 "cannot $1: your index contains uncommitted changes."
+        git diff-index --cached --name-status -r --ignore-submodules HEAD -- >&2
+        err=1
+    fi */
 
 // send javadocs to docs folder
 tasks.findByName("javadoc").destinationDir = file("docs/${version}")
 
-task switchToGithubPages(type: Exec) {
-    commandLine "git", "checkout", "gh-pages"
+
+task CopyAndThen(type: Copy) {
+   doFirst {
+      println "this is before the actual copy"
+   }
+   println "copy"
+   doLast {
+      println "this is after the actual copy"
+   }
 }
 
-task switchToMaster(type: Exec) {
-    commandLine "git", "checkout", "master"
+task makeJavadocBadge(type: Copy) {
+
+    def oldBranch = ""
+    doFirst {
+        println("running javadoc")
+        oldBranch = getBranch()
+        switchToBranch("gh-pages")
+        println "switched branch to ${getBranch()}"
+    }
+
+    def filename = "docs-passing.svg"
+    println "configuring"
+    from "images"
+    into  "docs/${version}"
+    include filename
+    rename filename, "docs-status-badge.svg"
+
+    doLast {
+        println "finished copy"
+        println "on branch ${getBranch()}"
+        switchToBranch(oldBranch)
+        println "switched branch to ${getBranch()}"
+    }
 }
 
-task makeJavadocBadge (type: Copy) {
-    dependsOn switchToGithubPages
-    from "images/docs-passing.svg"
-    into  "docs/${version}/"
-}
-
-task publishJavadocs(type: GradleBuild) {
+/* task publishJavadocs(type: GradleBuild) {
      tasks = ['clean', 'javadoc']
-}
-
-//TODO: add task to switch to gh-pages, commit, and push after running 'javadoc'
-
+} */
 
 quality {
     checkstyleVersion = "8.1"
@@ -102,49 +157,14 @@ repositories {
     mavenCentral()
 }
 
-/* dependencies {
-    compile gradleApi()
-    testCompile gradleTestKit()
-} */
-
-/* test {
-    // always run tests
-    outputs.upToDateWhen { false }
-
-    // turn on console logging
-    testLogging {
-        events "passed", "skipped", "failed"
-        exceptionFormat "full"
-        stackTraceFilters "entryPoint"
-    }
-
-} */
-
-/* task createClasspathManifest {
-    def outputDir = file("$buildDir/$name")
-
-    inputs.files sourceSets.main.runtimeClasspath
-    outputs.dir outputDir
-
-    doLast {
-        outputDir.mkdirs()
-        file("$outputDir/plugin-classpath.txt").text = sourceSets.main.runtimeClasspath.join("\n")
-    }
-} */
-
-// add classpath file to test runtime classpath
-/* dependencies {
-    testRuntime files(createClasspathManifest)
-} */
-
-tasks.whenTaskAdded { task ->
+/* tasks.whenTaskAdded { task ->
     if (task.getName().contains("PluginMavenPublication")) {
         task.setDependsOn([])
         task.setMustRunAfter([])
         task.setShouldRunAfter([])
         task.setEnabled(false)
     }
-}
+} */
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
