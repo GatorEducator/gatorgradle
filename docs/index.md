@@ -12,7 +12,7 @@ You can select one of the below versions to go to the javadoc for that version o
         <a href="/gatorgradle/docs/{{ build.name }}">
             Javadoc for {{ build.name }}
         </a>
-        <ul><li>Published on {{ build.date }}</li></ul>
+        <ul><li>Published {{ build.date }}</li></ul>
     </li>
 {% endfor%}
 </ul>

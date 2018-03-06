@@ -4,11 +4,29 @@
 @import "{{ site.theme }}";
 
 .version-list li {
-    font-size: 14pt;
+    font-size: 24px;
     font-weight: bold;
+    color: $section-headings-color;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    padding-bottom: 0em;
+    list-style: "-", none, inside;
+
+    border-style: outset;
+    border-width: 2.5px;
+    border-radius: 10%;
+    border-spacing: 2px;
 }
 
 .version-list li ul li {
-    list-style: none;
+    list-style-type: none;
+    list-style-position: inside;
 
+    color: $section-headings-color;
+    font-size: 9px;
+    font-weight: lighter;
+    font-style: italic;
+
+    padding-top: 5px;
+    margin: 0em;
 }
