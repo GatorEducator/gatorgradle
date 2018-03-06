@@ -9,10 +9,10 @@ You can select one of the below versions to go to the javadoc for that version o
 <ul>
 {% for build in sortedBuilds %}
     <li>
-        <h4><a href="/gatorgradle/docs/{{ build.name }}">
+        <a href="/gatorgradle/docs/{{ build.name }}">
             Javadoc for {{ build.name }}
-        </a></h4>
-        <h6>Published on {{ build.date }}</h6>
+        </a>
+        <li>Published on {{ build.date }}</li>
     </li>
 {% endfor%}
 </ul>
