@@ -3,7 +3,7 @@
 
 @import "{{ site.theme }}";
 
-.version-list li {
+ul.version-list li {
     font-size: 20px;
     font-weight: bold;
     color: $section-headings-color;
@@ -16,7 +16,7 @@
     list-style-position: inside
 }
 
-.version-list li ul li {
+ul.version-list li ul {
     list-style-type: none;
     list-style-position: inside;
 
