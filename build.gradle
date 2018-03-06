@@ -95,14 +95,15 @@ def switchToBranch(String branch) {
     checkLocalChanges()
     def err = false
     def proc = "git checkout ${branch}".execute()
-    proc.in.eachLine { line -> println line }
+    proc.in.eachLine { line -> println "[INFO] " + line }
     proc.err.eachLine { line ->
-        println line
+        println "[ERROR] " + line
         err = true
     }
     proc.waitFor()
     if(getBranch() != branch) {
         err = true
+        println "branch didn't switch " + getBranch()
     }
 
     if(err) {
