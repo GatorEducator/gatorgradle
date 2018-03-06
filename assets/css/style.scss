@@ -1,0 +1,14 @@
+---
+---
+
+@import "{{ site.theme }}";
+
+.version-list li {
+    font-size: 14pt;
+    font-weight: bold;
+}
+
+.version-list li ul li {
+    list-style: none;
+
+}
