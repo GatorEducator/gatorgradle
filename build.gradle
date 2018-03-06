@@ -53,7 +53,7 @@ uploadArchives {
 }
 
 // send javadocs to docs folder
-//tasks.findByName("javadoc").destinationDir = file("docs")
+tasks.findByName("javadoc").destinationDir = file("docs")
 
 
 quality {
