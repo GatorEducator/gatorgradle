@@ -4,7 +4,7 @@
 @import "{{ site.theme }}";
 
 .version-list li {
-    font-size: 24px;
+    font-size: 20px;
     font-weight: bold;
     color: $section-headings-color;
     margin-top: 1em;
@@ -13,7 +13,7 @@
     list-style: "-", none, inside;
 
     border-style: ridge;
-    border-width: 2.5px;
+    border-width: 1px;
     border-radius: 5px;
     border-spacing: 2px;
 }
@@ -22,11 +22,12 @@
     list-style-type: none;
     list-style-position: inside;
 
+    border: none;
+
     color: $section-headings-color;
-    font-size: 9px;
+    font-size: 12px;
     font-weight: lighter;
     font-style: italic;
-
-    padding-top: 5px;
+    padding: 0em;
     margin: 0em;
 }
