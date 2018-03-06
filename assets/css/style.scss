@@ -14,8 +14,6 @@ ul.version-list li {
     padding-right: 0.5em;
     list-style-type: circle;
     list-style-position: inside
-
-    border: none;
 }
 
 ul.version-list li ul li {
@@ -25,7 +23,7 @@ ul.version-list li ul li {
     background-image:     -ms-linear-gradient(bottom, $section-headings-color, transparentize($section-headings-color, 25%), #fff); /* For pre-releases of IE 10*/
     background-image:      -o-linear-gradient(bottom, $section-headings-color, transparentize($section-headings-color, 25%), #fff); /* For old Opera (11.1 to 12.0) */
     background-image:         linear-gradient(to top, $section-headings-color, transparentize($section-headings-color, 25%), #fff); /* Standard syntax; must be last */
-    color:transparent;
+    color: transparent;
     -webkit-background-clip: text;
     background-clip: text;
 
@@ -34,9 +32,6 @@ ul.version-list li ul li {
     list-style-type: none;
     list-style-position: inside;
 
-    border: none;
-
-    color: ;
     font-size: 12px;
     font-weight: lighter;
     font-style: italic;
