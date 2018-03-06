@@ -19,12 +19,24 @@ ul.version-list li {
 }
 
 ul.version-list li ul li {
+
+    background-image: -webkit-linear-gradient(bottom, $section-headings-color, transparentize($section-headings-color, 25%), #fff); /* For Chrome and Safari */
+    background-image:    -moz-linear-gradient(bottom, $section-headings-color, transparentize($section-headings-color, 25%), #fff); /* For old Fx (3.6 to 15) */
+    background-image:     -ms-linear-gradient(bottom, $section-headings-color, transparentize($section-headings-color, 25%), #fff); /* For pre-releases of IE 10*/
+    background-image:      -o-linear-gradient(bottom, $section-headings-color, transparentize($section-headings-color, 25%), #fff); /* For old Opera (11.1 to 12.0) */
+    background-image:         linear-gradient(to top, $section-headings-color, transparentize($section-headings-color, 25%), #fff); /* Standard syntax; must be last */
+    color:transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+
+
+
     list-style-type: none;
     list-style-position: inside;
 
     border: none;
 
-    color: $section-headings-color;
+    color: ;
     font-size: 12px;
     font-weight: lighter;
     font-style: italic;
