@@ -26,9 +26,13 @@ show_downloads: "false"
 markdown: kramdown
 theme: jekyll-theme-cayman
 
-
 gems:
     - jekyll-readme-index
+
+
+readme_index:
+    enabled: true
+    remove_originals: true
 
 # Exclude from processing.
 # The following items will not be processed, by default. Create a custom list
