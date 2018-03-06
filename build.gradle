@@ -52,8 +52,37 @@ uploadArchives {
     }
 }
 
+def gitBranch() {
+    def branch = ""
+    def proc = "git rev-parse --abbrev-ref HEAD".execute()
+    proc.in.eachLine { line -> branch = line }
+    proc.err.eachLine { line -> println line }
+    proc.waitFor()
+    return branch
+}
+
+println gitBranch()
+
 // send javadocs to docs folder
-tasks.findByName("javadoc").destinationDir = file("docs")
+tasks.findByName("javadoc").destinationDir = file("docs/${version}")
+
+task switchToGithubPages(type: Exec) {
+    commandLine "git", "checkout", "gh-pages"
+}
+
+task switchToMaster(type: Exec) {
+    commandLine "git", "checkout", "master"
+}
+
+task makeJavadocBadge (type: Copy) {
+    dependsOn switchToGithubPages
+    from "images/docs-passing.svg"
+    into  "docs/${version}/"
+}
+
+task publishJavadocs(type: GradleBuild) {
+     tasks = ['clean', 'javadoc']
+}
 
 //TODO: add task to switch to gh-pages, commit, and push after running 'javadoc'
 
