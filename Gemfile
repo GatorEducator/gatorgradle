@@ -17,6 +17,9 @@ gem "jekyll-theme-cayman"
 # uncomment the line below. To upgrade, run `bundle update github-pages`.
 gem 'github-pages', group: :jekyll_plugins
 
+
+gem "jekyll-readme-index"
+
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 # if you're on windows, probably want to uncomment this
 #gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]

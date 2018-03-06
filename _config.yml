@@ -21,9 +21,14 @@ url: "https://gatored.github.io/gatorgradle/"
 twitter_username: michionlion
 github_username:  michionlion
 show_downloads: "false"
+
 # Build settings
 markdown: kramdown
 theme: jekyll-theme-cayman
+
+
+gems:
+    - jekyll-readme-index
 
 # Exclude from processing.
 # The following items will not be processed, by default. Create a custom list
