@@ -55,6 +55,8 @@ uploadArchives {
 // send javadocs to docs folder
 tasks.findByName("javadoc").destinationDir = file("docs")
 
+//TODO: add task to switch to gh-pages, commit, and push after running 'javadoc'
+
 
 quality {
     checkstyleVersion = "8.1"
