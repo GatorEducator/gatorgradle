@@ -61,36 +61,39 @@ def getBranch() {
     return branch
 }
 
-def hasLocalChanges() {
-
+def executeCommand(String command, String error, boolean sendToConsole=true, String errorCommand=null) {
     def err = false
 
-    def proc = "git update-index -q --ignore-submodules --refresh".execute()
-    proc.in.eachLine { line -> println line }
+    def proc = "${command}".execute()
+    if(sendToConsole) {
+        proc.in.eachLine { line -> println line }
+    }
     proc.err.eachLine { line ->
         println line
         err = true
     }
-    
-    if ! git diff-files --quiet --ignore-submodules --
-    then
-        echo >&2 "cannot $1: you have unstaged changes."
-        git diff-files --name-status -r --ignore-submodules -- >&2
-        err=1
-    fi
 
-    # Disallow uncommitted changes in the index
-    if ! git diff-index --cached --quiet HEAD --ignore-submodules --
-    then
-        echo >&2 "cannot $1: your index contains uncommitted changes."
-        git diff-index --cached --name-status -r --ignore-submodules HEAD -- >&2
-        err=1
-    fi
+    proc.waitFor()
+    if(proc.exitValue() != 0) {
+        if(errorCommand != null) {
+            executeCommand(errorCommand, "Unknown nested error, see above!", null, true)
+        }
+        throw new GradleException("${error}")
+    } else if (err) {
+        throw new GradleException("Unknown error, see above!")
+    }
+}
+
+def checkLocalChanges() {
+
+    executeCommand("git update-index -q --ignore-submodules --refresh", "Failed to update git index")
+    executeCommand("git diff-files --quiet --ignore-submodules", "Please commit your changes!");
+    executeCommand("git diff-index --cached --quiet HEAD --ignore-submodules", "Please add your changes:", true, "git diff-index --cached --name-status -r --ignore-submodules HEAD")
 }
 
 def switchToBranch(String branch) {
+    checkLocalChanges()
     def err = false
-
     def proc = "git checkout ${branch}".execute()
     proc.in.eachLine { line -> println line }
     proc.err.eachLine { line ->
@@ -107,48 +110,67 @@ def switchToBranch(String branch) {
     }
 }
 
-// send javadocs to docs folder
-tasks.findByName("javadoc").destinationDir = file("docs/${version}")
 
 
-task CopyAndThen(type: Copy) {
-   doFirst {
-      println "this is before the actual copy"
-   }
-   println "copy"
-   doLast {
-      println "this is after the actual copy"
-   }
+def copy(String from, String to) {
+    def srcStream = new File(from).newDataInputStream()
+    def dstStream = new File(to).newDataOutputStream()
+    dstStream << srcStream
+    srcStream.close()
+    dstStream.close()
 }
 
-task makeJavadocBadge(type: Copy) {
+def createJavadocBadge(String docFolder) {
 
     def oldBranch = ""
-    doFirst {
-        println("running javadoc")
-        oldBranch = getBranch()
-        switchToBranch("gh-pages")
-        println "switched branch to ${getBranch()}"
-    }
+    println("running javadoc")
+    oldBranch = getBranch()
+    switchToBranch("gh-pages")
+    println "switched branch to ${getBranch()}"
 
     def filename = "docs-passing.svg"
-    println "configuring"
-    from "images"
-    into  "docs/${version}"
-    include filename
-    rename filename, "docs-status-badge.svg"
+    println filename
+    copy("images/${filename}", "${docFolder}/docs-status-badge.svg")
 
-    doLast {
-        println "finished copy"
-        println "on branch ${getBranch()}"
-        switchToBranch(oldBranch)
-        println "switched branch to ${getBranch()}"
-    }
+    println "finished copy"
+    println "on branch ${getBranch()}"
+    switchToBranch(oldBranch)
+    println "switched branch to ${getBranch()}"
 }
 
-/* task publishJavadocs(type: GradleBuild) {
-     tasks = ['clean', 'javadoc']
-} */
+def publishToGit(String path, String branch=null) {
+    def currBranch = getBranch()
+    def switched = false;
+    if(branch != null && branch != currBranch) {
+        switchToBranch(branch)
+        switched = true
+    } else {
+        branch = currBranch
+    }
+    executeCommand("git add ${path}", "Failed to add ${path} to git!", true)
+    executeCommand("git commit ${path} -am \"automatic javadoc publish for v${version}\"", "Failed to commit ${path} to git!", true)
+    executeCommand("git push -u origin ${branch}", "Failed to push to git!", true)
+
+    if(switched) {
+        switchToBranch(currBranch)
+    }
+
+}
+
+task publishJavadocs(type: GradleBuild) {
+    def docFolder = "docs/${version}"
+
+    doFirst {
+        project.tasks.findByName("javadoc").destinationDir = file(docFolder)
+    }
+
+    tasks = ['clean', 'javadoc']
+
+    doLast {
+        createJavadocBadge(docFolder)
+        publishToGit(docFolder)
+    }
+}
 
 quality {
     checkstyleVersion = "8.1"
