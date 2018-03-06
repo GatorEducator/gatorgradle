@@ -1,3 +1,7 @@
+---
+layout: default
+---
+
 # Javadocs
 You can select one of the below versions to go to the javadoc for that version of GatorGradle.
 
