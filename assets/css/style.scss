@@ -4,15 +4,15 @@
 @import "{{ site.theme }}";
 
 ul.version-list li {
-    font-size: 20px;
-    font-weight: bold;
+    font-size: 24px;
+    font-weight: 600;
     color: $section-headings-color;
-    margin-top: 1em;
-    margin-bottom: 1em;
+    margin-top: 1.5em;
+    margin-bottom: 1.5em;
     padding-bottom: 0em;
-    padding-left: 0.2em;
-    padding-right: 0.2em;
-    list-style-type: '-';
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    list-style-type: circle;
     list-style-position: inside
 }
 
