@@ -1,10 +1,9 @@
 # Javadocs
 You can select one of the below versions to go to the javadoc for that version of GatorGradle.
 
-{% assign pre_sorted_builds = site.data.versions | sort: 'date' %}
-{% assign sorted_builds = pre_sorted_builds | reversed %}
+{% assign sortedBuilds = site.data.versions | sort: 'date' %}
 <ul>
-{% for build in sorted_builds %}
+{% for build in sortedBuilds %}
     <li>
         <h4><a href="/gatorgradle/docs/{{ build.name }}">
             Javadoc for {{ build.name }}
