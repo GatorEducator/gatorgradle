@@ -2,6 +2,12 @@
 /build/
 #/docs/
 
+
+# Jekyll
+_site
+.sass-cache
+.jekyll-metadata
+
 # Ignore Gradle GUI config
 gradle-app.setting
 
