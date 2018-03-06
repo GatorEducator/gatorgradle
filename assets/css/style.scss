@@ -5,18 +5,20 @@
 
 ul.version-list li {
     font-size: 24px;
-    font-weight: 600;
+    font-weight: 500;
     color: $section-headings-color;
-    margin-top: 1.5em;
-    margin-bottom: 1.5em;
+    margin-top: 2em;
+    margin-bottom: 1em;
     padding-bottom: 0em;
     padding-left: 0.5em;
     padding-right: 0.5em;
     list-style-type: circle;
     list-style-position: inside
+
+    border: none;
 }
 
-ul.version-list li ul {
+ul.version-list li ul li {
     list-style-type: none;
     list-style-position: inside;
 
