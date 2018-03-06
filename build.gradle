@@ -122,21 +122,9 @@ def copy(String from, String to) {
 }
 
 def createJavadocBadge(String docFolder) {
-
-    def oldBranch = ""
-    println("running javadoc")
-    oldBranch = getBranch()
-    switchToBranch("gh-pages")
-    println "switched branch to ${getBranch()}"
-
     def filename = "docs-passing.svg"
     println filename
     copy("images/${filename}", "${docFolder}/docs-status-badge.svg")
-
-    println "finished copy"
-    println "on branch ${getBranch()}"
-    switchToBranch(oldBranch)
-    println "switched branch to ${getBranch()}"
 }
 
 def publishToGit(String path, String branch=null) {
@@ -168,8 +156,19 @@ task publishJavadocs(type: GradleBuild) {
     tasks = ['clean', 'javadoc']
 
     doLast {
+        def oldBranch = ""
+        println("running javadoc")
+        oldBranch = getBranch()
+        switchToBranch("gh-pages")
+        println "switched branch to ${getBranch()}"
+
         createJavadocBadge(docFolder)
-        publishToGit(docFolder)
+        publishToGit(docFolder, "gh-pages")
+
+        println "finished copy"
+        println "on branch ${getBranch()}"
+        switchToBranch(oldBranch)
+        println "switched branch to ${getBranch()}"
     }
 }
 
