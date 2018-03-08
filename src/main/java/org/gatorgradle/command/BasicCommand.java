@@ -18,7 +18,7 @@ public class BasicCommand implements Command {
     private File workingDir;
 
     private String output;
-    private transient Thread thread;
+    private transient Thread thread = null;
     private Callback callback;
 
     private boolean fin;
