@@ -116,10 +116,10 @@ def copy(String from, String to) {
     dstStream.close()
 }
 
-def createJavadocBadge(String docFolder) {
-    def filename = "docs-passing.svg"
+def createJavadocBadge(String status) {
+    def filename = "docs-${status.toLowerCase()}.svg"
     println filename
-    copy("images/${filename}", "${docFolder}/docs-status-badge.svg")
+    copy("images/${filename}", "docs/docs-status-badge.svg")
 }
 
 def publishToGit(String path, String branch=null) {
@@ -141,6 +141,19 @@ def publishToGit(String path, String branch=null) {
 
 }
 
+
+def versionsFile = "_data/versions.csv"
+
+def addVersionToDatalist(String docFolder) {
+
+    def date = new Date().format("MMMM dd", TimeZone.getTimeZone("UTC")
+    def (v1, v2, v3) = version.split(".")
+    def build = v1 * 100 + v2 * 10 + v3
+    
+    def file = new File(versionsFile)
+    file << "\n" << build << "," << version << "," << date << "," << docFolder
+}
+
 task publishJavadocs(type: GradleBuild) {
     def docFolder = "docs/${version}"
 
@@ -157,10 +170,13 @@ task publishJavadocs(type: GradleBuild) {
         switchToBranch("gh-pages")
         println "switched branch to ${getBranch()}"
 
-        createJavadocBadge(docFolder)
+        // TODO: determine this better
+        def status = "passing"
+
+        createJavadocBadge(status)
+        addVersionToDatalist(docFolder)
         publishToGit(docFolder, "gh-pages")
 
-        println "finished copy"
         println "on branch ${getBranch()}"
         switchToBranch(oldBranch)
         println "switched branch to ${getBranch()}"
