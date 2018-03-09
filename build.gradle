@@ -133,7 +133,7 @@ def publishToGit(String path, String branch=null) {
         branch = currBranch
     }
     executeCommand("git add ${path}", "Failed to add ${path} to git!", true)
-    executeCommand("git commit -m \"automatic javadoc publish for v${version}\"", "Failed to commit ${path} to git!", true)
+    executeCommand("git commit -m \\\"automatic javadoc publish for v${version}\\\"", "Failed to commit ${path} to git!", true)
     executeCommand("git push -u origin ${branch}", "Failed to push to git!", true)
 
     if(switched) {
