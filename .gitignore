@@ -2,6 +2,10 @@
 /build/
 /docs/
 
+
+/_site/
+/vendor/
+
 # Ignore Gradle GUI config
 gradle-app.setting
 

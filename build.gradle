@@ -16,8 +16,8 @@ ext.gitVersioner = [
 apply from: "versioner.gradle"
 
 group = "${artifact_group}"
-version = "${artifact_release}.${artifact_patch}-${gitVersionName}"
-
+def sem_version = "${artifact_release}.${artifact_patch}"
+version = "${sem_version}-${gitVersionName}"
 
 println("\u001B[1;36mVERSION ${version}\u001B[0m")
 
@@ -125,7 +125,7 @@ def createJavadocBadge(String status) {
 
 def publishToGit(String path, String branch=null) {
     def currBranch = getBranch()
-    def switched = false;
+    def switched = false
     if(branch != null && branch != currBranch) {
         switchToBranch(branch)
         switched = true
@@ -133,7 +133,7 @@ def publishToGit(String path, String branch=null) {
         branch = currBranch
     }
     executeCommand("git add ${path}", "Failed to add ${path} to git!", true)
-    executeCommand("git commit ${path} -am \"automatic javadoc publish for v${version}\"", "Failed to commit ${path} to git!", true)
+    executeCommand("git commit -m \"automatic javadoc publish for v${version}\"", "Failed to commit ${path} to git!", true)
     executeCommand("git push -u origin ${branch}", "Failed to push to git!", true)
 
     if(switched) {
@@ -147,20 +147,28 @@ def versionsFile = "_data/versions.csv"
 
 def addVersionToDatalist(String docFolder) {
 
-    def date = new Date().format("MMMM dd", TimeZone.getTimeZone("UTC"))
+    def currBranch = getBranch()
+    def switched = false
+    if(currBranch != "gh-pages") {
+        switchToBranch("gh-pages")
+        switched = true
+    }
+
+    def date = new Date().format("MMMM dd, YYYY", TimeZone.getTimeZone("UTC"))
     def (semantic, build) = version.split("-")
 
     def file = new File(versionsFile)
 
-
-
-
-
     file << "\n\"" << build << "\",\"" << semantic << "\",\"" << date << "\",\"" << docFolder << "\""
+
+    if(switched) {
+        switchToBranch(currBranch)
+    }
+
 }
 
 task publishJavadocs(type: GradleBuild) {
-    def docFolder = "docs/${version}"
+    def docFolder = "docs/${sem_version}"
 
     doFirst {
         project.tasks.findByName("javadoc").destinationDir = file(docFolder)
@@ -180,8 +188,7 @@ task publishJavadocs(type: GradleBuild) {
 
         createJavadocBadge(status)
         addVersionToDatalist(docFolder)
-        publishToGit(docFolder, "gh-pages")
-
+        publishToGit(docFolder + " " + , "gh-pages")
         println "on branch ${getBranch()}"
         switchToBranch(oldBranch)
         println "switched branch to ${getBranch()}"
