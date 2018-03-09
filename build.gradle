@@ -65,7 +65,14 @@ def getBranch() {
 def executeCommand(String command, String error, boolean sendToConsole=true, String errorCommand=null) {
     def err = false
 
-    def proc = "${command}".execute()
+    // parse into list to accomodate spaces and quoted strings
+
+    def cmd = []
+    act.split("\"").each {
+        if(it.trim() != "") { cmd += it.trim() }
+    }
+
+    def proc = cmd.execute()
     if(sendToConsole) {
         proc.in.eachLine { line -> println line }
     }
@@ -133,7 +140,7 @@ def publishToGit(String path, String branch=null) {
         branch = currBranch
     }
     executeCommand("git add ${path}", "Failed to add ${path} to git!", true)
-    executeCommand("git commit -m \\\\\"automatic javadoc publish for v${version}\\\\\"", "Failed to commit ${path} to git!", true)
+    executeCommand("git commit -m \"automatic javadoc publish for v${version}\"", "Failed to commit ${path} to git!", true)
     executeCommand("git push -u origin ${branch}", "Failed to push to git!", true)
 
     if(switched) {
@@ -156,7 +163,7 @@ def addVersionToDatalist(String docFolder, String versionsFile) {
 
     def file = new File(versionsFile)
 
-    file << "\n\"" << build << "\",\"" << semantic << "\",\"" << date << "\",\"" << docFolder << "\""
+    file << "\"" << build << "\",\"" << semantic << "\",\"" << date << "\",\"" << docFolder << "\""
 
     if(switched) {
         switchToBranch(currBranch)
