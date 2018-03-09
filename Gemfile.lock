@@ -234,6 +234,7 @@ PLATFORMS
 
 DEPENDENCIES
   github-pages
+  jekyll-readme-index
   jekyll-theme-cayman
 
 BUNDLED WITH

@@ -17,16 +17,17 @@ title: GatorGradle
 email: saejinmh@gmail.com
 description: >- # this means to ignore newlines until next main tag
   GatorGradle is a plugin that enables a Gradle task to run GatorGrader grading checks.
-url: "https://gatored.github.io/gatorgradle/"
-twitter_username: michionlion
-github_username:  michionlion
-show_downloads: "false"
+url: "https://gatored.github.io"
+baseurl: "/gatorgradle"
+twitter_username: "michionlion"
+github_username:  "michionlion"
+show_downloads: false
 
 # Build settings
 markdown: kramdown
 theme: jekyll-theme-cayman
 
-gems:
+plugins:
     - jekyll-readme-index
 
 
