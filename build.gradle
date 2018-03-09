@@ -157,7 +157,7 @@ def addVersionToDatalist(String docFolder) {
     def date = new Date().format("MMMM dd, YYYY", TimeZone.getTimeZone("UTC"))
     def (semantic, build) = version.split("-")
 
-    def file = new File(versionsFile)
+    def file = new File("${versionsFile}")
 
     file << "\n\"" << build << "\",\"" << semantic << "\",\"" << date << "\",\"" << docFolder << "\""
 
