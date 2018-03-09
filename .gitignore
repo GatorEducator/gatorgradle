@@ -3,7 +3,7 @@
 #/docs/
 
 /vendor/
-
+/_site/
 # Jekyll
 .sass-cache
 .jekyll-metadata
