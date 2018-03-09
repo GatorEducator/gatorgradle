@@ -94,7 +94,7 @@ def executeCommand(String command, String error, boolean sendToConsole=true, Str
 
 def checkLocalChanges() {
 
-    executeCommand("git update-index -q --ignore-submodules --refresh", "Failed to update git index")
+//    executeCommand("git update-index -q --ignore-submodules --refresh", "Failed to update git index")
     executeCommand("git diff-files --quiet --ignore-submodules", "Please commit your changes!");
     executeCommand("git diff-index --cached --quiet HEAD --ignore-submodules", "Please add your changes:", true, "git diff-index --cached --name-status -r --ignore-submodules HEAD")
 }
