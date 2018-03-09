@@ -117,10 +117,10 @@ def copy(String from, String to) {
     dstStream.close()
 }
 
-def createJavadocBadge(String status) {
+def createJavadocBadge(String status, String dest) {
     def filename = "docs-${status.toLowerCase()}.svg"
     println filename
-    copy("images/${filename}", "docs/docs-status-badge.svg")
+    copy("images/${filename}", dest)
 }
 
 def publishToGit(String path, String branch=null) {
@@ -185,10 +185,11 @@ task publishJavadocs(type: GradleBuild) {
 
         // TODO: determine this better
         def status = "passing"
+        def badge = "docs/docs-status-badge.svg"
 
-        createJavadocBadge(status)
+        createJavadocBadge(status, badge)
         addVersionToDatalist(docFolder)
-        publishToGit(docFolder + " " + , "gh-pages")
+        publishToGit(docFolder + " " + badge, "gh-pages")
         println "on branch ${getBranch()}"
         switchToBranch(oldBranch)
         println "switched branch to ${getBranch()}"
