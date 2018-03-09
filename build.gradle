@@ -68,7 +68,7 @@ def executeCommand(String command, String error, boolean sendToConsole=true, Str
     // parse into list to accomodate spaces and quoted strings
 
     def cmd = []
-    act.split("\"").each {
+    command.split("\"").each {
         if(it.trim() != "") { cmd += it.trim() }
     }
 
