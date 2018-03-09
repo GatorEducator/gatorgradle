@@ -151,7 +151,7 @@ def addVersionToDatalist(String docFolder, String versionsFile) {
         switched = true
     }
 
-    def date = new Date().format("MMMM dd, YYYY", TimeZone.getTimeZone("UTC"))
+    def date = new Date().format("MMMM d, YYYY", TimeZone.getTimeZone("UTC"))
     def (semantic, build) = version.split("-")
 
     def file = new File(versionsFile)
@@ -166,10 +166,7 @@ def addVersionToDatalist(String docFolder, String versionsFile) {
 
 task publishJavadocs(type: GradleBuild) {
     def docFolder = "docs/${sem_version}"
-
-    doFirst {
-        project.tasks.findByName("javadoc").destinationDir = file(docFolder)
-    }
+    project.tasks.findByName("javadoc").destinationDir = file(docFolder)
 
     tasks = ['clean', 'javadoc']
 
