@@ -142,10 +142,7 @@ def publishToGit(String path, String branch=null) {
 
 }
 
-
-def versionsFile = "_data/versions.csv"
-
-def addVersionToDatalist(String docFolder) {
+def addVersionToDatalist(String docFolder, String versionsFile) {
 
     def currBranch = getBranch()
     def switched = false
@@ -157,7 +154,7 @@ def addVersionToDatalist(String docFolder) {
     def date = new Date().format("MMMM dd, YYYY", TimeZone.getTimeZone("UTC"))
     def (semantic, build) = version.split("-")
 
-    def file = new File("${versionsFile}")
+    def file = new File(versionsFile)
 
     file << "\n\"" << build << "\",\"" << semantic << "\",\"" << date << "\",\"" << docFolder << "\""
 
@@ -186,9 +183,10 @@ task publishJavadocs(type: GradleBuild) {
         // TODO: determine this better
         def status = "passing"
         def badge = "docs/docs-status-badge.svg"
+        def versionsFile = "_data/versions.csv"
 
         createJavadocBadge(status, badge)
-        addVersionToDatalist(docFolder)
+        addVersionToDatalist(docFolder, versionsFile)
         publishToGit(docFolder + " " + badge, "gh-pages")
         println "on branch ${getBranch()}"
         switchToBranch(oldBranch)
