@@ -5,10 +5,10 @@ layout: default
 # Javadocs
 You can select one of the below versions to go to the javadoc for that version of GatorGradle.
 
-{% assign sortedBuilds = site.data.versions | sort: 'semantic' %}
+{% assign sortedBuilds = site.data.versions | sort: 'build' | reverse %}
 {% assign sortedBuilds = sortedBuilds | uniq: 'url' %}
 <ul class="version-list">
-{% for version in sortedBuilds reversed %}
+{% for version in sortedBuilds %}
     <li>
         <a href="{{ site.baseurl }}/{{ version.url }}">
             Javadoc for {{ version.semantic }}
