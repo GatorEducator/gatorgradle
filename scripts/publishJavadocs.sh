@@ -104,6 +104,10 @@ currentBranch=$(git rev-parse --abbrev-ref HEAD)
 # switch to gh-pages branch
 git checkout "$PAGES_BRANCH"
 
+# update local copy of branch
+
+git pull origin gh-pages
+
 # update data file
 echo "\"$BUILD_VERSION\",\"$SEM_VERSION\",\"$DOC_DATE\",\"$DOC_FOLDER\"" >> $VERSION_DATA_FILE
 
