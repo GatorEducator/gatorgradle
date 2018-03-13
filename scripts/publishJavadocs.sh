@@ -84,19 +84,21 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-echo "---------------"
-echo "DOC_FOLDER: $DOC_FOLDER"
-echo "DOC_STATUS: $DOC_STATUS"
-echo "DOC_VERSION: $DOC_VERSION"
-echo "DOC_DATE: $DOC_DATE"
-echo "---------------"
-
 # separate semver and build
 SEM_VERSION=${DOC_VERSION%-*}
 BUILD_VERSION=${DOC_VERSION##*-}
 
 # check for local changes and exit if there are any
 require_clean_work_tree "publish javadoc"
+
+
+echo "------------------------"
+echo "DOC_FOLDER: $DOC_FOLDER"
+echo "DOC_STATUS: $DOC_STATUS"
+echo "DOC_VERSION: $DOC_VERSION"
+echo "DOC_DATE: $DOC_DATE"
+echo "------------------------"
+
 
 # save current branch
 currentBranch=$(git rev-parse --abbrev-ref HEAD)
@@ -115,7 +117,7 @@ echo "\"$BUILD_VERSION\",\"$SEM_VERSION\",\"$DOC_DATE\",\"$DOC_FOLDER\"" >> $VER
 command cp "images/docs-$DOC_STATUS.svg" "$DOC_BADGE"
 
 # add doc folder and badge
-git add "$DOC_FOLDER" "$DOC_BADGE"
+git add "$DOC_FOLDER" "$DOC_BADGE" "$VERSION_DATA_FILE"
 git commit -m "test autopublish javadoc for version $DOC_VERSION: $DOC_STATUS"
 git push origin "$PAGES_BRANCH"
 
