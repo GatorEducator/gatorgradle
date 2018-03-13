@@ -105,8 +105,8 @@ currentBranch=$(git rev-parse --abbrev-ref HEAD)
 git checkout "$PAGES_BRANCH"
 
 # update local copy of branch
-
-git pull origin gh-pages
+git fetch --all
+git pull origin "$PAGES_BRANCH"
 
 # update data file
 echo "\"$BUILD_VERSION\",\"$SEM_VERSION\",\"$DOC_DATE\",\"$DOC_FOLDER\"" >> $VERSION_DATA_FILE
@@ -117,7 +117,7 @@ command cp "images/docs-$DOC_STATUS.svg" "$DOC_BADGE"
 # add doc folder and badge
 git add "$DOC_FOLDER" "$DOC_BADGE"
 git commit -m "test autopublish javadoc for version $DOC_VERSION: $DOC_STATUS"
-git push origin gh-pages
+git push origin "$PAGES_BRANCH"
 
 # switch back to old branch
 git checkout "$currentBranch"
