@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# TODO: add error checking and error return
+
 # colors for output
 red="\033[1;31m"
 grn="\033[1;32m"
@@ -118,7 +120,7 @@ command cp "images/docs-$DOC_STATUS.svg" "$DOC_BADGE"
 
 # add doc folder and badge
 git add "$DOC_FOLDER" "$DOC_BADGE" "$VERSION_DATA_FILE"
-git commit -m "test autopublish javadoc for version $DOC_VERSION: $DOC_STATUS"
+git commit -m "autopublish javadoc for version $DOC_VERSION: $DOC_STATUS"
 git push origin "$PAGES_BRANCH"
 
 # switch back to old branch
