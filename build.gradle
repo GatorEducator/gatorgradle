@@ -53,14 +53,6 @@ uploadArchives {
     }
 }
 
-def addVersionToDatalist(String docFolder) {
-
-    def date = new Date().format("MMMM d, YYYY", TimeZone.getTimeZone("UTC"))
-    def (semantic, build) = version.split("-")
-
-    return "\"" + build + "\",\"" + semantic + "\",\"" + date + "\",\"" + docFolder + "\""
-}
-
 task publishJavadocs(type: GradleBuild) {
     def docFolder = "docs/${sem_version}"
     project.tasks.findByName("javadoc").destinationDir = file(docFolder)
@@ -70,10 +62,10 @@ task publishJavadocs(type: GradleBuild) {
     doLast {
         // TODO: determine this better
         def status = "passing"
-        def badge = "docs/docs-status-badge.svg"
-        def versionsFile = "_data/versions.csv"
+        def date = new Date().format("MMMM d, YYYY", TimeZone.getTimeZone("UTC"))
 
-        addVersionToDatalist(docFolder, versionsFile)
+        def proc = ["bash scripts/"]
+
     }
 }
 
