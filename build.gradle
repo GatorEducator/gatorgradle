@@ -13,8 +13,8 @@ ext.gitVersioner = [
         localChangesCountEnabled: false,       // default false, the (<commitCount>) before -SNAPSHOT
 ]
 // import the script which runs the version generation
-apply from: "versioner.gradle"
 
+apply from: "scripts/versioner.gradle"
 group = "${artifact_group}"
 def sem_version = "${artifact_release}.${artifact_patch}"
 version = "${sem_version}-${gitVersionName}"
@@ -53,151 +53,27 @@ uploadArchives {
     }
 }
 
-def getBranch() {
-    def branch = ""
-    def proc = "usr/bin/git rev-parse --abbrev-ref HEAD".execute()
-    proc.in.eachLine { line -> branch = line }
-    proc.err.eachLine { line -> println line }
-    proc.waitFor()
-    return branch
-}
-
-def executeCommand(String command, String error, boolean sendToConsole=true, String errorCommand=null) {
-    def err = false
-
-    // parse into list to accomodate spaces and quoted strings
-
-    def cmd = []
-    command.split("\"").each {
-        if(it.trim() != "") { cmd += it.trim() }
-    }
-
-    def proc = cmd.execute()
-    if(sendToConsole) {
-        proc.in.eachLine { line -> println line }
-    }
-    proc.err.eachLine { line ->
-        println line
-        err = true
-    }
-
-    proc.waitFor()
-    if(proc.exitValue() != 0) {
-        if(errorCommand != null) {
-            executeCommand(errorCommand, "Unknown nested error, see above!", null, true)
-        }
-        throw new GradleException("${error}")
-    } else if (err) {
-        throw new GradleException("Unknown error, see above!")
-    }
-}
-
-def checkLocalChanges() {
-
-   executeCommand("usr/bin/git update-index -q --ignore-submodules --refresh", "Failed to update git index")
-   executeCommand("usr/bin/git diff-files --quiet --ignore-submodules", "Please commit your changes!");
-   executeCommand("usr/bin/git diff-index --cached --quiet HEAD --ignore-submodules", "Please add your changes:", true, "usr/bin/git diff-index --cached --name-status -r --ignore-submodules HEAD")
-}
-
-def switchToBranch(String branch) {
-    def err = false
-    def proc = "usr/bin/git checkout ${branch}".execute()
-    proc.waitFor()
-    if(getBranch() != branch) {
-        err = true
-        println "Git didn't switch to " + getBranch()
-    }
-
-    if(err) {
-        throw new GradleException("Could not checkout ${branch}!")
-    }
-}
-
-
-
-def copy(String from, String to) {
-    def srcStream = new File(from).newDataInputStream()
-    def dstStream = new File(to).newDataOutputStream()
-    dstStream << srcStream
-    srcStream.close()
-    dstStream.close()
-}
-
-def createJavadocBadge(String status, String dest) {
-    def filename = "docs-${status.toLowerCase()}.svg"
-    println filename
-    copy("images/${filename}", dest)
-}
-
-def publishToGit(String path, String branch=null) {
-    def currBranch = getBranch()
-    def switched = false
-    if(branch != null && branch != currBranch) {
-        switchToBranch(branch)
-        switched = true
-    } else {
-        branch = currBranch
-    }
-    executeCommand("usr/bin/git add ${path}", "Failed to add ${path} to git!", true)
-    executeCommand("usr/bin/git commit -m \"automatic javadoc publish for v${version}\"", "Failed to commit ${path} to git!", true)
-    executeCommand("usr/bin/git push -u origin ${branch}", "Failed to push to git!", true)
-
-    if(switched) {
-        switchToBranch(currBranch)
-    }
-
-}
-
-def addVersionToDatalist(String docFolder, String versionsFile) {
-
-    def currBranch = getBranch()
-    def switched = false
-    if(currBranch != "gh-pages") {
-        switchToBranch("gh-pages")
-        switched = true
-    }
+def addVersionToDatalist(String docFolder) {
 
     def date = new Date().format("MMMM d, YYYY", TimeZone.getTimeZone("UTC"))
     def (semantic, build) = version.split("-")
 
-    def file = new File(versionsFile)
-
-    file << "\"" << build << "\",\"" << semantic << "\",\"" << date << "\",\"" << docFolder << "\""
-
-    if(switched) {
-        switchToBranch(currBranch)
-    }
-
+    return "\"" + build + "\",\"" + semantic + "\",\"" + date + "\",\"" + docFolder + "\""
 }
 
 task publishJavadocs(type: GradleBuild) {
     def docFolder = "docs/${sem_version}"
     project.tasks.findByName("javadoc").destinationDir = file(docFolder)
 
-    doFirst {
-        checkLocalChanges()
-    }
-
     tasks = ['clean', 'javadoc']
 
     doLast {
-        def oldBranch = ""
-        println("running javadoc")
-        oldBranch = getBranch()
-        switchToBranch("gh-pages")
-        println "switched branch to ${getBranch()}"
-
         // TODO: determine this better
         def status = "passing"
         def badge = "docs/docs-status-badge.svg"
         def versionsFile = "_data/versions.csv"
 
-        createJavadocBadge(status, badge)
         addVersionToDatalist(docFolder, versionsFile)
-        publishToGit(docFolder + " " + badge, "gh-pages")
-        println "on branch ${getBranch()}"
-        switchToBranch(oldBranch)
-        println "switched branch to ${getBranch()}"
     }
 }
 
