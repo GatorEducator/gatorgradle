@@ -72,7 +72,7 @@ task _publishJavadocs(type: Exec) {
     def docFolder = "docs/${sem_version}"
     def date = new Date().format("MMMM d, YYYY", TimeZone.getTimeZone("UTC"))
 
-    commandLine "./scripts/publishJavadocs.sh", "\"$docFolder\"", "\"$status\"", "\"$version\"", "\"$date\""
+    commandLine "./scripts/publishJavadocs.sh", docFolder, status, version, date
 }
 
 quality {
