@@ -57,16 +57,19 @@ task publishJavadocs(type: GradleBuild) {
     def docFolder = "docs/${sem_version}"
     project.tasks.findByName("javadoc").destinationDir = file(docFolder)
 
-    tasks = ['clean', 'javadoc']
+    tasks = ['clean', 'javadoc', '_publishJavadocs']
+}
 
-    doLast {
-        // TODO: determine this better
-        def status = "passing"
-        def date = new Date().format("MMMM d, YYYY", TimeZone.getTimeZone("UTC"))
+task _publishJavadocs(type: Exec) {
+    dependsOn 'javadoc'
 
-        def proc = ["bash scripts/"]
+    // TODO: determine this better
+    def status = "passing"
+    def docFolder = "docs/${sem_version}"
+    def date = new Date().format("MMMM d, YYYY", TimeZone.getTimeZone("UTC"))
 
-    }
+    executable "sh"
+    args "-c", "./scripts/publishJavadocs.sh" "-s" "${status}" "-f" "${docFolder}" "-v" "${version}" "-d" "${date}"
 }
 
 quality {
