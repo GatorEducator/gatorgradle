@@ -58,33 +58,39 @@ DOC_STATUS="unknown"
 DOC_VERSION="unknown"
 DOC_DATE="unknown"
 
-while [ $# -gt 0 ]; do
-    arg="$1"
-    shift;
-    case $arg in
-        -f|--doc-folder )
-            DOC_FOLDER="$1"
-            shift;
-            ;;
-        -s|--status )
-            DOC_STATUS="$1"
-            shift;
-            ;;
-        -v|--version )
-            DOC_VERSION="$1"
-            shift;
-            ;;
-        -d|--date )
-            DOC_DATE="$1"
-            shift;
-            ;;
-        * )
-            #shellcheck disable=SC2059
-            printf "%b" "${red}Unrecognized argument ${arg}${end}\n"
-            exit 1;
-            ;;
-    esac
-done
+DOC_FOLDER="$1"
+DOC_STATUS="$2"
+DOC_VERSION="$3"
+DOC_DATE="$4"
+
+
+# while [ $# -gt 0 ]; do
+#     arg="$1"
+#     shift;
+#     case $arg in
+#         -f|--doc-folder )
+#             DOC_FOLDER="$1"
+#             shift;
+#             ;;
+#         -s|--status )
+#             DOC_STATUS="$1"
+#             shift;
+#             ;;
+#         -v|--version )
+#             DOC_VERSION="$1"
+#             shift;
+#             ;;
+#         -d|--date )
+#             DOC_DATE="$1"
+#             shift;
+#             ;;
+#         * )
+#             #shellcheck disable=SC2059
+#             printf "%b" "${red}Unrecognized argument ${arg}${end}\n"
+#             exit 1;
+#             ;;
+#     esac
+# done
 
 # separate semver and build
 SEM_VERSION=${DOC_VERSION%-*}
