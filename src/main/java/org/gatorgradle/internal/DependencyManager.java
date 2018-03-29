@@ -2,14 +2,18 @@ package org.gatorgradle.internal;
 
 import static org.gatorgradle.GatorGradlePlugin.F_SEP;
 import static org.gatorgradle.GatorGradlePlugin.GATORGRADER_HOME;
+import static org.gatorgradle.GatorGradlePlugin.LINUX;
+import static org.gatorgradle.GatorGradlePlugin.MACOS;
 import static org.gatorgradle.GatorGradlePlugin.OS;
 import static org.gatorgradle.GatorGradlePlugin.USER_HOME;
+import static org.gatorgradle.GatorGradlePlugin.WINDOWS;
 
 import org.gatorgradle.command.BasicCommand;
 import org.gatorgradle.command.Command;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class DependencyManager {
@@ -50,33 +54,52 @@ public class DependencyManager {
     }
 
     private static boolean doGatorGrader() {
-        // TODO: fix this when nltk is removed as a dependency
-
-        if (!OS.equals("linux")) {
-            System.err.println(
-                "Automated installation of GatorGrader unsupported for non-Linux OSes!");
-            System.err.println("To install, run the following command translated to your system:");
-            System.err.println(
-                "git clone https://github.com/gkapfham/gatorgrader.git " + GATORGRADER_HOME);
-            System.err.println("pip3 install nltk");
-            System.err.println("python3 -m nltk.downloader punkt");
-            return false;
+        if (OS.equals(WINDOWS)) {
+            return doWindowsGatorGrader();
+        } else if (OS.equals(MACOS)) {
+            return doMacGatorGrader();
+        } else {
+            // assume linux if not windows or mac
+            return doLinuxGatorGrader();
         }
+    }
 
-        File workingDir = new File(GATORGRADER_HOME);
+    private static boolean doWindowsGatorGrader() {
+        System.err.println("Automated installation of GatorGrader unsupported for Windows!");
+        System.err.println(
+            "To install, run the following command after installing git (https://git-scm.com/downloads):");
+        System.err.println(
+            "git clone https://github.com/gkapfham/gatorgrader.git " + GATORGRADER_HOME);
+        return false;
+    }
+
+    private static boolean doMacGatorGrader() {
+        System.err.println("Automated installation of GatorGrader unsupported for MacOS!");
+        System.err.println("To install, run the following commands:");
+        System.err.println(
+            "ruby -e \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)\"");
+        System.err.println("brew update");
+        System.err.println("brew install git");
+        System.err.println(
+            "git clone https://github.com/gkapfham/gatorgrader.git " + GATORGRADER_HOME);
+        return false;
+    }
+
+    private static boolean doLinuxGatorGrader() {
+        Path workingDir = Paths.get(GATORGRADER_HOME);
 
         boolean doDeps = false;
 
         // quick git pull installation
         BasicCommand updateOrInstall = new BasicCommand();
-        updateOrInstall.outputToSysOut(true).setWorkingDir(workingDir);
+        updateOrInstall.outputToSysOut(true).setWorkingDir(workingDir.toFile());
         if (Files.exists(Paths.get(GATORGRADER_HOME))) {
             // gatorgrader repo exists (most likely)
             updateOrInstall.with("git", "pull");
             System.out.println("Updating GatorGrader...");
         } else {
             // make dirs
-            boolean suc = workingDir.mkdirs();
+            boolean suc = workingDir.toFile().mkdirs();
             if (!suc) {
                 System.err.println("Failed to make directories: " + workingDir);
             }
@@ -108,19 +131,8 @@ public class DependencyManager {
                 new BasicCommand("pip3", "install", "-r", GATORGRADER_HOME + "/requirements.txt");
             dep.outputToSysOut(true);
             dep.run();
-            if (dep.exitValue() == 0) {
-                System.out.println("Downloading nltk_data...");
-                dep = new BasicCommand("python3", "-m", "nltk.downloader", "punkt");
-                dep.outputToSysOut(true);
-                dep.run();
-                if (dep.exitValue() != 0) {
-                    System.err.println(
-                        "ERROR! GatorGrader management failed! Could not download punkt!");
-                    System.err.println("Command run: " + dep.getDescription());
-                    System.err.println("OUTPUT: " + dep.getOutput());
-                    return false;
-                }
-            } else {
+            System.out.println("Finished GatorGrader install!");
+            if (dep.exitValue() != 0) {
                 System.err.println(
                     "ERROR! GatorGrader management failed! Could not install dependencies!");
                 System.err.println("Command run: " + dep.getDescription());
@@ -128,6 +140,7 @@ public class DependencyManager {
                 return false;
             }
         }
+
         System.out.println();
         System.out.println();
         return true;

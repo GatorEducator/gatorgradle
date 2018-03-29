@@ -16,6 +16,10 @@ import java.util.Locale;
  *        CONFIG_FILE_LOCATION and GATORGRADER_HOME.
  */
 public class GatorGradlePlugin implements Plugin<Project> {
+    public static final String WINDOWS = "windows";
+    public static final String LINUX   = "linux";
+    public static final String MACOS   = "mac";
+
     public static final String GATORGRADER_HOME;
     public static final String CONFIG_FILE_LOCATION;
     public static final String USER_HOME;
@@ -28,11 +32,11 @@ public class GatorGradlePlugin implements Plugin<Project> {
 
         String os = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
         if (os.contains("linux")) {
-            OS = "linux";
+            OS = LINUX;
         } else if (os.contains("windows")) {
-            OS = "windows";
+            OS = WINDOWS;
         } else if (os.contains("mac")) {
-            OS = "mac";
+            OS = MACOS;
         } else {
             OS = "unsupported";
         }
