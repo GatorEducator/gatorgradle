@@ -2,6 +2,7 @@ package org.gatorgradle;
 
 import org.gatorgradle.config.GatorGradleConfig;
 import org.gatorgradle.task.GatorGradleTask;
+import org.gatorgradle.util.Console;
 
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
@@ -41,8 +42,8 @@ public class GatorGradlePlugin implements Plugin<Project> {
             OS = "unsupported";
         }
 
-        // TODO: is this a sensible default for gg home? - probably only on linux
-        if ("linux".equals(OS)) {
+        // TODO: is this a sensible default for gg home? - probably only on linux and mac
+        if (OS.equals(LINUX) || OS.equals(MACOS)) {
             GATORGRADER_HOME =
                 USER_HOME + F_SEP + ".local" + F_SEP + "share" + F_SEP + "gatorgrader";
         } else {

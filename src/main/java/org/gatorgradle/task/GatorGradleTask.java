@@ -3,14 +3,11 @@ package org.gatorgradle.task;
 import static org.gatorgradle.GatorGradlePlugin.CONFIG_FILE_LOCATION;
 
 import org.gatorgradle.GatorGradlePlugin;
-import org.gatorgradle.command.BasicCommand;
-import org.gatorgradle.command.Command;
-import org.gatorgradle.command.GatorGraderCommand;
+import org.gatorgradle.command.*;
 import org.gatorgradle.config.GatorGradleConfig;
 import org.gatorgradle.display.CommandOutputSummary;
-import org.gatorgradle.internal.Dependency;
-import org.gatorgradle.internal.DependencyManager;
-import org.gatorgradle.internal.ProgressLoggerWrapper;
+import org.gatorgradle.internal.*;
+import org.gatorgradle.util.Console;
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.Input;
@@ -75,7 +72,7 @@ public class GatorGradleTask extends DefaultTask {
      */
     private static synchronized void completedTask(Command complete) {
         completedTasks.add(complete);
-        // System.out.println("FINISHED " + complete.getDescription());
+        // Console.log("FINISHED " + complete.getDescription());
 
         // To break the build if wanted, throw a GradleException here
         // throw new GradleException(this);
@@ -91,9 +88,15 @@ public class GatorGradleTask extends DefaultTask {
      */
     @TaskAction
     public void grade() {
-        // ensure GatorGrader is installed
+        // ensure GatorGrader and dependencies are installed
+        if (!DependencyManager.installOrUpdate(Dependency.GIT)) {
+            throw new RuntimeException("Git not installed!");
+        }
+        if (!DependencyManager.installOrUpdate(Dependency.PYTHON)) {
+            throw new RuntimeException("Python not installed!");
+        }
         if (!DependencyManager.installOrUpdate(Dependency.GATORGRADER)) {
-            throw new RuntimeException("Failed to install gatorgrader!");
+            throw new RuntimeException("GatorGrader not installed!");
         }
 
         // ensure we have a configuration
@@ -132,7 +135,7 @@ public class GatorGradleTask extends DefaultTask {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException ex) {
-                System.err.println("Failed to sleep");
+                Console.error("Failed to sleep");
             }
         }
 

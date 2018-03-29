@@ -18,6 +18,8 @@
 
 package org.gatorgradle.internal;
 
+import org.gatorgradle.util.Console;
+
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
 
@@ -54,7 +56,7 @@ public class ProgressLoggerWrapper {
             progressLoggerFactoryClass =
                 Class.forName("org.gradle.internal.logging.progress.ProgressLoggerFactory");
         } catch (ClassNotFoundException ex) {
-            System.err.println("ProgressLoggerWrapper Error: " + ex);
+            Console.error("ProgressLoggerWrapper Error: " + ex);
         }
 
         // get ProgressLoggerFactory service
@@ -66,13 +68,13 @@ public class ProgressLoggerWrapper {
             // get actual progress logger
             progressLogger = invoke(progressLoggerFactory, "newOperation", getClass());
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
-            System.err.println("ProgressLoggerWrapper Error: " + ex);
+            Console.error("ProgressLoggerWrapper Error: " + ex);
         }
 
         try {
             invoke(progressLogger, "setDescription", description);
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
-            System.err.println("ProgressLoggerWrapper Error: " + ex);
+            Console.error("ProgressLoggerWrapper Error: " + ex);
         }
     }
 

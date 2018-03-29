@@ -1,5 +1,7 @@
 package org.gatorgradle.command;
 
+import org.gatorgradle.util.Console;
+
 import org.gradle.api.GradleException;
 import org.gradle.api.logging.Logging;
 
@@ -101,7 +103,7 @@ public class BasicCommand implements Command {
             try {
                 thread.join();
             } catch (InterruptedException ex) {
-                System.err.println("Error waiting for command to finish: " + ex);
+                Console.error("Error waiting for command to finish: " + ex);
             }
         }
         return this;
@@ -177,11 +179,11 @@ public class BasicCommand implements Command {
             // } else {
             //     System.err.print("Error while running '");
             //     System.err.print(command.stream().collect(Collectors.joining("\' \'")));
-            //     System.err.println("':");
+            //     Console.error("':");
             //     ex.printStackTrace();
             //     exitVal = -1;
             // }
-            // System.err.println("Exception while running " + getDescription() + ": " + ex);
+            // Console.error("Exception while running " + getDescription() + ": " + ex);
             Logging.getLogger(BasicCommand.class)
                 .error("Exception while running {}: {}", getDescription(), ex);
         } finally {
@@ -194,7 +196,7 @@ public class BasicCommand implements Command {
                     in.close();
                 }
             } catch (IOException ex) {
-                System.err.println("Failed to close command input stream!");
+                Console.error("Failed to close command input stream!");
             }
         }
     }
@@ -209,6 +211,6 @@ public class BasicCommand implements Command {
         com.outputToSysOut(false);
         com.run(true);
         System.out.print("OUTPUT:\n" + com.getOutput());
-        System.out.println("EXIT VALUE: " + com.exitValue());
+        Console.log("EXIT VALUE: " + com.exitValue());
     }
 }

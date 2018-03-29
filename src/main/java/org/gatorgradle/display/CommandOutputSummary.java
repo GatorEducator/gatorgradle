@@ -3,7 +3,7 @@ package org.gatorgradle.display;
 import org.gatorgradle.command.BasicCommand;
 import org.gatorgradle.command.Command;
 import org.gatorgradle.task.GatorGradleTask;
-import org.gatorgradle.util.StringUtil;
+import org.gatorgradle.util.*;
 
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
@@ -27,7 +27,7 @@ public class CommandOutputSummary {
         String yes  = "\u001B[1;32mYes\u001B[0m";
         String no   = "\u001B[1;31mNo\u001B[0m";
 
-        System.out.println("\n  --  \u001B[1;36mBeginning check summary\u001B[1;0m  --  \n");
+        Console.log("\n  --  \u001B[1;36mBeginning check summary\u001B[1;0m  --  \n");
 
         for (Command cmd : completedCommands) {
             // failure needs to be handled
