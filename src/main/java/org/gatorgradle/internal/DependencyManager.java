@@ -1,12 +1,6 @@
 package org.gatorgradle.internal;
 
-import static org.gatorgradle.GatorGradlePlugin.F_SEP;
-import static org.gatorgradle.GatorGradlePlugin.GATORGRADER_HOME;
-import static org.gatorgradle.GatorGradlePlugin.LINUX;
-import static org.gatorgradle.GatorGradlePlugin.MACOS;
-import static org.gatorgradle.GatorGradlePlugin.OS;
-import static org.gatorgradle.GatorGradlePlugin.USER_HOME;
-import static org.gatorgradle.GatorGradlePlugin.WINDOWS;
+import static org.gatorgradle.GatorGradlePlugin.*;
 
 import org.gatorgradle.command.BasicCommand;
 import org.gatorgradle.command.Command;
