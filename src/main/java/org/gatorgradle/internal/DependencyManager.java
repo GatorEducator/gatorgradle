@@ -4,6 +4,7 @@ import static org.gatorgradle.GatorGradlePlugin.*;
 
 import org.gatorgradle.command.BasicCommand;
 import org.gatorgradle.command.Command;
+import org.gatorgradle.util.Console;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -11,6 +12,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class DependencyManager {
+    public static final String GATORGRADER_GIT_REPO = "https://github.com/gkapfham/gatorgrader.git";
+
     /**
      * Install or Update the given dependency.
      *
@@ -23,63 +26,49 @@ public class DependencyManager {
                 return doGatorGrader();
             case PYTHON:
                 return doPython();
+            case GIT:
+                return doGit();
             default:
-                System.err.println("Unsupported Dependency: " + dep);
+                Console.error("Unsupported Dependency: " + dep);
                 return false;
         }
     }
 
-    private static boolean hasPython3() {
-        BasicCommand cmd = new BasicCommand("python3", "-V").outputToSysOut(false);
+    private static boolean doGit() {
+        BasicCommand cmd = new BasicCommand("git", "--version").outputToSysOut(false);
         cmd.run();
-        if (cmd.exitValue() == 0 && cmd.getOutput().contains(" 3.")) {
+        if (cmd.exitValue() == Command.SUCCESS) {
             return true;
+        }
+        if (OS.equals(MACOS)) {
+            Console.log(
+                "You must install Git! An Xcode installation window should open to help you.");
+            Console.log(
+                "If a window did not open, please visit https://git-scm.com/downloads to get started!");
+        } else if (OS.equals(LINUX)) {
+            Console.log(
+                "You must install Git! Please issue the below command or visit https://git-scm.com/downloads.");
+            Console.log("sudo apt-get install git");
+        } else {
+            Console.log(
+                "You must install Git! Please visit https://git-scm.com/downloads to get started!");
         }
         return false;
     }
 
     private static boolean doPython() {
-        if (hasPython3()) {
+        BasicCommand cmd = new BasicCommand("python3", "-V").outputToSysOut(false);
+        cmd.run();
+        if (cmd.exitValue() == Command.SUCCESS && cmd.getOutput().contains(" 3.")) {
             return true;
         }
-        System.out.println(
-            "You must install Python 3! Please visit https://www.python.org/ to get started!");
+        Console.log(
+            "You must install Python 3! We recommend using Pyenv (https://github.com/pyenv/pyenv).");
+        Console.log("You can also visit https://www.python.org/ to download Windows installers.");
         return false;
     }
 
     private static boolean doGatorGrader() {
-        if (OS.equals(WINDOWS)) {
-            return doWindowsGatorGrader();
-        } else if (OS.equals(MACOS)) {
-            return doMacGatorGrader();
-        } else {
-            // assume linux if not windows or mac
-            return doLinuxGatorGrader();
-        }
-    }
-
-    private static boolean doWindowsGatorGrader() {
-        System.err.println("Automated installation of GatorGrader unsupported for Windows!");
-        System.err.println(
-            "To install, run the following command after installing git (https://git-scm.com/downloads):");
-        System.err.println(
-            "git clone https://github.com/gkapfham/gatorgrader.git " + GATORGRADER_HOME);
-        return false;
-    }
-
-    private static boolean doMacGatorGrader() {
-        System.err.println("Automated installation of GatorGrader unsupported for MacOS!");
-        System.err.println("To install, run the following commands:");
-        System.err.println(
-            "ruby -e \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)\"");
-        System.err.println("brew update");
-        System.err.println("brew install git");
-        System.err.println(
-            "git clone https://github.com/gkapfham/gatorgrader.git " + GATORGRADER_HOME);
-        return false;
-    }
-
-    private static boolean doLinuxGatorGrader() {
         Path workingDir = Paths.get(GATORGRADER_HOME);
 
         boolean doDeps = false;
@@ -89,30 +78,30 @@ public class DependencyManager {
         updateOrInstall.outputToSysOut(true).setWorkingDir(workingDir.toFile());
         if (Files.exists(Paths.get(GATORGRADER_HOME))) {
             // gatorgrader repo exists (most likely)
+            BasicCommand checkout = new BasicCommand("git", "checkout", "master");
+            checkout.run();
+            if (checkout.exitValue() != Command.SUCCESS) {
+                error(
+                    "GatorGrader management failed, could not checkout 'master' branch!", checkout);
+            }
             updateOrInstall.with("git", "pull");
-            System.out.println("Updating GatorGrader...");
+            Console.log("Updating GatorGrader...");
         } else {
             // make dirs
-            boolean suc = workingDir.toFile().mkdirs();
-            if (!suc) {
-                System.err.println("Failed to make directories: " + workingDir);
+            if (!workingDir.toFile().mkdirs()) {
+                Console.error("Failed to make directories: " + workingDir);
             }
-            // FIXME: will need to update url
-            updateOrInstall.with(
-                "git", "clone", "https://github.com/gkapfham/gatorgrader.git", GATORGRADER_HOME);
+            updateOrInstall.with("git", "clone", GATORGRADER_GIT_REPO, GATORGRADER_HOME);
 
             // configure gatorgrader dependencies
             doDeps = true;
-            System.out.println("Installing GatorGrader...");
+            Console.log("Installing GatorGrader...");
         }
 
         // install gatorgrader, and block until complete (FIXME: this needs to be better)
         updateOrInstall.run(true);
         if (updateOrInstall.exitValue() != Command.SUCCESS) {
-            System.err.println(
-                "ERROR! GatorGrader management failed! Perhaps we couldn't find git?");
-            System.err.println("Command run: " + updateOrInstall.getDescription());
-            System.err.println("OUTPUT: " + updateOrInstall.getOutput().trim());
+            error("GatorGrader management failed! Perhaps we couldn't find git?", updateOrInstall);
             return false;
         }
 
@@ -120,23 +109,32 @@ public class DependencyManager {
             // TODO: look into using pipenv or other virtual environment - can we activate those
             // environments from java and have it continue to be activated for subsequent commands?
 
-            System.out.println("Installing GatorGrader dependencies...");
+            Console.log("Installing GatorGrader dependencies...");
+            BasicCommand pip = new BasicCommand("python3", "-m", "ensurepip");
+            pip.outputToSysOut(true);
+            pip.run();
+            if (pip.exitValue() != Command.SUCCESS) {
+                error("GatorGrader management failed, could not install dependencies!", pip);
+                return false;
+            }
             BasicCommand dep =
                 new BasicCommand("pip3", "install", "-r", GATORGRADER_HOME + "/requirements.txt");
             dep.outputToSysOut(true);
             dep.run();
-            System.out.println("Finished GatorGrader install!");
-            if (dep.exitValue() != 0) {
-                System.err.println(
-                    "ERROR! GatorGrader management failed! Could not install dependencies!");
-                System.err.println("Command run: " + dep.getDescription());
-                System.err.println("OUTPUT: " + dep.getOutput());
+            Console.log("Finished GatorGrader install!");
+            if (dep.exitValue() != Command.SUCCESS) {
+                error("GatorGrader management failed, could not install dependencies!", dep);
                 return false;
             }
         }
 
-        System.out.println();
-        System.out.println();
+        Console.newline(2);
         return true;
+    }
+
+    private static void error(String desc, BasicCommand cmd) {
+        Console.error("ERROR:", desc);
+        Console.error("Command run:", cmd.getDescription());
+        Console.error("OUTPUT:", cmd.getOutput().trim());
     }
 }
