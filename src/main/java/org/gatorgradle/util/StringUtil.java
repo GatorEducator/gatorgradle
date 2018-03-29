@@ -40,9 +40,35 @@ public class StringUtil {
      * @return       a string of spaces
      */
     public static String spaces(int width) {
-        StringBuilder spc = new StringBuilder(width);
-        for (int i = 0; i < width; i++) {
-            spc.append(' ');
+        return repeat(' ', width);
+    }
+
+    /**
+     * Generate the provided number of string repetitions.
+     *
+     * @param  str   the string to repeat
+     * @param  times the number of strings to repeat
+     * @return       a string of strings
+     */
+    public static String repeat(String str, int times) {
+        StringBuilder spc = new StringBuilder(times * str.length());
+        for (int i = 0; i < times; i++) {
+            spc.append(str);
+        }
+        return spc.toString();
+    }
+
+    /**
+     * Generate the provided number of char repetitions.
+     *
+     * @param  str   the char to repeat
+     * @param  times the number of chars to repeats
+     * @return       a string of chars
+     */
+    public static String repeat(char str, int times) {
+        StringBuilder spc = new StringBuilder(times);
+        for (int i = 0; i < times; i++) {
+            spc.append(str);
         }
         return spc.toString();
     }

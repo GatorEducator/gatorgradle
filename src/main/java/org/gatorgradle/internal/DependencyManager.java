@@ -117,8 +117,8 @@ public class DependencyManager {
                 error("GatorGrader management failed, could not install dependencies!", pip);
                 return false;
             }
-            BasicCommand dep =
-                new BasicCommand("pip3", "install", "-r", GATORGRADER_HOME + "/requirements.txt");
+            BasicCommand dep = new BasicCommand(
+                "python3", "-m", "pip", "install", "-r", GATORGRADER_HOME + "/requirements.txt");
             dep.outputToSysOut(true);
             dep.run();
             Console.log("Finished GatorGrader install!");

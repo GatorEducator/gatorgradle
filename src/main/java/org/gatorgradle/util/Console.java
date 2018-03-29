@@ -32,11 +32,7 @@ public class Console {
         num--;
         String str = "";
         if (num > 0) {
-            StringBuilder builder = new StringBuilder(num);
-            for (int i = 0; i < num; i++) {
-                builder.append('\n');
-            }
-            str = builder.toString();
+            str = StringUtil.repeat('\n', num);
         }
         log(str);
     }
