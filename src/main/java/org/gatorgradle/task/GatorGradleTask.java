@@ -105,6 +105,8 @@ public class GatorGradleTask extends DefaultTask {
                 "GatorGradle grade task's configuration was not specified correctly!");
         }
 
+        config.parse();
+
         // get a progress logger
         ProgressLoggerWrapper progLog = new ProgressLoggerWrapper(super.getProject(), "Graded");
 

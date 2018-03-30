@@ -3,6 +3,7 @@ package org.gatorgradle.display;
 import org.gatorgradle.GatorGradlePlugin;
 import org.gatorgradle.command.BasicCommand;
 import org.gatorgradle.command.Command;
+import org.gatorgradle.config.GatorGradleConfig;
 import org.gatorgradle.task.GatorGradleTask;
 import org.gatorgradle.util.*;
 
@@ -59,7 +60,7 @@ public class CommandOutputSummary {
         if (cmd.exitValue() != 0) {
             log.info("Check failed ({})!\nCommand description: {}", cmd.exitValue(),
                 cmd.getDescription());
-            if (GatorGradlePlugin.BREAK_BUILD) {
+            if (GatorGradleConfig.shouldBreakBuild()) {
                 throw new RuntimeException("Check failed, ending execution!");
             }
         }

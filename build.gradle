@@ -80,9 +80,15 @@ quality {
 
     // disable PMD for now (100+ issues to fix)
     pmd = false;
-
     findbugsLevel = "low"
 }
+
+// afterEvaluation {
+//     checkstyle {
+//         maxWarnings = 0;
+//         maxErrors = 0;
+//     }
+// }
 
 dependencies {
     compile gradleApi()
