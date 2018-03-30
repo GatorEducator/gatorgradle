@@ -12,6 +12,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class BasicCommand implements Command {
     private static final long serialVersionUID = 6412L;
@@ -70,6 +71,24 @@ public class BasicCommand implements Command {
 
     public int elements() {
         return command.size();
+    }
+
+    /**
+     * Tests the object for equality.
+     *
+     * @param  cmd the object to test
+     * @return     true if the object represents the same textual command
+     */
+    public boolean equals(Object cmd) {
+        if (cmd instanceof BasicCommand) {
+            return command.equals(((BasicCommand) cmd).command);
+        } else {
+            return false;
+        }
+    }
+
+    public int hashCode() {
+        return 17 * command.hashCode() + 79;
     }
 
     /**
@@ -135,6 +154,8 @@ public class BasicCommand implements Command {
             throw new RuntimeException("Empty command run!");
         }
 
+        // final long startTime = System.nanoTime();
+
         ProcessBuilder pb = new ProcessBuilder(command);
         if (workingDir != null) {
             pb.directory(workingDir);
@@ -199,6 +220,9 @@ public class BasicCommand implements Command {
                 Console.error("Failed to close command input stream!");
             }
         }
+
+        // Console.log("Command " + getDescription() + " finished in "
+        // + String.format("%.2fms!", (System.nanoTime() - startTime) / 1_000_000d));
     }
 
     /**

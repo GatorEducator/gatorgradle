@@ -4,6 +4,8 @@ import org.gatorgradle.GatorGradlePlugin;
 import org.gatorgradle.command.*;
 import org.gatorgradle.util.Console;
 
+import org.gradle.api.GradleException;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -73,7 +75,7 @@ public class GatorGradleConfig implements Iterable<Command> {
                 .forEach((this)::with);
         } catch (IOException ex) {
             // Console.error("Failed to read in config file!");
-            throw new RuntimeException("Failed to read config file \"" + file + "\"");
+            throw new GradleException("Failed to read config file \"" + file + "\"");
         }
     }
 

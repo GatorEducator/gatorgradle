@@ -27,6 +27,8 @@ public class GatorGradlePlugin implements Plugin<Project> {
     public static final String F_SEP;
     public static final String OS;
 
+    public static final boolean BREAK_BUILD = false;
+
     static {
         F_SEP     = System.getProperty("file.separator");
         USER_HOME = System.getProperty("user.home");

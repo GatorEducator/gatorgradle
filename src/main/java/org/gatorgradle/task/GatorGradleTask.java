@@ -1,7 +1,5 @@
 package org.gatorgradle.task;
 
-import static org.gatorgradle.GatorGradlePlugin.CONFIG_FILE_LOCATION;
-
 import org.gatorgradle.GatorGradlePlugin;
 import org.gatorgradle.command.*;
 import org.gatorgradle.config.GatorGradleConfig;
@@ -10,6 +8,8 @@ import org.gatorgradle.internal.*;
 import org.gatorgradle.util.Console;
 
 import org.gradle.api.DefaultTask;
+import org.gradle.api.GradleException;
+import org.gradle.api.logging.Logger;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputDirectory;
 import org.gradle.api.tasks.TaskAction;
@@ -63,7 +63,7 @@ public class GatorGradleTask extends DefaultTask {
     // because of Java serialization limitations, along with
     // how gradle implements logging, these must be static
     private static int totalTasks;
-    private static List<Command> completedTasks;
+    private static CommandOutputSummary summary;
 
     /**
      * Static handler to call when a subtask completes.
@@ -71,16 +71,16 @@ public class GatorGradleTask extends DefaultTask {
      * @param complete the command that was run
      */
     private static synchronized void completedTask(Command complete) {
-        completedTasks.add(complete);
+        summary.addCompletedCommand(complete);
         // Console.log("FINISHED " + complete.getDescription());
 
         // To break the build if wanted, throw a GradleException here
         // throw new GradleException(this);
     }
 
-    private static synchronized void initTasks(int total) {
-        totalTasks     = total;
-        completedTasks = new ArrayList<>(total);
+    private static synchronized void initTasks(int total, Logger logger) {
+        totalTasks = total;
+        summary    = new CommandOutputSummary(logger);
     }
 
     /**
@@ -90,18 +90,18 @@ public class GatorGradleTask extends DefaultTask {
     public void grade() {
         // ensure GatorGrader and dependencies are installed
         if (!DependencyManager.installOrUpdate(Dependency.GIT)) {
-            throw new RuntimeException("Git not installed!");
+            throw new GradleException("Git not installed!");
         }
         if (!DependencyManager.installOrUpdate(Dependency.PYTHON)) {
-            throw new RuntimeException("Python not installed!");
+            throw new GradleException("Python not installed!");
         }
         if (!DependencyManager.installOrUpdate(Dependency.GATORGRADER)) {
-            throw new RuntimeException("GatorGrader not installed!");
+            throw new GradleException("GatorGrader not installed!");
         }
 
         // ensure we have a configuration
         if (config == null) {
-            throw new RuntimeException(
+            throw new GradleException(
                 "GatorGradle grade task's configuration was not specified correctly!");
         }
 
@@ -110,7 +110,7 @@ public class GatorGradleTask extends DefaultTask {
 
         // start task submission
         progLog.started();
-        initTasks(config.size());
+        initTasks(config.size(), this.getLogger());
         // submit commands to executor
         for (Command cmd : config) {
             // configure command
@@ -129,8 +129,8 @@ public class GatorGradleTask extends DefaultTask {
 
         int percentComplete = 0;
         while (percentComplete < 100) {
-            percentComplete = (completedTasks.size() * 100) / totalTasks;
-            progLog.progress("Finished " + (completedTasks.size()) + " / " + totalTasks
+            percentComplete = (summary.getNumCompletedTasks() * 100) / totalTasks;
+            progLog.progress("Finished " + summary.getNumCompletedTasks() + " / " + totalTasks
                              + " checks  >  " + percentComplete + "% complete!");
             try {
                 Thread.sleep(100);
@@ -142,12 +142,18 @@ public class GatorGradleTask extends DefaultTask {
         // make sure tasks have ended
         executor.await();
 
-        progLog.progress("Finished " + (completedTasks.size()) + " / " + totalTasks + " checks  >  "
-                         + percentComplete + "% complete!  >  Compiling Report...");
+        // this is impossible now because of the for loop above, FIXME
+        if (summary.getNumCompletedTasks() != totalTasks) {
+            // silent failure somewhere, break the build
+            throw new GradleException("Silent failure in task execution! Only completed "
+                                      + summary.getNumCompletedTasks()
+                                      + " tasks but should have completed " + totalTasks);
+        }
 
-        CommandOutputSummary outSum = new CommandOutputSummary(completedTasks, this.getLogger());
+        progLog.progress("Finished " + summary.getNumCompletedTasks() + " / " + totalTasks
+                         + " checks  >  100% complete!  >  Compiling Report...");
 
-        outSum.showOutputSummary();
+        summary.showOutputSummary();
 
         // complete task submission
         progLog.completed();
