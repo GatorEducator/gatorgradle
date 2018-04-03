@@ -54,7 +54,7 @@ public class GatorGradleConfig implements Iterable<Command> {
     private static final Pattern commandPattern = Pattern.compile("([^\"]\\S*|\".+?\")\\s*");
 
     private boolean breakBuild    = false;
-    private String assignmentName = "Unnamed Assignment";
+    private String assignmentName = "this assignment";
 
     List<Command> gradingCommands;
     File file;

@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Scanner;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class CommandOutputSummary {
     private static final String YES   = "\u001B[1;32mYes\u001B[0m";
@@ -62,7 +64,21 @@ public class CommandOutputSummary {
         if (nomore) {
             return;
         }
-        // TODO: parse this better
+        boolean fail = printCommandResult(cmd);
+        if (fail && GatorGradleConfig.get().shouldBreakBuild()) {
+            log.lifecycle("\n  -~-  \u001B[1;31mCHECKS FAILED\u001B[0m  -~-\n");
+            nomore = true;
+            throw new RuntimeException("Check failed, ending execution!");
+        }
+    }
+
+    // TODO: parse this better
+    private boolean printCommandResult(Command cmd) {
+        // debug output for TAs
+        log.info("COMMAND: {}", cmd.getDescription());
+        log.info("EXIT VALUE: {}", cmd.exitValue());
+        log.info("OUTPUT:");
+        // actual output of the command should be parsed and colored, etc
         if (cmd instanceof BasicCommand) {
             String output = parseCommandOutput((BasicCommand) cmd);
             log.lifecycle(output);
@@ -72,55 +88,58 @@ public class CommandOutputSummary {
             // }
         }
 
-        if (cmd.exitValue() != 0) {
-            log.info("Check failed ({})!\nCommand description: {}", cmd.exitValue(),
-                cmd.getDescription());
-            if (GatorGradleConfig.get().shouldBreakBuild()) {
-                log.lifecycle("\n  -~-  \u001B[1;31mCHECKS FAILED\u001B[0m  -~-\n");
-                nomore = true;
-                throw new RuntimeException("Check failed, ending execution!");
-            }
+        if (cmd.exitValue() != Command.SUCCESS) {
+            log.info("Check failed ({})!", cmd.exitValue());
+            return true;
         }
+        return false;
     }
 
     /**
      * Output the compiled summary to the project's Logger.
      */
     public void showOutputSummary() {
-        boolean mis = false;
-
         log.lifecycle("\n  -~-  \u001B[1;36mBeginning check summary\u001B[1;0m  -~-\n");
 
-        // completedCommands.sort((first, second) -> second.hashCode() - first.hashCode());
+        List<Command> failed = completedCommands.stream()
+                                   .filter(cmd -> cmd.exitValue() != Command.SUCCESS)
+                                   .collect(Collectors.toList());
+        boolean mis = completedCommands.removeAll(failed);
 
         for (int i = 0; i < completedCommands.size(); i++) {
-            Command cmd = completedCommands.get(i);
             // failure needs to be handled
-            if (cmd.exitValue() != 0) {
-                log.info("Check failed ({})!", cmd.exitValue());
-                mis = true;
-            }
-            // debug output for TAs
-            log.info("COMMAND: {}", cmd.getDescription());
-            log.info("EXIT VALUE: {}", cmd.exitValue());
-            log.info("OUTPUT:");
-            // actual output of the command should be parsed and colored, etc
-            if (cmd instanceof BasicCommand) {
-                String output = parseCommandOutput((BasicCommand) cmd);
-                log.lifecycle(output);
-                // log.warn(StringUtil.clamp(output, 80));
-                // if (output.length() > 80) {
-                //     log.info("…" + output.substring(79));
-                // }
-            }
-
+            printCommandResult(completedCommands.get(i));
             if (i < completedCommands.size() - 1) {
                 log.lifecycle(" ~-~-~ ");
             }
         }
 
-        log.warn("\n\u001B[1;33mOverall, does this assignment pass every grading check? {}",
-            mis ? NO : YES);
+        failed.forEach(cmd -> {
+            log.lifecycle(" ~-~-~ ");
+            printCommandResult(cmd);
+        });
+
+        String text =
+            mis ? "Failed some checks for " + GatorGradleConfig.get().getAssignmentName() + "!"
+                : "Passed all checks for " + GatorGradleConfig.get().getAssignmentName() + "!";
+        int textLen = text.length();
+        text        = (mis ? "\u001B[1;31m" : "\u001B[1;32m") + text + "\u001B[0m";
+
+        char upleft    = '\u250f'; // upper left corner
+        char upright   = '\u2513'; // upper right corner
+        char downleft  = '\u2517'; // lower left corner
+        char downright = '\u251B'; // lower right corner
+        char vert      = '\u2503'; // vertical line
+        char horz      = '\u2501'; // horizontal line
+
+        String above = "\u001B[1;35m" + upleft + StringUtil.repeat(horz, textLen + 2) + upright
+                       + "\u001B[0m"; // line above
+        String before = "\u001B[1;35m" + vert + "\u001B[0m "; // vertical line
+        String after  = " \u001B[1;35m" + vert + "\u001B[0m"; // vertical line
+        String below  = "\u001B[1;35m" + downleft + StringUtil.repeat(horz, textLen + 2) + downright
+                       + "\u001B[0m"; // line below
+
+        log.warn("\n\n\t{}\n\t{}{}{}\n\t{}", above, before, text, after, below);
     }
 
     private String parseCommandOutput(BasicCommand cmd) {
