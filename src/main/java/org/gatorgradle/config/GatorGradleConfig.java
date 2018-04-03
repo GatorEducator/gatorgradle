@@ -74,6 +74,13 @@ public class GatorGradleConfig implements Iterable<Command> {
         this.file = configFile;
     }
 
+    /**
+     * Create a config that will use the given values.
+     *
+     * @param breakBuild     should the build break on check failures
+     * @param assignmentName the assignment name
+     * @param commands       the list of commands to run
+     */
     public GatorGradleConfig(boolean breakBuild, String assignmentName, List<Command> commands) {
         this.breakBuild      = breakBuild;
         this.assignmentName  = assignmentName;

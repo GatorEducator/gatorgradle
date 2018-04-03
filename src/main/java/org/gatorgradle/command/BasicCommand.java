@@ -87,8 +87,15 @@ public class BasicCommand implements Command {
         }
     }
 
+    /**
+     * Calculated the hashcode.
+     *
+     * @return the hashcode
+     */
     public int hashCode() {
-        return 17 * command.hashCode() + 79;
+        return command.stream()
+            .map(str -> str.hashCode())
+            .reduce(1, (first, second) -> 17 * first + 29 * second);
     }
 
     /**

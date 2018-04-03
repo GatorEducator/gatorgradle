@@ -93,17 +93,17 @@ public class CommandOutputSummary {
 
         // completedCommands.sort((first, second) -> second.hashCode() - first.hashCode());
 
-        for (Command cmd : completedCommands) {
+        for (int i = 0; i < completedCommands.size(); i++) {
+            Command cmd = completedCommands.get(i);
             // failure needs to be handled
             if (cmd.exitValue() != 0) {
-                log.info("Check failed ({})!\nCommand description: {}", cmd.exitValue(),
-                    cmd.getDescription());
+                log.info("Check failed ({})!", cmd.exitValue());
                 mis = true;
             }
             // debug output for TAs
-            log.info("COMMAND {}", cmd.getDescription());
+            log.info("COMMAND: {}", cmd.getDescription());
             log.info("EXIT VALUE: {}", cmd.exitValue());
-
+            log.info("OUTPUT:");
             // actual output of the command should be parsed and colored, etc
             if (cmd instanceof BasicCommand) {
                 String output = parseCommandOutput((BasicCommand) cmd);
@@ -114,7 +114,9 @@ public class CommandOutputSummary {
                 // }
             }
 
-            log.lifecycle(" ~-~-~ ");
+            if (i < completedCommands.size() - 1) {
+                log.lifecycle(" ~-~-~ ");
+            }
         }
 
         log.warn("\n\u001B[1;33mOverall, does this assignment pass every grading check? {}",
