@@ -26,15 +26,40 @@ import java.util.stream.Stream;
  * TODO: make this configurable via DSL blocks in build.gradle
  */
 public class GatorGradleConfig implements Iterable<Command> {
+    private static GatorGradleConfig singleton;
+
+    /**
+     * Get the config.
+     *
+     * @return the config
+     */
+    public static GatorGradleConfig get() {
+        if (singleton != null) {
+            return singleton;
+        }
+        throw new RuntimeException("GatorGradleConfig not created");
+    }
+
+    /**
+     * Create the config by parsing the given file.
+     *
+     * @param  configFile the file to be parsed
+     * @return            the config
+     */
+    public static GatorGradleConfig create(File configFile) {
+        singleton = new GatorGradleConfig(configFile);
+        return singleton;
+    }
+
     private static final Pattern commandPattern = Pattern.compile("([^\"]\\S*|\".+?\")\\s*");
 
-    private static boolean breakBuild    = false;
-    private static String assignmentName = "Unnamed Assignment";
+    private boolean breakBuild    = false;
+    private String assignmentName = "Unnamed Assignment";
 
-    ArrayList<Command> gradingCommands;
+    List<Command> gradingCommands;
     File file;
 
-    public GatorGradleConfig() {
+    private GatorGradleConfig() {
         gradingCommands = null;
     }
 
@@ -43,10 +68,16 @@ public class GatorGradleConfig implements Iterable<Command> {
      *
      * @param configFile the file to base this configuration on
      */
-    public GatorGradleConfig(File configFile) {
+    private GatorGradleConfig(File configFile) {
         this();
         // TODO: parse configFile to build gradingCommands
         this.file = configFile;
+    }
+
+    public GatorGradleConfig(boolean breakBuild, String assignmentName, List<Command> commands) {
+        this.breakBuild      = breakBuild;
+        this.assignmentName  = assignmentName;
+        this.gradingCommands = new ArrayList<>(commands);
     }
 
     /**
@@ -80,7 +111,7 @@ public class GatorGradleConfig implements Iterable<Command> {
         }
     }
 
-    private void parseHeader(Stream<Line> lines) {
+    private void parseHeader(List<Line> lines) {
         List<Integer> markers = new ArrayList<>();
         lines.forEach(line -> {
             if (line.content.contains("---")) {
@@ -90,7 +121,8 @@ public class GatorGradleConfig implements Iterable<Command> {
         if (markers.size() > 0) {
             int endOfHeader = markers.get(markers.size() - 1);
 
-            lines.filter(line -> line.number < endOfHeader && !line.content.contains("---"))
+            lines.stream()
+                .filter(line -> line.number < endOfHeader && !line.content.contains("---"))
                 .forEach(line -> {
                     String[] spl = line.content.split(":");
                     String key   = spl[0].trim();
@@ -100,7 +132,14 @@ public class GatorGradleConfig implements Iterable<Command> {
                             assignmentName = val;
                             break;
                         case "break":
-                            breakBuild = "true".equalsIgnoreCase(val);
+                            if (val.matches("[Tt][Rr][Uu][Ee]")) {
+                                breakBuild = true;
+                            } else if (val.matches("[Ff][Aa][Ll][Ss][Ee]")) {
+                                breakBuild = false;
+                            } else {
+                                throw new RuntimeException(
+                                    "Failed to parse '" + val + "' to 'break' value");
+                            }
                             break;
                         default:
                             Console.error("Unknown header key " + key);
@@ -109,8 +148,11 @@ public class GatorGradleConfig implements Iterable<Command> {
         }
     }
 
-    private void parseCommands(Stream<Line> lines) {
-        lines.map(line -> lineToCommand(line.content)).forEach(this ::with);
+    private void parseCommands(List<Line> lines) {
+        lines.stream()
+            .filter(cont -> cont.content.startsWith("gg: "))
+            .map(line -> lineToCommand(line.content))
+            .forEach(this ::with);
         // lineToCommand consumes everything
         // lines.removeIf(line -> true);
     }
@@ -121,9 +163,10 @@ public class GatorGradleConfig implements Iterable<Command> {
     public void parse() {
         try (Stream<String> strLines = Files.lines(file.toPath())) {
             final AtomicInteger lineNumber = new AtomicInteger(0);
-            Stream<Line> lines =
+            List<Line> lines =
                 strLines.filter(line -> line.trim().length() > 0 && !line.startsWith("#"))
-                    .map(str -> new Line(lineNumber.incrementAndGet(), str));
+                    .map(str -> new Line(lineNumber.incrementAndGet(), str))
+                    .collect(Collectors.toList());
             parseHeader(lines);
             parseCommands(lines);
         } catch (IOException ex) {
@@ -155,11 +198,11 @@ public class GatorGradleConfig implements Iterable<Command> {
         return gradingCommands.iterator();
     }
 
-    public static boolean shouldBreakBuild() {
+    public boolean shouldBreakBuild() {
         return breakBuild;
     }
 
-    public static String getAssignmentName() {
+    public String getAssignmentName() {
         return assignmentName;
     }
 

@@ -62,9 +62,7 @@ public class GatorGradlePlugin implements Plugin<Project> {
         // Logger logger = project.getLogger();
         // set config file location, then generate config
         // TODO: what should we do for config file location?
-        File conFile = project.file(CONFIG_FILE_LOCATION);
-
-        GatorGradleConfig config = new GatorGradleConfig(conFile);
+        GatorGradleConfig config = GatorGradleConfig.create(project.file(CONFIG_FILE_LOCATION));
 
         // create gatorgradle 'grade' task
         GatorGradleTask grade = project.getTasks().create("grade", GatorGradleTask.class, task -> {

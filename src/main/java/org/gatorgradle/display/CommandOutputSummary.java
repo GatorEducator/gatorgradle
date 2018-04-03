@@ -51,20 +51,17 @@ public class CommandOutputSummary {
         return completedCommands.size();
     }
 
+    boolean nomore = false;
+
     /**
      * Output a description of what just finished, or maybe a status.
      *
      * @param cmd the command that just finished
      */
     public void showInProgressSummary(Command cmd) {
-        if (cmd.exitValue() != 0) {
-            log.info("Check failed ({})!\nCommand description: {}", cmd.exitValue(),
-                cmd.getDescription());
-            if (GatorGradleConfig.shouldBreakBuild()) {
-                throw new RuntimeException("Check failed, ending execution!");
-            }
+        if (nomore) {
+            return;
         }
-
         // TODO: parse this better
         if (cmd instanceof BasicCommand) {
             String output = parseCommandOutput((BasicCommand) cmd);
@@ -74,6 +71,16 @@ public class CommandOutputSummary {
             //     log.info("…" + output.substring(79));
             // }
         }
+
+        if (cmd.exitValue() != 0) {
+            log.info("Check failed ({})!\nCommand description: {}", cmd.exitValue(),
+                cmd.getDescription());
+            if (GatorGradleConfig.get().shouldBreakBuild()) {
+                log.lifecycle("\n  -~-  \u001B[1;31mCHECKS FAILED\u001B[0m  -~-\n");
+                nomore = true;
+                throw new RuntimeException("Check failed, ending execution!");
+            }
+        }
     }
 
     /**
@@ -82,7 +89,7 @@ public class CommandOutputSummary {
     public void showOutputSummary() {
         boolean mis = false;
 
-        Console.log("\n  -~-  \u001B[1;36mBeginning check summary\u001B[1;0m  -~-  \n");
+        log.lifecycle("\n  -~-  \u001B[1;36mBeginning check summary\u001B[1;0m  -~-\n");
 
         // completedCommands.sort((first, second) -> second.hashCode() - first.hashCode());
 
@@ -110,7 +117,7 @@ public class CommandOutputSummary {
             log.lifecycle(" ~-~-~ ");
         }
 
-        log.warn("\u001B[1;33mOverall, does this assignment pass every grading check? {}",
+        log.warn("\n\u001B[1;33mOverall, does this assignment pass every grading check? {}",
             mis ? NO : YES);
     }
 

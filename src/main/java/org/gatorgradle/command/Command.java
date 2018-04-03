@@ -2,6 +2,8 @@ package org.gatorgradle.command;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 public interface Command extends Runnable, Serializable {
@@ -22,4 +24,23 @@ public interface Command extends Runnable, Serializable {
     public abstract void setWorkingDir(File dir);
 
     public abstract void setCallback(Callback callback);
+
+    public static List<Command> list(String... cmds) {
+        String[][] parsed = new String[cmds.length][];
+        return list(parsed);
+    }
+
+    public static List<Command> list(String[]... cmds) {
+        List<Command> commands = new ArrayList<>();
+
+        for (String[] cmd : cmds) {
+            commands.add(create(cmd));
+        }
+
+        return commands;
+    }
+
+    public static Command create(String... cmd) {
+        return new BasicCommand(cmd);
+    }
 }
