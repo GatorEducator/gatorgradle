@@ -116,46 +116,49 @@ public class GatorGradleConfig implements Iterable<Command> {
             this.number  = number;
             this.content = content;
         }
-    }
 
-    private void parseHeader(List<Line> lines) {
-        List<Integer> markers = new ArrayList<>();
-        lines.forEach(line -> {
-            if (line.content.contains("---")) {
-                markers.add(line.number);
-            }
-        });
-        if (markers.size() > 0) {
-            int endOfHeader = markers.get(markers.size() - 1);
+        public boolean isEmpty() {
+            return content != null && content.length() > 0;
+        }
 
-            lines.stream()
-                .filter(line -> line.number < endOfHeader && !line.content.contains("---"))
-                .forEach(line -> {
-                    String[] spl = line.content.split(":");
-                    String key   = spl[0].trim();
-                    String val   = spl[1].trim();
-                    switch (key) {
-                        case "name":
-                            assignmentName = val;
-                            break;
-                        case "break":
-                            if (val.matches("[Tt][Rr][Uu][Ee]")) {
-                                breakBuild = true;
-                            } else if (val.matches("[Ff][Aa][Ll][Ss][Ee]")) {
-                                breakBuild = false;
-                            } else {
-                                throw new RuntimeException(
-                                    "Failed to parse '" + val + "' to 'break' value");
-                            }
-                            break;
-                        default:
-                            Console.error("Unknown header key " + key);
-                    }
-                });
+        public String toString() {
+            return content;
         }
     }
 
+    private void printLines(List<Line> lines) {
+        Console.log(
+            String.join(", ", lines.stream().map(str -> str.toString()).toArray(String[] ::new)));
+    }
+
+    private void parseHeader(List<Line> lines) {
+        printLines(lines);
+        lines.forEach(line -> {
+            String[] spl = line.content.split(":");
+            String key   = spl[0].trim();
+            String val   = spl[1].trim();
+            switch (key) {
+                case "name":
+                    assignmentName = val;
+                    break;
+                case "break":
+                    if (val.matches("[Tt][Rr][Uu][Ee]")) {
+                        breakBuild = true;
+                    } else if (val.matches("[Ff][Aa][Ll][Ss][Ee]")) {
+                        breakBuild = false;
+                    } else {
+                        throw new GradleException("Failed to parse '" + val + "' to 'break' value");
+                    }
+                    break;
+                default:
+                    Console.error("Unknown header key " + key);
+                    throw new GradleException("Failed to parse config file");
+            }
+        });
+    }
+
     private void parseCommands(List<Line> lines) {
+        printLines(lines);
         lines.stream()
             .filter(cont -> cont.content.startsWith("gg: "))
             .map(line -> lineToCommand(line.content))
@@ -168,14 +171,28 @@ public class GatorGradleConfig implements Iterable<Command> {
      * Parses the config file.
      */
     public void parse() {
+        Console.log("parsing config");
         try (Stream<String> strLines = Files.lines(file.toPath())) {
             final AtomicInteger lineNumber = new AtomicInteger(0);
+            Console.log("parsing config");
             List<Line> lines =
-                strLines.filter(line -> line.trim().length() > 0 && !line.startsWith("#"))
-                    .map(str -> new Line(lineNumber.incrementAndGet(), str))
+                strLines.map(str -> new Line(lineNumber.incrementAndGet(), str.trim()))
+                    .filter(line -> !line.isEmpty() && !line.content.startsWith("#"))
                     .collect(Collectors.toList());
-            parseHeader(lines);
-            parseCommands(lines);
+            printLines(lines);
+            int divider = lines.isEmpty() ? 0 : lines.get(0).number;
+            int marks   = 0;
+            String mark = "^-{3,}$";
+            for (int i = 0; i < lines.size(); i++) {
+                if (lines.get(i).content.matches(mark)) {
+                    marks++;
+                    divider = i;
+                }
+            }
+            divider -= marks;
+            lines.removeIf(line -> line.content.matches(mark));
+            parseHeader(lines.subList(0, divider));
+            parseCommands(lines.subList(divider, lines.size()));
         } catch (IOException ex) {
             // Console.error("Failed to read in config file!");
             throw new GradleException("Failed to read config file \"" + file + "\"");

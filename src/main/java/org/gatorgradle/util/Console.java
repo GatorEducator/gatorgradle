@@ -37,6 +37,10 @@ public class Console {
         log(str);
     }
 
+    public static void newline() {
+        newline(1);
+    }
+
     /**
      * Log a message to a specified stream.
      *

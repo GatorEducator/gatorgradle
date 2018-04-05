@@ -100,7 +100,7 @@ public class CommandOutputSummary {
      */
     public void showOutputSummary() {
         log.lifecycle("\n  -~-  \u001B[1;36mBeginning check summary\u001B[1;0m  -~-\n");
-
+        int totalChecks      = completedCommands.size();
         List<Command> failed = completedCommands.stream()
                                    .filter(cmd -> cmd.exitValue() != Command.SUCCESS)
                                    .collect(Collectors.toList());
@@ -119,8 +119,11 @@ public class CommandOutputSummary {
             printCommandResult(cmd);
         });
 
+        int percentFailed = (failed.size() * 100) / totalChecks;
         String text =
-            mis ? "Failed some checks for " + GatorGradleConfig.get().getAssignmentName() + "!"
+            mis
+                ? "Passed " + percentFailed + "% of checks for "
+                      + GatorGradleConfig.get().getAssignmentName() + "!"
                 : "Passed all checks for " + GatorGradleConfig.get().getAssignmentName() + "!";
         int textLen = text.length();
         text        = (mis ? "\u001B[1;31m" : "\u001B[1;32m") + text + "\u001B[0m";
@@ -154,15 +157,10 @@ public class CommandOutputSummary {
             }
         }
 
-        if (CUT_OUTPUT) {
-            // always return last line with a yes or no, TODO fix this when GatorGrader has atomic
-            // checks
-            return pots.get(pots.size() - 1)
-                .trim()
-                .replaceAll("[Yy][Ee][Ss]", YES)
-                .replaceAll("[Nn][Oo]", NO);
-        }
+        // always return last line with a yes or no, TODO fix this when GatorGrader has atomic
+        // checks (when CUT_OUTPUT is true)
+        String output = CUT_OUTPUT ? pots.get(pots.size() - 1) : cmd.getOutput();
 
-        return cmd.getOutput().trim().replaceAll("[Yy][Ee][Ss]", YES).replaceAll("[Nn][Oo]", NO);
+        return output.trim().replaceAll("\\b[Yy][Ee][Ss]\\b", YES).replaceAll("\\b[Nn][Oo]\\b", NO);
     }
 }
