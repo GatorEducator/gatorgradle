@@ -119,10 +119,11 @@ public class CommandOutputSummary {
             printCommandResult(cmd);
         });
 
-        int percentFailed = (failed.size() * 100) / totalChecks;
+        int percentPassed =
+            totalChecks == 0 ? 100 : ((totalChecks - failed.size()) * 100) / totalChecks;
         String text =
             mis
-                ? "Passed " + percentFailed + "% of checks for "
+                ? "Passed " + percentPassed + "% of checks for "
                       + GatorGradleConfig.get().getAssignmentName() + "!"
                 : "Passed all checks for " + GatorGradleConfig.get().getAssignmentName() + "!";
         int textLen = text.length();

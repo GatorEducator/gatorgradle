@@ -108,48 +108,52 @@ public class GatorGradleTask extends DefaultTask {
         config.parse();
 
         // get a progress logger
-        ProgressLoggerWrapper progLog = new ProgressLoggerWrapper(super.getProject(), "Graded");
+        ProgressLoggerWrapper progLog =
+            new ProgressLoggerWrapper(super.getProject(), config.getAssignmentName());
 
         // start task submission
         progLog.started();
         initTasks(config.size(), this.getLogger());
-        // submit commands to executor
-        for (Command cmd : config) {
-            // configure command
-            cmd.setCallback((Command.Callback) GatorGradleTask::completedTask);
-            if (cmd.getWorkingDir() == null) {
-                cmd.setWorkingDir(workingDir);
+
+        if (totalTasks > 0) {
+            // submit commands to executor
+            for (Command cmd : config) {
+                // configure command
+                cmd.setCallback((Command.Callback) GatorGradleTask::completedTask);
+                if (cmd.getWorkingDir() == null) {
+                    cmd.setWorkingDir(workingDir);
+                }
+
+                // configure command executor
+                executor.submit(CommandExecutor.class, (conf) -> {
+                    conf.setIsolationMode(IsolationMode.NONE);
+                    conf.setDisplayName(cmd.getDescription());
+                    conf.setParams(cmd);
+                });
             }
 
-            // configure command executor
-            executor.submit(CommandExecutor.class, (conf) -> {
-                conf.setIsolationMode(IsolationMode.NONE);
-                conf.setDisplayName(cmd.getDescription());
-                conf.setParams(cmd);
-            });
-        }
-
-        int percentComplete = 0;
-        while (percentComplete < 100) {
-            percentComplete = (summary.getNumCompletedTasks() * 100) / totalTasks;
-            progLog.progress("Finished " + summary.getNumCompletedTasks() + " / " + totalTasks
-                             + " checks  >  " + percentComplete + "% complete!");
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException ex) {
-                Console.error("Failed to sleep");
+            int percentComplete = 0;
+            while (percentComplete < 100) {
+                percentComplete = (summary.getNumCompletedTasks() * 100) / totalTasks;
+                progLog.progress("Finished " + summary.getNumCompletedTasks() + " / " + totalTasks
+                                 + " checks  >  " + percentComplete + "% complete!");
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException ex) {
+                    Console.error("Failed to sleep");
+                }
             }
-        }
 
-        // make sure tasks have ended
-        executor.await();
+            // make sure tasks have ended
+            executor.await();
 
-        // this is impossible now because of the for loop above, FIXME
-        if (summary.getNumCompletedTasks() != totalTasks) {
-            // silent failure somewhere, break the build
-            throw new GradleException("Silent failure in task execution! Only completed "
-                                      + summary.getNumCompletedTasks()
-                                      + " tasks but should have completed " + totalTasks);
+            // this is impossible now because of the for loop above, FIXME
+            if (summary.getNumCompletedTasks() != totalTasks) {
+                // silent failure somewhere, break the build
+                throw new GradleException("Silent failure in task execution! Only completed "
+                                          + summary.getNumCompletedTasks()
+                                          + " tasks but should have completed " + totalTasks);
+            }
         }
 
         progLog.progress("Finished " + summary.getNumCompletedTasks() + " / " + totalTasks
