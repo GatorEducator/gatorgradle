@@ -45,7 +45,7 @@ public class CommandOutputSummary {
             completedCommands.add(cmd);
             showInProgressSummary(cmd);
         } else {
-            log.info("Duplicate command: " + cmd.getDescription());
+            log.info("Duplicate command: " + cmd.toString());
         }
     }
 
@@ -75,7 +75,7 @@ public class CommandOutputSummary {
     // TODO: parse this better
     private boolean printCommandResult(Command cmd) {
         // debug output for TAs
-        log.info("COMMAND: {}", cmd.getDescription());
+        log.info("COMMAND: {}", cmd.toString());
         log.info("EXIT VALUE: {}", cmd.exitValue());
         log.info("OUTPUT:");
         // actual output of the command should be parsed and colored, etc
@@ -118,14 +118,8 @@ public class CommandOutputSummary {
             log.lifecycle(" ~-~-~ ");
             printCommandResult(cmd);
         });
-
-        int percentPassed =
-            totalChecks == 0 ? 100 : ((totalChecks - failed.size()) * 100) / totalChecks;
-        String text =
-            mis
-                ? "Passed " + percentPassed + "% of checks for "
-                      + GatorGradleConfig.get().getAssignmentName() + "!"
-                : "Passed all checks for " + GatorGradleConfig.get().getAssignmentName() + "!";
+        String text = "Passed " + completedCommands.size() + "/" + totalChecks + " of checks for "
+                      + GatorGradleConfig.get().getAssignmentName() + "!";
         int textLen = text.length();
         text        = (mis ? "\u001B[1;31m" : "\u001B[1;32m") + text + "\u001B[0m";
 
@@ -136,12 +130,12 @@ public class CommandOutputSummary {
         char vert      = '\u2503'; // vertical line
         char horz      = '\u2501'; // horizontal line
 
-        String above = "\u001B[1;35m" + upleft + StringUtil.repeat(horz, textLen + 2) + upright
-                       + "\u001B[0m"; // line above
+        String line = StringUtil.repeat(horz, textLen + 2);
+
+        String above  = "\u001B[1;35m" + upleft + line + upright + "\u001B[0m"; // line above
         String before = "\u001B[1;35m" + vert + "\u001B[0m "; // vertical line
         String after  = " \u001B[1;35m" + vert + "\u001B[0m"; // vertical line
-        String below  = "\u001B[1;35m" + downleft + StringUtil.repeat(horz, textLen + 2) + downright
-                       + "\u001B[0m"; // line below
+        String below  = "\u001B[1;35m" + downleft + line + downright + "\u001B[0m"; // line below
 
         log.warn("\n\n\t{}\n\t{}{}{}\n\t{}", above, before, text, after, below);
     }
@@ -149,7 +143,7 @@ public class CommandOutputSummary {
     private String parseCommandOutput(BasicCommand cmd) {
         Scanner scan      = new Scanner(cmd.getOutput());
         List<String> pots = new ArrayList<>();
-        pots.add("No output for " + cmd.getDescription());
+        pots.add("No output for " + cmd.toString());
         while (scan.hasNext()) {
             String potential = scan.nextLine();
             if (potential.toLowerCase(Locale.ENGLISH).contains("yes")

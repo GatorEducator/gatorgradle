@@ -134,7 +134,7 @@ public class DependencyManager {
 
     private static void error(String desc, BasicCommand cmd) {
         Console.error("ERROR:", desc);
-        Console.error("Command run:", cmd.getDescription());
+        Console.error("Command run:", cmd.toString());
         Console.error("OUTPUT:", cmd.getOutput().trim());
     }
 }

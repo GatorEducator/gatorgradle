@@ -65,7 +65,7 @@ public class BasicCommand implements Command {
         return output;
     }
 
-    public String getDescription() {
+    public String toString() {
         return "\'" + String.join("\' \'", command) + "\'";
     }
 
@@ -211,9 +211,9 @@ public class BasicCommand implements Command {
             //     ex.printStackTrace();
             //     exitVal = -1;
             // }
-            // Console.error("Exception while running " + getDescription() + ": " + ex);
+            // Console.error("Exception while running " + toString() + ": " + ex);
             Logging.getLogger(BasicCommand.class)
-                .error("Exception while running {}: {}", getDescription(), ex);
+                .error("Exception while running {}: {}", toString(), ex);
         } finally {
             fin = true;
             if (callback != null) {
@@ -228,7 +228,7 @@ public class BasicCommand implements Command {
             }
         }
 
-        // Console.log("Command " + getDescription() + " finished in "
+        // Console.log("Command " + toString() + " finished in "
         // + String.format("%.2fms!", (System.nanoTime() - startTime) / 1_000_000d));
     }
 

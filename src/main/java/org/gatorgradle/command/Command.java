@@ -17,8 +17,6 @@ public interface Command extends Runnable, Serializable {
 
     public abstract Command waitFor();
 
-    public abstract String getDescription();
-
     public abstract File getWorkingDir();
 
     public abstract void setWorkingDir(File dir);

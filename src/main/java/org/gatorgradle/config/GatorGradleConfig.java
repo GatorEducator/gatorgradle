@@ -118,7 +118,7 @@ public class GatorGradleConfig implements Iterable<Command> {
         }
 
         public boolean isEmpty() {
-            return content != null && content.length() > 0;
+            return content == null || content.length() == 0;
         }
 
         public String toString() {
@@ -127,15 +127,14 @@ public class GatorGradleConfig implements Iterable<Command> {
     }
 
     private void printLines(List<Line> lines) {
-        Console.log("in lines");
-        System.out.println("in lines 2");
-        Console.log("LIST: {",
-            String.join(", ", lines.stream().map(str -> str.toString()).toArray(String[] ::new)),
-            "}");
+        Console.log("LIST: {"
+                    + String.join("\", \"",
+                          lines.stream().map(str -> str.toString()).toArray(String[] ::new))
+                    + "}");
     }
 
     private void parseHeader(List<Line> lines) {
-        printLines(lines);
+        // printLines(lines);
         lines.forEach(line -> {
             String[] spl = line.content.split(":");
             String key   = spl[0].trim();
@@ -161,7 +160,7 @@ public class GatorGradleConfig implements Iterable<Command> {
     }
 
     private void parseCommands(List<Line> lines) {
-        printLines(lines);
+        // printLines(lines);
         lines.stream().map(line -> lineToCommand(line.content)).forEach(this ::with);
         // lineToCommand consumes everything
         // lines.removeIf(line -> true);
@@ -171,17 +170,12 @@ public class GatorGradleConfig implements Iterable<Command> {
      * Parses the config file.
      */
     public void parse() {
-        Console.log("parsing config 1");
         try (Stream<String> strLines = Files.lines(file.toPath())) {
             final AtomicInteger lineNumber = new AtomicInteger(0);
-            Console.log("parsing config 2");
             List<Line> lines =
                 strLines.map(str -> new Line(lineNumber.incrementAndGet(), str.trim()))
                     .filter(line -> !line.isEmpty() && !line.content.startsWith("#"))
                     .collect(Collectors.toList());
-            Console.log("parsing config 3");
-            printLines(lines);
-            Console.log("parsing config 4");
             int divider = lines.isEmpty() ? 0 : lines.get(0).number;
             int marks   = 0;
             String mark = "^-{3,}$";
@@ -191,16 +185,12 @@ public class GatorGradleConfig implements Iterable<Command> {
                     divider = i;
                 }
             }
-            divider -= marks;
-            Console.log("parsing config 5");
+            divider -= marks - 1;
             lines.removeIf(line -> line.content.matches(mark));
-            Console.log("parsing config 6");
             parseHeader(lines.subList(0, divider));
             parseCommands(lines.subList(divider, lines.size()));
-            Console.log("parsing config 7");
         } catch (Throwable ex) {
             // Console.error("Failed to read in config file!");
-            Console.log("parsing config failed");
             throw new GradleException("Failed to read config file \"" + file + "\"", ex);
         }
     }
@@ -218,7 +208,7 @@ public class GatorGradleConfig implements Iterable<Command> {
 
     public String toString() {
         return String.join(" -> ",
-            gradingCommands.stream().map(cmd -> cmd.getDescription()).collect(Collectors.toList()));
+            gradingCommands.stream().map(cmd -> cmd.toString()).collect(Collectors.toList()));
     }
 
     public Iterator<Command> iterator() {

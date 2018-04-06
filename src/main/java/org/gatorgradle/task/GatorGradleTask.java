@@ -72,7 +72,7 @@ public class GatorGradleTask extends DefaultTask {
      */
     private static synchronized void completedTask(Command complete) {
         summary.addCompletedCommand(complete);
-        // Console.log("FINISHED " + complete.getDescription());
+        // Console.log("FINISHED " + complete.toString());
 
         // To break the build if wanted, throw a GradleException here
         // throw new GradleException(this);
@@ -127,7 +127,7 @@ public class GatorGradleTask extends DefaultTask {
                 // configure command executor
                 executor.submit(CommandExecutor.class, (conf) -> {
                     conf.setIsolationMode(IsolationMode.NONE);
-                    conf.setDisplayName(cmd.getDescription());
+                    conf.setDisplayName(cmd.toString());
                     conf.setParams(cmd);
                 });
             }
