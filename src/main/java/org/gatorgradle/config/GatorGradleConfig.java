@@ -126,12 +126,12 @@ public class GatorGradleConfig implements Iterable<Command> {
         }
     }
 
-    private void printLines(List<Line> lines) {
-        Console.log("LIST: {"
-                    + String.join("\", \"",
-                          lines.stream().map(str -> str.toString()).toArray(String[] ::new))
-                    + "}");
-    }
+    // private void printLines(List<Line> lines) {
+    //     Console.log("LIST: {"
+    //                 + String.join("\", \"",
+    //                       lines.stream().map(str -> str.toString()).toArray(String[] ::new))
+    //                 + "}");
+    // }
 
     private void parseHeader(List<Line> lines) {
         // printLines(lines);
