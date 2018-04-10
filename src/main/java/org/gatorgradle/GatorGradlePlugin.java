@@ -50,7 +50,7 @@ public class GatorGradlePlugin implements Plugin<Project> {
             GATORGRADER_HOME = USER_HOME + F_SEP + ".gatorgrader";
         }
 
-        CONFIG_FILE_LOCATION = "config/gatorgrader.yml";
+        CONFIG_FILE_LOCATION = "config" + F_SEP + "gatorgrader.yml";
     }
 
     /**

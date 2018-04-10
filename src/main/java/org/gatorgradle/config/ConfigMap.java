@@ -1,5 +1,6 @@
 package org.gatorgradle.config;
 
+import org.gatorgradle.GatorGradlePlugin;
 import org.gatorgradle.util.StringUtil;
 
 import org.gradle.api.GradleException;
@@ -195,15 +196,27 @@ public class ConfigMap {
                         StringUtil.repeat('\t', line.indentLevel + 1) + controls[1].trim(),
                         indentSpacing));
                 }
-                parseBody(path + "/" + subPath, subLines);
 
+                while (i + 1 < lines.size() && lines.get(i + 1).indentLevel > line.indentLevel) {
+                    subLines.add(lines.get(++i));
+                }
+
+                parseBody(path + GatorGradlePlugin.F_SEP + subPath, subLines);
             } else {
                 // line is a value, add it to the current path
-                if (!filechecks.containsKey(path)) {
-                    filechecks.put(path, new ArrayList<>());
-                }
-                filechecks.get(path).add(new Value(line.content.trim(), line.number));
+                addCheck(path, new Value(line.content.trim(), line.number));
             }
+        }
+    }
+
+    private void addCheck(String path, Value value) {
+        List<Value> vals = filechecks.get(path);
+        if (vals == null) {
+            vals = new ArrayList<>();
+            vals.add(value);
+            filechecks.put(path, vals);
+        } else {
+            vals.add(value);
         }
     }
 
@@ -239,5 +252,21 @@ public class ConfigMap {
 
     public Set<String> getPaths() {
         return filechecks.keySet();
+    }
+
+    /**
+     * Give a description of this ConfigMap.
+     *
+     * @return a descriptive string
+     */
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("HEADER:\n");
+        header.keySet().forEach(
+            key -> builder.append(key).append("=").append(getHeader(key)).append('\n'));
+        builder.append("---\nBODY:\n");
+        header.keySet().forEach(
+            key -> builder.append(key).append("=").append(getHeader(key)).append('\n'));
+        return builder.toString();
     }
 }

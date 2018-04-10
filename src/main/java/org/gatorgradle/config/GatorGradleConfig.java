@@ -97,12 +97,20 @@ public class GatorGradleConfig implements Iterable<Command> {
     private static Command makeCommand(String path, String line) {
         // need to deal with adding checkfiles and directories associated with path
         BasicCommand cmd;
-        if (line.toLowerCase(Locale.ENGLISH).startsWith("gg: ")) {
-            line = line.substring(4);
+        if (path.endsWith("/gg")) {
             cmd  = new GatorGraderCommand().outputToSysOut(false);
+            path = path.substring(0, path.length() - 3);
+            if (path.length() > 0) {
+                int sep     = path.lastIndexOf(GatorGradlePlugin.F_SEP);
+                String name = path.substring(sep + 1);
+                path        = path.substring(0, sep);
+                cmd.with("--directories", path.length() > 0 ? path : ".");
+                cmd.with("--checkfiles", name);
+            }
         } else {
             cmd = new BasicCommand().outputToSysOut(false);
         }
+
         Matcher mtc = commandPattern.matcher(line);
         while (mtc.find()) {
             cmd.with(mtc.group(1).replace("\"", ""));
@@ -133,9 +141,15 @@ public class GatorGradleConfig implements Iterable<Command> {
         return this;
     }
 
+    /**
+     * Gives a string representation of this config.
+     *
+     * @return a descriptive string
+     */
     public String toString() {
-        return String.join(" -> ",
-            gradingCommands.stream().map(cmd -> cmd.toString()).collect(Collectors.toList()));
+        return file.toString() + "\n\nCOMMANDS:"
+            + String.join("\n-> ",
+                  gradingCommands.stream().map(cmd -> cmd.toString()).collect(Collectors.toList()));
     }
 
     public Iterator<Command> iterator() {
