@@ -2,7 +2,7 @@ plugins {
     id "maven"
     id "java-gradle-plugin"
     id "com.gradle.plugin-publish" version "0.9.7"
-    id "ru.vyarus.quality" version "2.4.0"
+    id "ru.vyarus.quality" version "3.0.0"
 }
 
 ext.gitVersioner = [
@@ -78,17 +78,24 @@ task _publishJavadocs(type: Exec) {
 quality {
     checkstyleVersion = "8.1"
 
-    // disable PMD for now (100+ issues to fix)
+    checkstyle = true
     pmd = false;
-    findbugsLevel = "low"
+    spotbugs = true
+    codenarc = true
+
+    spotbugsEffort = "max"
+    spotbugsLevel = "low"
+
+    strict = true
 }
 
-// afterEvaluation {
-//     checkstyle {
-//         maxWarnings = 0;
-//         maxErrors = 0;
-//     }
-// }
+afterEvaluate {
+    checkstyle {
+        ignoreFailures = false
+        maxErrors = 0
+        maxWarnings = 0
+    }
+}
 
 dependencies {
     compile gradleApi()

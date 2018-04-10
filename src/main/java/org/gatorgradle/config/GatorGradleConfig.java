@@ -10,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -46,7 +47,7 @@ public class GatorGradleConfig implements Iterable<Command> {
      * @param  configFile the file to be parsed
      * @return            the config
      */
-    public static GatorGradleConfig create(File configFile) {
+    public static GatorGradleConfig create(Path configFile) {
         singleton = new GatorGradleConfig(configFile);
         return singleton;
     }
@@ -57,7 +58,7 @@ public class GatorGradleConfig implements Iterable<Command> {
     private String assignmentName = "this assignment";
 
     List<Command> gradingCommands;
-    File file;
+    ConfigMap file;
 
     private GatorGradleConfig() {
         gradingCommands = new ArrayList<>();
@@ -68,10 +69,10 @@ public class GatorGradleConfig implements Iterable<Command> {
      *
      * @param configFile the file to base this configuration on
      */
-    private GatorGradleConfig(File configFile) {
+    private GatorGradleConfig(Path configFile) {
         this();
         // TODO: parse configFile to build gradingCommands
-        this.file = configFile;
+        this.file = new ConfigMap(configFile);
     }
 
     /**
@@ -93,7 +94,8 @@ public class GatorGradleConfig implements Iterable<Command> {
      * @param  line a line to parse
      * @return      a command
      */
-    private static Command lineToCommand(String line) {
+    private static Command makeCommand(String path, String line) {
+        // need to deal with adding checkfiles and directories associated with path
         BasicCommand cmd;
         if (line.toLowerCase(Locale.ENGLISH).startsWith("gg: ")) {
             line = line.substring(4);
@@ -108,91 +110,16 @@ public class GatorGradleConfig implements Iterable<Command> {
         return cmd;
     }
 
-    private static class Line {
-        int number;
-        String content;
-
-        protected Line(int number, String content) {
-            this.number  = number;
-            this.content = content;
-        }
-
-        public boolean isEmpty() {
-            return content == null || content.length() == 0;
-        }
-
-        public String toString() {
-            return content;
-        }
-    }
-
-    // private void printLines(List<Line> lines) {
-    //     Console.log("LIST: {"
-    //                 + String.join("\", \"",
-    //                       lines.stream().map(str -> str.toString()).toArray(String[] ::new))
-    //                 + "}");
-    // }
-
-    private void parseHeader(List<Line> lines) {
-        // printLines(lines);
-        lines.forEach(line -> {
-            String[] spl = line.content.split(":");
-            String key   = spl[0].trim();
-            String val   = spl[1].trim();
-            switch (key) {
-                case "name":
-                    assignmentName = val;
-                    break;
-                case "break":
-                    if (val.matches("[Tt][Rr][Uu][Ee]")) {
-                        breakBuild = true;
-                    } else if (val.matches("[Ff][Aa][Ll][Ss][Ee]")) {
-                        breakBuild = false;
-                    } else {
-                        throw new GradleException("Failed to parse '" + val + "' to 'break' value");
-                    }
-                    break;
-                default:
-                    Console.error("Unknown header key " + key);
-                    throw new GradleException("Failed to parse config file");
-            }
-        });
-    }
-
-    private void parseCommands(List<Line> lines) {
-        // printLines(lines);
-        lines.stream().map(line -> lineToCommand(line.content)).forEach(this ::with);
-        // lineToCommand consumes everything
-        // lines.removeIf(line -> true);
-    }
-
     /**
      * Parses the config file.
      */
     public void parse() {
-        try (Stream<String> strLines = Files.lines(file.toPath())) {
-            final AtomicInteger lineNumber = new AtomicInteger(0);
-            List<Line> lines =
-                strLines.map(str -> new Line(lineNumber.incrementAndGet(), str.trim()))
-                    .filter(line -> !line.isEmpty() && !line.content.startsWith("#"))
-                    .collect(Collectors.toList());
-            int divider = lines.isEmpty() ? 0 : lines.get(0).number;
-            int marks   = 0;
-            String mark = "^-{3,}$";
-            for (int i = 0; i < lines.size(); i++) {
-                if (lines.get(i).content.matches(mark)) {
-                    marks++;
-                    divider = i;
-                }
-            }
-            divider -= marks - 1;
-            lines.removeIf(line -> line.content.matches(mark));
-            parseHeader(lines.subList(0, divider));
-            parseCommands(lines.subList(divider, lines.size()));
-        } catch (Throwable ex) {
-            // Console.error("Failed to read in config file!");
-            throw new GradleException("Failed to read config file \"" + file + "\"", ex);
-        }
+        file.parse();
+        assignmentName = file.getHeader("name").asString();
+        breakBuild     = file.getHeader("break").asBoolean();
+
+        file.getPaths().forEach(
+            path -> file.getChecks(path).forEach(val -> with(makeCommand(path, val.asString()))));
     }
 
     /**
