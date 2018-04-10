@@ -97,10 +97,9 @@ public class GatorGradleConfig implements Iterable<Command> {
     private static Command makeCommand(String path, String line) {
         // need to deal with adding checkfiles and directories associated with path
         BasicCommand cmd;
-        if (path.endsWith("/gg")) {
-            cmd  = new GatorGraderCommand().outputToSysOut(false);
-            path = path.substring(0, path.length() - 3);
-            if (path.length() > 0) {
+        if (path.length() > 0) {
+            cmd = new GatorGraderCommand().outputToSysOut(false);
+            if (!path.matches("/[Gg]{2}")) {
                 int sep     = path.lastIndexOf(GatorGradlePlugin.F_SEP);
                 String name = path.substring(sep + 1);
                 path        = path.substring(0, sep);

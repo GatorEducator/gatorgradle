@@ -25,10 +25,16 @@ public class ConfigMap {
         String content;
         int indentLevel;
 
-        protected Line(int number, String content, int indentSpacing) {
+        protected Line(int number, String content) {
             this.number  = number;
             this.content = content;
-            int spaces   = 0;
+        }
+
+        public void calcIndentLevel(int indentSpacing) {
+            if (indentLevel > 0) {
+                return;
+            }
+            int spaces = 0;
             for (int i = 0; i < content.length(); i++) {
                 if (content.charAt(i) == ' ') {
                     spaces++;
@@ -44,7 +50,7 @@ public class ConfigMap {
             }
             if (spaces > 0) {
                 throw new GradleException(
-                    "Got " + spaces + " extra indent spaces on line " + number);
+                    "Got " + spaces + " out of place indent spaces on line " + number);
             }
         }
 
@@ -121,7 +127,7 @@ public class ConfigMap {
     // name -> value
     private Map<String, Value> header;
     // path -> checks
-    private Map<String, List<Value>> filechecks;
+    private Map<String, List<Value>> body;
 
     private int indentSpacing = 4;
 
@@ -133,9 +139,9 @@ public class ConfigMap {
      * @param path the path to parse for checks/headers/etc
      */
     public ConfigMap(Path path) {
-        this.header     = new HashMap<>();
-        this.filechecks = new HashMap<>();
-        this.path       = path;
+        this.header = new HashMap<>();
+        this.body   = new HashMap<>();
+        this.path   = path;
     }
 
     /**
@@ -144,10 +150,9 @@ public class ConfigMap {
     public void parse() {
         try (Stream<String> strLines = Files.lines(path)) {
             final AtomicInteger lineNumber = new AtomicInteger(0);
-            List<Line> lines =
-                strLines.map(str -> new Line(lineNumber.incrementAndGet(), str, indentSpacing))
-                    .filter(line -> !line.isEmpty() && !line.content.startsWith("#"))
-                    .collect(Collectors.toList());
+            List<Line> lines = strLines.map(str -> new Line(lineNumber.incrementAndGet(), str))
+                                   .filter(line -> !line.isEmpty() && !line.content.startsWith("#"))
+                                   .collect(Collectors.toList());
             int divider = lines.isEmpty() ? 0 : lines.get(0).number;
             int marks   = 0;
             for (int i = 0; i < lines.size(); i++) {
@@ -173,13 +178,16 @@ public class ConfigMap {
                     indentSpacing = indent.asInteger();
                 }
             }
+            lines.forEach(line -> line.calcIndentLevel(indentSpacing));
 
             // parse body
             parseBody("", lines.subList(divider, lines.size()));
         } catch (RuntimeException ex) {
-            throw new GradleException("Failed to read config file \"" + path + "\"", ex);
+            throw new GradleException(
+                "Failed to read config file \"" + path + "\": " + ex.getMessage(), ex);
         } catch (Exception ex) {
-            throw new GradleException("Failed to read config file \"" + path + "\"", ex);
+            throw new GradleException(
+                "Failed to read config file \"" + path + "\": " + ex.getMessage(), ex);
         }
     }
 
@@ -189,19 +197,18 @@ public class ConfigMap {
             if (line.matches(".*\\S+" + KEYVAL_SEP + ".*")) {
                 // line denotes a path (and maybe value after)
                 String[] controls   = line.content.trim().split(KEYVAL_SEP, 2);
-                String subPath      = controls[0];
                 List<Line> subLines = new ArrayList<>();
-                if (controls.length > 1) {
+                if (controls.length > 1 && controls[1].trim().length() > 0) {
                     subLines.add(new Line(line.number,
-                        StringUtil.repeat('\t', line.indentLevel + 1) + controls[1].trim(),
-                        indentSpacing));
+                        StringUtil.repeat('\t', line.indentLevel + 1) + controls[1].trim()));
                 }
 
                 while (i + 1 < lines.size() && lines.get(i + 1).indentLevel > line.indentLevel) {
                     subLines.add(lines.get(++i));
                 }
 
-                parseBody(path + GatorGradlePlugin.F_SEP + subPath, subLines);
+                parseBody(
+                    (path.isEmpty() ? "" : path + GatorGradlePlugin.F_SEP) + controls[0], subLines);
             } else {
                 // line is a value, add it to the current path
                 addCheck(path, new Value(line.content.trim(), line.number));
@@ -210,11 +217,11 @@ public class ConfigMap {
     }
 
     private void addCheck(String path, Value value) {
-        List<Value> vals = filechecks.get(path);
+        List<Value> vals = body.get(path);
         if (vals == null) {
             vals = new ArrayList<>();
             vals.add(value);
-            filechecks.put(path, vals);
+            body.put(path, vals);
         } else {
             vals.add(value);
         }
@@ -235,7 +242,7 @@ public class ConfigMap {
      * @return      a list of values
      */
     public List<Value> getChecks(String path) {
-        return filechecks.get(path);
+        return body.get(path);
     }
 
     /**
@@ -244,14 +251,11 @@ public class ConfigMap {
      * @return a list of all values
      */
     public List<Value> getAllChecks() {
-        return filechecks.values()
-            .stream()
-            .flatMap(list -> list.stream())
-            .collect(Collectors.toList());
+        return body.values().stream().flatMap(list -> list.stream()).collect(Collectors.toList());
     }
 
     public Set<String> getPaths() {
-        return filechecks.keySet();
+        return body.keySet();
     }
 
     /**
@@ -265,8 +269,12 @@ public class ConfigMap {
         header.keySet().forEach(
             key -> builder.append(key).append("=").append(getHeader(key)).append('\n'));
         builder.append("---\nBODY:\n");
-        header.keySet().forEach(
-            key -> builder.append(key).append("=").append(getHeader(key)).append('\n'));
+        body.keySet().forEach(key -> {
+            builder.append(key).append("=[");
+            builder.append(String.join(
+                ", ", getChecks(key).stream().map(val -> val.asString()).toArray(String[] ::new)));
+            builder.append("]\n");
+        });
         return builder.toString();
     }
 }

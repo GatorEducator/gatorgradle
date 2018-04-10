@@ -79,6 +79,7 @@ public class CommandOutputSummary {
         log.info("EXIT VALUE: {}", cmd.exitValue());
         log.info("OUTPUT:");
         // actual output of the command should be parsed and colored, etc
+
         if (cmd instanceof BasicCommand) {
             String output = parseCommandOutput((BasicCommand) cmd);
             log.lifecycle(output);
@@ -92,6 +93,7 @@ public class CommandOutputSummary {
             log.info("Check failed ({})!", cmd.exitValue());
             return true;
         }
+
         return false;
     }
 
@@ -141,9 +143,12 @@ public class CommandOutputSummary {
     }
 
     private String parseCommandOutput(BasicCommand cmd) {
-        Scanner scan      = new Scanner(cmd.getOutput());
+        String output = cmd.getOutput();
+        if (output == null) {
+            return "";
+        }
+        Scanner scan      = new Scanner(output);
         List<String> pots = new ArrayList<>();
-        pots.add("No output for " + cmd.toString());
         while (scan.hasNext()) {
             String potential = scan.nextLine();
             if (potential.toLowerCase(Locale.ENGLISH).contains("yes")
@@ -153,8 +158,8 @@ public class CommandOutputSummary {
         }
 
         // always return last line with a yes or no, TODO fix this when GatorGrader has atomic
-        // checks (when CUT_OUTPUT is true)
-        String output = CUT_OUTPUT ? pots.get(pots.size() - 1) : cmd.getOutput();
+        // checks or json reporting (when CUT_OUTPUT is true)
+        output = CUT_OUTPUT && pots.size() > 0 ? pots.get(pots.size() - 1) : output;
 
         return output.trim().replaceAll("\\b[Yy][Ee][Ss]\\b", YES).replaceAll("\\b[Nn][Oo]\\b", NO);
     }

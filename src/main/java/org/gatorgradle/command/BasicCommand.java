@@ -191,29 +191,10 @@ public class BasicCommand implements Command {
             exitVal = proc.exitValue();
             output  = out.toString().trim();
 
-        } catch (InterruptedException | IOException ex) {
-            // don't do anything fancy with logs
-            // if (ex.getMessage().contains("error=2")) {
-            //     output.append("Error: Command not found: \'")
-            //         .append(command.stream().collect(Collectors.joining(" ")))
-            //         .append("\'\n");
-            //     if (outSys) {
-            //         System.out.print("Error: Command not found: \'");
-            //         System.out.print(command.stream().collect(Collectors.joining(" ")));
-            //         System.out.print("\'\n");
-            //     }
-            //     // command not found exit code
-            //     exitVal = 127;
-            // } else {
-            //     System.err.print("Error while running '");
-            //     System.err.print(command.stream().collect(Collectors.joining("\' \'")));
-            //     Console.error("':");
-            //     ex.printStackTrace();
-            //     exitVal = -1;
-            // }
-            // Console.error("Exception while running " + toString() + ": " + ex);
+        } catch (Throwable thr) {
             Logging.getLogger(BasicCommand.class)
-                .error("Exception while running {}: {}", toString(), ex);
+                .error("Exception while running {}: {}", toString(), thr);
+            exitVal = 127;
         } finally {
             fin = true;
             if (callback != null) {
