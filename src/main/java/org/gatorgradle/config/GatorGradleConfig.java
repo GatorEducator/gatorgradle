@@ -11,11 +11,14 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,6 +30,16 @@ import java.util.stream.Stream;
  * TODO: make this configurable via DSL blocks in build.gradle
  */
 public class GatorGradleConfig implements Iterable<Command> {
+    public static final Collection<String> PROGRAMS;
+
+    static {
+        Collection<String> set = new HashSet<>();
+        set.add("mdl");
+        set.add("htmlhint");
+        set.add("proselint");
+        PROGRAMS = Collections.unmodifiableCollection(set);
+    }
+
     private static GatorGradleConfig singleton;
 
     /**
@@ -57,11 +70,11 @@ public class GatorGradleConfig implements Iterable<Command> {
     private boolean breakBuild    = false;
     private String assignmentName = "this assignment";
 
-    List<Command> gradingCommands;
+    Set<Command> gradingCommands;
     ConfigMap file;
 
     private GatorGradleConfig() {
-        gradingCommands = new ArrayList<>();
+        gradingCommands = new HashSet<>();
     }
 
     /**
@@ -82,10 +95,11 @@ public class GatorGradleConfig implements Iterable<Command> {
      * @param assignmentName the assignment name
      * @param commands       the list of commands to run
      */
-    public GatorGradleConfig(boolean breakBuild, String assignmentName, List<Command> commands) {
+    public GatorGradleConfig(
+        boolean breakBuild, String assignmentName, Collection<Command> commands) {
         this.breakBuild      = breakBuild;
         this.assignmentName  = assignmentName;
-        this.gradingCommands = new ArrayList<>(commands);
+        this.gradingCommands = new HashSet<>(commands);
     }
 
     /**
@@ -96,24 +110,38 @@ public class GatorGradleConfig implements Iterable<Command> {
      */
     private static Command makeCommand(String path, String line) {
         // need to deal with adding checkfiles and directories associated with path
-        BasicCommand cmd;
-        if (path.length() > 0) {
-            cmd = new GatorGraderCommand().outputToSysOut(false);
-            if (!path.matches("/[Gg]{2}")) {
-                int sep     = path.lastIndexOf(GatorGradlePlugin.F_SEP);
-                String name = path.substring(sep + 1);
-                path        = path.substring(0, sep);
-                cmd.with("--directories", path.length() > 0 ? path : ".");
-                cmd.with("--checkfiles", name);
-            }
-        } else {
-            cmd = new BasicCommand().outputToSysOut(false);
+
+        List<String> splits = new ArrayList<>();
+        Matcher mtc         = commandPattern.matcher(line);
+        while (mtc.find()) {
+            splits.add(mtc.group(1).replace("\"", ""));
         }
 
-        Matcher mtc = commandPattern.matcher(line);
-        while (mtc.find()) {
-            cmd.with(mtc.group(1).replace("\"", ""));
+        int sep     = path.lastIndexOf(GatorGradlePlugin.F_SEP);
+        String name = path;
+        String dir  = ".";
+        if (sep >= 0) {
+            name = path.substring(sep + 1);
+            dir  = path.substring(0, sep);
         }
+        BasicCommand cmd;
+        if (PROGRAMS.contains(splits.get(0))) {
+            cmd = new BasicCommand().outputToSysOut(false);
+            splits.add(path.length() > 0 ? path : ".");
+        } else {
+            cmd = new GatorGraderCommand().outputToSysOut(false);
+            if (name.length() > 0) {
+                splits.add(0, name);
+                splits.add(0, "--checkfiles");
+            }
+            if (path.length() > 0) {
+                splits.add(0, dir);
+                splits.add(0, "--directories");
+            }
+        }
+
+        cmd.with(splits);
+
         return cmd;
     }
 

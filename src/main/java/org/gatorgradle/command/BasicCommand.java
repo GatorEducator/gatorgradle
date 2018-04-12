@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -31,15 +32,15 @@ public class BasicCommand implements Command {
         this.command = new ArrayList<>(Arrays.asList(command));
     }
 
-    public BasicCommand(final List<String> command) {
-        this.command = command;
+    public BasicCommand(final Collection<String> command) {
+        this.command = new ArrayList<>(command);
     }
 
     public BasicCommand with(final String... command) {
         return with(Arrays.asList(command));
     }
 
-    public BasicCommand with(final List<String> command) {
+    public BasicCommand with(final Collection<String> command) {
         this.command.addAll(command);
         return this;
     }
@@ -67,6 +68,14 @@ public class BasicCommand implements Command {
 
     public String toString() {
         return "\'" + String.join("\' \'", command) + "\'";
+    }
+
+    public String executable() {
+        return command.get(0);
+    }
+
+    public String last() {
+        return command.get(command.size() - 1);
     }
 
     public int elements() {

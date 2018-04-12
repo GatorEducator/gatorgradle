@@ -150,9 +150,10 @@ public class ConfigMap {
     public void parse() {
         try (Stream<String> strLines = Files.lines(path)) {
             final AtomicInteger lineNumber = new AtomicInteger(0);
-            List<Line> lines = strLines.map(str -> new Line(lineNumber.incrementAndGet(), str))
-                                   .filter(line -> !line.isEmpty() && !line.content.startsWith("#"))
-                                   .collect(Collectors.toList());
+            List<Line> lines =
+                strLines.map(str -> new Line(lineNumber.incrementAndGet(), str))
+                    .filter(line -> !line.isEmpty() && !line.content.trim().startsWith("#"))
+                    .collect(Collectors.toList());
             int divider = lines.isEmpty() ? 0 : lines.get(0).number;
             int marks   = 0;
             for (int i = 0; i < lines.size(); i++) {

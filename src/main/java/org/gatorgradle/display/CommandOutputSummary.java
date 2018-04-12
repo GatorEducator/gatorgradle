@@ -1,8 +1,7 @@
 package org.gatorgradle.display;
 
 import org.gatorgradle.GatorGradlePlugin;
-import org.gatorgradle.command.BasicCommand;
-import org.gatorgradle.command.Command;
+import org.gatorgradle.command.*;
 import org.gatorgradle.config.GatorGradleConfig;
 import org.gatorgradle.task.GatorGradleTask;
 import org.gatorgradle.util.*;
@@ -64,7 +63,7 @@ public class CommandOutputSummary {
         if (nomore) {
             return;
         }
-        boolean fail = printCommandResult(cmd);
+        boolean fail = printCommandResult(cmd, true);
         if (fail && GatorGradleConfig.get().shouldBreakBuild()) {
             log.lifecycle("\n  -~-  \u001B[1;31mCHECKS FAILED\u001B[0m  -~-\n");
             nomore = true;
@@ -73,7 +72,7 @@ public class CommandOutputSummary {
     }
 
     // TODO: parse this better
-    private boolean printCommandResult(Command cmd) {
+    private boolean printCommandResult(Command cmd, boolean sep) {
         // debug output for TAs
         log.info("COMMAND: {}", cmd.toString());
         log.info("EXIT VALUE: {}", cmd.exitValue());
@@ -83,6 +82,9 @@ public class CommandOutputSummary {
         if (cmd instanceof BasicCommand) {
             String output = parseCommandOutput((BasicCommand) cmd);
             log.lifecycle(output);
+            if (sep) {
+                log.lifecycle("\u001B[1;36m ~-~-~ \u001B[0m");
+            }
             // log.warn(StringUtil.clamp(output, 80));
             // if (output.length() > 80) {
             //     log.info("…" + output.substring(79));
@@ -101,66 +103,72 @@ public class CommandOutputSummary {
      * Output the compiled summary to the project's Logger.
      */
     public void showOutputSummary() {
-        log.lifecycle("\n  -~-  \u001B[1;36mBeginning check summary\u001B[1;0m  -~-\n");
+        // log.lifecycle("\n\n  -~-  \u001B[1;36mBeginning check summary\u001B[1;0m  -~-\n\n");
         int totalChecks      = completedCommands.size();
         List<Command> failed = completedCommands.stream()
                                    .filter(cmd -> cmd.exitValue() != Command.SUCCESS)
                                    .collect(Collectors.toList());
-        boolean mis = completedCommands.removeAll(failed);
+        boolean mis = failed.size() > 0;
 
-        for (int i = 0; i < completedCommands.size(); i++) {
-            // failure needs to be handled
-            printCommandResult(completedCommands.get(i));
-            if (i < completedCommands.size() - 1) {
-                log.lifecycle(" ~-~-~ ");
+        if (mis) {
+            log.lifecycle(
+                "\n\n\u001B[1;33m  -~-  \u001B[1;31mFAILURES  \u001B[1;33m-~-\u001B[0m\n");
+            for (int i = 0; i < failed.size(); i++) {
+                printCommandResult(failed.get(i), false);
+                if (i < failed.size() - 1) {
+                    log.lifecycle("\u001B[1;36m ~-~-~ \u001B[0m");
+                }
             }
         }
 
-        failed.forEach(cmd -> {
-            log.lifecycle(" ~-~-~ ");
-            printCommandResult(cmd);
-        });
-        String text = "Passed " + completedCommands.size() + "/" + totalChecks + " of checks for "
-                      + GatorGradleConfig.get().getAssignmentName() + "!";
-        int textLen = text.length();
-        text        = (mis ? "\u001B[1;31m" : "\u001B[1;32m") + text + "\u001B[0m";
-
-        char upleft    = '\u250f'; // upper left corner
-        char upright   = '\u2513'; // upper right corner
-        char downleft  = '\u2517'; // lower left corner
-        char downright = '\u251B'; // lower right corner
-        char vert      = '\u2503'; // vertical line
-        char horz      = '\u2501'; // horizontal line
-
-        String line = StringUtil.repeat(horz, textLen + 2);
-
-        String above  = "\u001B[1;35m" + upleft + line + upright + "\u001B[0m"; // line above
-        String before = "\u001B[1;35m" + vert + "\u001B[0m "; // vertical line
-        String after  = " \u001B[1;35m" + vert + "\u001B[0m"; // vertical line
-        String below  = "\u001B[1;35m" + downleft + line + downright + "\u001B[0m"; // line below
-
-        log.warn("\n\n\t{}\n\t{}{}{}\n\t{}", above, before, text, after, below);
+        StringUtil.border("Passed " + (completedCommands.size() - failed.size()) + "/" + totalChecks
+                              + " of checks for " + GatorGradleConfig.get().getAssignmentName()
+                              + "!",
+            mis ? "\u001B[1;31m" : "\u001B[1;32m", mis ? "\u001B[1;35m" : "\u001B[1;32m", log);
     }
 
     private String parseCommandOutput(BasicCommand cmd) {
         String output = cmd.getOutput();
-        if (output == null) {
-            return "";
-        }
-        Scanner scan      = new Scanner(output);
+
+        boolean gatorgrader = cmd instanceof GatorGraderCommand;
+
         List<String> pots = new ArrayList<>();
-        while (scan.hasNext()) {
-            String potential = scan.nextLine();
-            if (potential.toLowerCase(Locale.ENGLISH).contains("yes")
-                || potential.toLowerCase(Locale.ENGLISH).contains("no")) {
-                pots.add(potential);
+        if (gatorgrader && output != null) {
+            Scanner scan = new Scanner(output);
+            while (scan.hasNext()) {
+                String potential = scan.nextLine();
+                if (potential.toLowerCase(Locale.ENGLISH).contains("yes")
+                    || potential.toLowerCase(Locale.ENGLISH).contains("no")) {
+                    pots.add(potential);
+                }
             }
+        } else if (GatorGradleConfig.PROGRAMS.contains(cmd.executable())) {
+            StringBuilder builder = new StringBuilder();
+            builder.append("Does ")
+                .append(cmd.last())
+                .append(" pass ")
+                .append(cmd.executable())
+                .append("? ")
+                .append(cmd.exitValue() == cmd.SUCCESS ? YES : NO);
+            if (output != null && !output.isEmpty()) {
+                Scanner scan = new Scanner(cmd.getOutput());
+                builder.append("\n\u001B[1;31m  ---\u001B[0m\n\u001B[33m");
+                while (scan.hasNext()) {
+                    builder.append("  ").append(scan.nextLine()).append("\n");
+                }
+                builder.append("\u001B[0m\u001B[1;31m  ---\u001B[0m");
+            }
+            output = builder.toString();
+        } else {
+            output = "Does " + cmd + " pass? " + (cmd.exitValue() == cmd.SUCCESS ? YES : NO);
         }
 
-        // always return last line with a yes or no, TODO fix this when GatorGrader has atomic
+        // always return last line with a yes or no, FIXME: fix this when GatorGrader has atomic
         // checks or json reporting (when CUT_OUTPUT is true)
-        output = CUT_OUTPUT && pots.size() > 0 ? pots.get(pots.size() - 1) : output;
+        output = CUT_OUTPUT && pots.size() > 0 && gatorgrader ? pots.get(pots.size() - 1) : output;
 
-        return output.trim().replaceAll("\\b[Yy][Ee][Ss]\\b", YES).replaceAll("\\b[Nn][Oo]\\b", NO);
+        return gatorgrader
+            ? output.trim().replaceAll("\\b[Yy][Ee][Ss]\\b", YES).replaceAll("\\b[Nn][Oo]\\b", NO)
+            : output;
     }
 }

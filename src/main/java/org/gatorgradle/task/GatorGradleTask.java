@@ -106,8 +106,8 @@ public class GatorGradleTask extends DefaultTask {
         }
 
         config.parse();
-        System.out.println("Using config:");
-        System.out.println(config);
+        // System.out.println("Using config:");
+        // System.out.println(config);
 
         // get a progress logger
         ProgressLoggerWrapper progLog =
