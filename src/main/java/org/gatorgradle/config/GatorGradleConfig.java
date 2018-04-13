@@ -31,6 +31,7 @@ import java.util.stream.Stream;
  */
 public class GatorGradleConfig implements Iterable<Command> {
     public static final Collection<String> PROGRAMS;
+    public static final Collection<String> FILENAME_EXCLUSIONS;
 
     static {
         Collection<String> set = new HashSet<>();
@@ -38,6 +39,10 @@ public class GatorGradleConfig implements Iterable<Command> {
         set.add("htmlhint");
         set.add("proselint");
         PROGRAMS = Collections.unmodifiableCollection(set);
+
+        set = new HashSet<>();
+        set.add("gg");
+        FILENAME_EXCLUSIONS = Collections.unmodifiableCollection(set);
     }
 
     private static GatorGradleConfig singleton;
@@ -119,7 +124,7 @@ public class GatorGradleConfig implements Iterable<Command> {
 
         int sep     = path.lastIndexOf(GatorGradlePlugin.F_SEP);
         String name = path;
-        String dir  = ".";
+        String dir  = "";
         if (sep >= 0) {
             name = path.substring(sep + 1);
             dir  = path.substring(0, sep);
@@ -130,7 +135,7 @@ public class GatorGradleConfig implements Iterable<Command> {
             splits.add(path.length() > 0 ? path : ".");
         } else {
             cmd = new GatorGraderCommand().outputToSysOut(false);
-            if (name.length() > 0) {
+            if (name.length() > 0 && !FILENAME_EXCLUSIONS.contains(name)) {
                 splits.add(0, name);
                 splits.add(0, "--checkfiles");
             }
