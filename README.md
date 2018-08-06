@@ -3,7 +3,7 @@
 GatorGradle integrates [GatorGrader](https://github.com/gkapfham/gatorgrader)
 into a Gradle project.
 
-[![Build Status](https://travis-ci.org/gatoreducator/gatorgradle.svg?branch=master)](https://travis-ci.org/gatoreducator/gatorgradle)
+[![Build Status](https://travis-ci.org/GatorEducator/gatorgradle.svg?branch=master)](https://travis-ci.org/GatorEducator/gatorgradle)
 [![javadocs](https://gatoreducator.github.io/gatorgradle/docs/docs-status-badge.svg)](https://gatoreducator.github.io/gatorgradle/docs)
 
 ## Running Checks
