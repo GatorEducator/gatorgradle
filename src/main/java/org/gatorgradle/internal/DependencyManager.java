@@ -12,7 +12,29 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class DependencyManager {
-    public static final String GATORGRADER_GIT_REPO = "https://github.com/gkapfham/gatorgrader.git";
+    public static final String GATORGRADER_GIT_REPO =
+        "https://github.com/GatorEducator/gatorgrader.git";
+    private static String PYTHON_EXECUTABLE = null;
+
+    /**
+     * Returns the python executable path.
+     *
+     * @return the path
+     */
+    public static String getPython() {
+        if (PYTHON_EXECUTABLE == null) {
+            BasicCommand query = new BasicCommand("pipenv", "--venv");
+            query.setWorkingDir(new File(GATORGRADER_HOME));
+            query.outputToSysOut(false);
+            query.run(true);
+            if (query.exitValue() != 0) {
+                error("Query for python executable location failed", query);
+                throw new Error("Failed to run pipenv --venv!");
+            }
+            PYTHON_EXECUTABLE = query.getOutput() + "/bin/python";
+        }
+        return PYTHON_EXECUTABLE;
+    }
 
     /**
      * Install or Update the given dependency.
@@ -110,6 +132,7 @@ public class DependencyManager {
             // environments from java and have it continue to be activated for subsequent commands?
 
             Console.log("Installing GatorGrader dependencies...");
+            Console.log("Ensuring pip is installed...");
             BasicCommand pip = new BasicCommand("python3", "-m", "ensurepip");
             pip.outputToSysOut(true);
             pip.run();
@@ -117,8 +140,17 @@ public class DependencyManager {
                 error("GatorGrader management failed, could not install dependencies!", pip);
                 return false;
             }
-            BasicCommand dep = new BasicCommand(
-                "python3", "-m", "pip", "install", "-r", GATORGRADER_HOME + "/requirements.txt");
+            Console.log("Installing pipenv...");
+            pip = new BasicCommand("pip", "install", "pipenv");
+            pip.outputToSysOut(true);
+            pip.run();
+            if (pip.exitValue() != Command.SUCCESS) {
+                error("GatorGrader management failed, could not install dependencies!", pip);
+                return false;
+            }
+            Console.log("Installing dependencies...");
+            BasicCommand dep = new BasicCommand("pipenv", "install");
+            dep.setWorkingDir(new File(GATORGRADER_HOME));
             dep.outputToSysOut(true);
             dep.run();
             Console.log("Finished GatorGrader install!");

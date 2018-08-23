@@ -17,9 +17,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class CommandOutputSummary {
-    private static final String YES   = "\u001B[1;32mYes\u001B[0m";
-    private static final String NO    = "\u001B[1;31mNo\u001B[0m";
-    private static boolean CUT_OUTPUT = true;
+    private static final String YES = StringUtil.color(StringUtil.GOOD, "Yes");
+    private static final String NO  = StringUtil.color(StringUtil.BAD, "No");
 
     private List<Command> completedCommands;
     private final Logger log;
@@ -63,7 +62,7 @@ public class CommandOutputSummary {
         if (nomore) {
             return;
         }
-        boolean fail = printCommandResult(cmd, true);
+        boolean fail = printCommandResult(cmd, false);
         if (fail && GatorGradleConfig.get().shouldBreakBuild()) {
             log.lifecycle("\n  -~-  \u001B[1;31mCHECKS FAILED\u001B[0m  -~-\n");
             nomore = true;
@@ -71,28 +70,19 @@ public class CommandOutputSummary {
         }
     }
 
-    // TODO: parse this better
-    private boolean printCommandResult(Command cmd, boolean sep) {
+    private boolean printCommandResult(Command cmd, boolean includeDiagnostic) {
         // debug output for TAs
         log.info("COMMAND: {}", cmd.toString());
         log.info("EXIT VALUE: {}", cmd.exitValue());
         log.info("OUTPUT:");
+
         // actual output of the command should be parsed and colored, etc
-
         if (cmd instanceof BasicCommand) {
-            String output = parseCommandOutput((BasicCommand) cmd);
+            String output = parseCommandOutput((BasicCommand) cmd, includeDiagnostic);
             log.lifecycle(output);
-            if (sep) {
-                log.lifecycle("\u001B[1;36m ~-~-~ \u001B[0m");
-            }
-            // log.warn(StringUtil.clamp(output, 80));
-            // if (output.length() > 80) {
-            //     log.info("…" + output.substring(79));
-            // }
         }
-
         if (cmd.exitValue() != Command.SUCCESS) {
-            log.info("Check failed ({})!", cmd.exitValue());
+            log.info("Check failed!");
             return true;
         }
 
@@ -108,67 +98,59 @@ public class CommandOutputSummary {
         List<Command> failed = completedCommands.stream()
                                    .filter(cmd -> cmd.exitValue() != Command.SUCCESS)
                                    .collect(Collectors.toList());
-        boolean mis = failed.size() > 0;
+        boolean failedChecks = failed.size() > 0;
 
-        if (mis) {
+        if (failedChecks) {
             log.lifecycle(
                 "\n\n\u001B[1;33m  -~-  \u001B[1;31mFAILURES  \u001B[1;33m-~-\u001B[0m\n");
             for (int i = 0; i < failed.size(); i++) {
-                printCommandResult(failed.get(i), false);
-                if (i < failed.size() - 1) {
-                    log.lifecycle("\u001B[1;36m ~-~-~ \u001B[0m");
-                }
+                printCommandResult(failed.get(i), true);
             }
         }
 
-        StringUtil.border("Passed " + (completedCommands.size() - failed.size()) + "/" + totalChecks
-                              + " of checks for " + GatorGradleConfig.get().getAssignmentName()
-                              + "!",
-            mis ? "\u001B[1;31m" : "\u001B[1;32m", mis ? "\u001B[1;35m" : "\u001B[1;32m", log);
+        int passedChecks = completedCommands.size() - failed.size();
+
+        StringUtil.border(
+            "Passed " + passedChecks + "/" + totalChecks + " ("
+                + ((int) Math.round((passedChecks * 100) / (float) totalChecks)) + "%)"
+                + " of checks for " + GatorGradleConfig.get().getAssignmentName() + "!",
+            failedChecks ? "\u001B[1;31m" : "\u001B[1;32m",
+            failedChecks ? "\u001B[1;35m" : "\u001B[1;32m", log);
     }
 
-    private String parseCommandOutput(BasicCommand cmd) {
-        String output = cmd.getOutput();
-
-        boolean gatorgrader = cmd instanceof GatorGraderCommand;
-
-        List<String> pots = new ArrayList<>();
-        if (gatorgrader && output != null) {
-            Scanner scan = new Scanner(output);
-            while (scan.hasNext()) {
-                String potential = scan.nextLine();
-                if (potential.toLowerCase(Locale.ENGLISH).contains("yes")
-                    || potential.toLowerCase(Locale.ENGLISH).contains("no")) {
-                    pots.add(potential);
-                }
+    private String parseCommandOutput(BasicCommand cmd, boolean includeDiagnostic) {
+        String output      = cmd.getOutput();
+        CheckResult result = null;
+        if (cmd instanceof GatorGraderCommand) {
+            try {
+                result = new CheckResult(output);
+            } catch (CheckResult.MalformedJsonException ex) {
+                log.error(cmd.toString() + " produced unparsable json: " + ex.getMessage());
             }
         } else if (GatorGradleConfig.PROGRAMS.contains(cmd.executable())) {
-            StringBuilder builder = new StringBuilder();
-            builder.append("Does ")
-                .append(cmd.last())
-                .append(" pass ")
-                .append(cmd.executable())
-                .append("? ")
-                .append(cmd.exitValue() == cmd.SUCCESS ? YES : NO);
-            if (output != null && !output.isEmpty()) {
-                Scanner scan = new Scanner(cmd.getOutput());
-                builder.append("\n\u001B[1;31m  ---\u001B[0m\n\u001B[33m");
+            StringBuilder diagnostic = new StringBuilder();
+            if (output != null && !output.isEmpty() && includeDiagnostic) {
+                Scanner scan = new Scanner(output);
+                diagnostic.append(cmd.executable() + " diagnostics:\n");
                 while (scan.hasNext()) {
-                    builder.append("  ").append(scan.nextLine()).append("\n");
+                    String line = scan.nextLine().trim();
+                    if (!line.isEmpty()) {
+                        diagnostic.append(line).append("\n");
+                    }
                 }
-                builder.append("\u001B[0m\u001B[1;31m  ---\u001B[0m");
+            } else {
+                diagnostic.append("No diagnostic available");
             }
-            output = builder.toString();
+            result = new CheckResult("The file " + cmd.last() + " passes " + cmd.executable(),
+                cmd.exitValue() == cmd.SUCCESS, diagnostic.toString());
         } else {
-            output = "Does " + cmd + " pass? " + (cmd.exitValue() == cmd.SUCCESS ? YES : NO);
+            result = new CheckResult(
+                cmd + " passes", cmd.exitValue() == cmd.SUCCESS, "No diagnostic available");
         }
 
-        // always return last line with a yes or no, FIXME: fix this when GatorGrader has atomic
-        // checks or json reporting (when CUT_OUTPUT is true)
-        output = CUT_OUTPUT && pots.size() > 0 && gatorgrader ? pots.get(pots.size() - 1) : output;
-
-        return gatorgrader
-            ? output.trim().replaceAll("\\b[Yy][Ee][Ss]\\b", YES).replaceAll("\\b[Nn][Oo]\\b", NO)
-            : output;
+        if (result != null) {
+            output = result.textReport(includeDiagnostic);
+        }
+        return output;
     }
 }

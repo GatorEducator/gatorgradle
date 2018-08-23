@@ -137,11 +137,11 @@ public class GatorGradleConfig implements Iterable<Command> {
             cmd = new GatorGraderCommand().outputToSysOut(false);
             if (name.length() > 0 && !FILENAME_EXCLUSIONS.contains(name)) {
                 splits.add(0, name);
-                splits.add(0, "--checkfiles");
+                splits.add(0, "--file");
             }
             if (path.length() > 0) {
                 splits.add(0, dir);
-                splits.add(0, "--directories");
+                splits.add(0, "--directory");
             }
         }
 

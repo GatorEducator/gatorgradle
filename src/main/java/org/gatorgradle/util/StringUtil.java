@@ -5,8 +5,6 @@ import org.gradle.api.logging.Logger;
 import java.lang.StringBuilder;
 
 public class StringUtil {
-    public static final String RESET = "\u001B[0m";
-
     /**
      * Clamps a string to the provided width, ending with \u2026.
      *
@@ -102,5 +100,14 @@ public class StringUtil {
         String below = borderCol + downleft + line + downright + RESET;
 
         log.warn("\n\n\t{}\n\t{} {} {}\n\t{}", above, side, text, side, below);
+    }
+
+    public static final String BAD   = "\u001B[1;31m";
+    public static final String GOOD  = "\u001B[1;32m";
+    public static final String FIX   = "\u001B[33m";
+    public static final String RESET = "\u001B[0m";
+
+    public static String color(String with, String contents) {
+        return with + contents + RESET;
     }
 }
