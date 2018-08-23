@@ -18,12 +18,8 @@ gradle grade
 ## Configuring Checks
 
 The `grade` task reads the configuration provided in `config/gatorgrader.yml`
-(to be renamed to `config/gatorgradle.yml` at some point in the future) by
-default, and then performs the specified commands. Lines in the configuration
-file that begin with `gg:` will be interpreted as GatorGrader parameters, and
-will be run as such. Non-prefixed lines will be executed in `bash`. Execution
-of checks is parallelized, so no ordering is guaranteed. Generally, commands
-which run faster are finished earlier, however.
+(to possibly be renamed to `config/gatorgradle.yml` at some point in the future) by
+default, and then performs the specified commands. Execution of checks is parallelized, so no ordering is guaranteed. Generally, commands which run faster are finished earlier, however.
 
 We have plans to improve the configuration file format -- issue
 [#1](https://github.com/gatoreducator/gatorgradle/issues/1) describes this task.
@@ -33,12 +29,37 @@ An example of a configuration file is given below.
 
 ```yaml
 # comments are possible by using `#`
-# gg: --directories src/main/java/samplelab --checkfiles SampleLabMain.java --multicomments 2 --language Java
-gg: --directories src/main/java/samplelab --checkfiles SampleLabMain.java --singlecomments 1 --multicomments 2 --language Java
-gg: --directories src/main/java/samplelab --checkfiles SampleLabMain.java --fragments println( --fragmentcounts 2
-gg: --commands "gradle -q --console=plain run" --outputlines 2
-gg: --commands "gradle -q --console=plain run" --fragments "Hello"
-gg: --commits 100
+---
+# the first block contains project configuration
+# like the name,
+name: gatorgrader-samplelab
+# an option to break the build on failures,
+break: false
+# and the indentation to use for this file
+indent: 4
+---
+# the second block consists of a tree-structure for file access,
+# with commands to run in a list below each path. Any commands
+# not inside a path will be run on their own, without the file.
+src/main:
+    java:
+        samplelab/SampleLabMain.java:
+            # These checks will all be run on the file
+            # src/main/java/samplelab/SampleLabMain.java
+            --single 1 --language Java
+            --multi 3 --language Java
+            --fragment "println(" --count 2
+            --fragment "new DataClass(" --count 1
+            --fragment "new Date(" --count 2
+        samplelab/DataClass.java:
+            --multi 1 --language Java
+            --fragment "int " --count 1
+writing/reflection.md:
+    mdl
+    # proselint
+    --paragraphs 2
+    --words 6
+--commits 18
 ```
 
 ## Output Summary
