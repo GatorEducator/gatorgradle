@@ -1,6 +1,6 @@
 # GatorGradle: GatorGrader Gradle Integration
 
-GatorGradle integrates [GatorGrader](https://github.com/gkapfham/gatorgrader)
+GatorGradle integrates [GatorGrader](https://github.com/GatorEducator/gatorgrader)
 into a Gradle project.
 
 [![Build Status](https://travis-ci.org/GatorEducator/gatorgradle.svg?branch=master)](https://travis-ci.org/GatorEducator/gatorgradle)
