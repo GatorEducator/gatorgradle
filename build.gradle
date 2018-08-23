@@ -22,8 +22,8 @@ version = "${sem_version}-${gitVersionName}"
 println("\u001B[1;36mVERSION ${version}\u001B[0m")
 
 pluginBundle {
-    website = "https://gatored.github.io/gatorgradle/"
-    vcsUrl = "https://github.com/gatored/gatorgradle"
+    website = "https://gatoreducator.github.io/gatorgradle/"
+    vcsUrl = "https://github.com/gatoreducator/gatorgradle"
     description = "Gradle plugin for integrating the grading tool GatorGrader as a runnable, configurable task"
     tags = ["grading", "allegheny", "gatorgrader", "mdl", "proselint"]
 
