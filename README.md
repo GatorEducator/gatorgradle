@@ -18,8 +18,10 @@ gradle grade
 ## Configuring Checks
 
 The `grade` task reads the configuration provided in `config/gatorgrader.yml`
-(to possibly be renamed to `config/gatorgradle.yml` at some point in the future) by
-default, and then performs the specified commands. Execution of checks is parallelized, so no ordering is guaranteed. Generally, commands which run faster are finished earlier, however.
+(to possibly be renamed to `config/gatorgradle.yml` at some point in the
+future) by default, and then performs the specified commands. Execution of
+checks is parallelized, so no ordering is guaranteed. Generally, commands
+which run faster are finished earlier, however.
 
 We have plans to improve the configuration file format -- issue
 [#1](https://github.com/gatoreducator/gatorgradle/issues/1) describes this task.
