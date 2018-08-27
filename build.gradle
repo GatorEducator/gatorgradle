@@ -76,7 +76,7 @@ task _publishJavadocs(type: Exec) {
 }
 
 quality {
-    checkstyleVersion = "8.1"
+    checkstyleVersion = "8.12"
 
     checkstyle = true
     pmd = false;
