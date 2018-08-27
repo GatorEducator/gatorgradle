@@ -270,8 +270,8 @@ public class ConfigMap {
     builder.append("---\nBODY:\n");
     body.keySet().forEach(key -> {
       builder.append(key).append("=[");
-      builder.append(String.join(
-          ", ", getChecks(key).stream().map(val -> val.asString()).toArray(String[] ::new)));
+      builder.append(String.join(", ",
+          getChecks(key).stream().map(val -> val.asString()).toArray(size -> new String[size])));
       builder.append("]\n");
     });
     return builder.toString();
