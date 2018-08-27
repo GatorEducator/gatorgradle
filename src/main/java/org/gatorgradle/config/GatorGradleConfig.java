@@ -1,11 +1,5 @@
 package org.gatorgradle.config;
 
-import org.gatorgradle.GatorGradlePlugin;
-import org.gatorgradle.command.*;
-import org.gatorgradle.util.Console;
-
-import org.gradle.api.GradleException;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -24,6 +18,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.gatorgradle.GatorGradlePlugin;
+import org.gatorgradle.command.BasicCommand;
+import org.gatorgradle.command.Command;
+import org.gatorgradle.command.GatorGraderCommand;
+import org.gatorgradle.util.Console;
+
+import org.gradle.api.GradleException;
 
 /**
  * GatorGradleConfig holds the configuration for this assignment.
