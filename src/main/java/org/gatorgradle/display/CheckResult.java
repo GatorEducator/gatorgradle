@@ -1,7 +1,5 @@
 package org.gatorgradle.display;
 
-import org.gatorgradle.util.*;
-
 import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -9,6 +7,9 @@ import java.util.Scanner;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+
+import org.gatorgradle.util.Console;
+import org.gatorgradle.util.StringUtil;
 
 public class CheckResult {
   public static class MalformedJsonException extends Exception {
