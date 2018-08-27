@@ -10,18 +10,18 @@ import java.util.List;
 import javax.inject.Inject;
 
 public class CommandExecutor implements Runnable {
-    private Command command;
+  private Command command;
 
-    @Inject
-    public CommandExecutor(Command command) {
-        this.command = command;
-    }
+  @Inject
+  public CommandExecutor(Command command) {
+    this.command = command;
+  }
 
-    /**
-     * Implements the run method from Runnable. This method executes the gathered Commands.
-     */
-    @Override
-    public void run() {
-        command.run();
-    }
+  /**
+   * Implements the run method from Runnable. This method executes the gathered Commands.
+   */
+  @Override
+  public void run() {
+    command.run();
+  }
 }
