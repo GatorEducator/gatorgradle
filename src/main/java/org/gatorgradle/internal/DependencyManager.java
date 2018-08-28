@@ -1,19 +1,26 @@
 package org.gatorgradle.internal;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.Comparator;
 
 import org.gatorgradle.GatorGradlePlugin;
 import org.gatorgradle.command.BasicCommand;
 import org.gatorgradle.command.Command;
 import org.gatorgradle.util.Console;
 
+import org.gradle.api.GradleException;
+
 public class DependencyManager {
   public static final String GATORGRADER_GIT_REPO =
       "https://github.com/GatorEducator/gatorgrader.git";
   private static String PYTHON_EXECUTABLE = null;
+
+
 
   /**
    * Returns the python executable path.
@@ -22,17 +29,35 @@ public class DependencyManager {
    */
   public static String getPython() {
     if (PYTHON_EXECUTABLE == null) {
-      BasicCommand query = new BasicCommand("pipenv", "--venv");
+      BasicCommand query = new BasicCommand(getPipenv(), "--venv");
       query.setWorkingDir(new File(GatorGradlePlugin.GATORGRADER_HOME));
       query.outputToSysOut(false);
       query.run(true);
       if (query.exitValue() != 0) {
-        error("Query for python executable location failed", query);
-        throw new Error("Failed to run pipenv --venv!");
+        error("Query for python executable failed -- try reinstalling GatorGrader", query);
+        throw new GradleException("Failed to run pipenv --venv! -- Was GatorGrader installed?");
       }
       PYTHON_EXECUTABLE = query.getOutput() + "/bin/python";
     }
     return PYTHON_EXECUTABLE;
+  }
+
+  /**
+   * Returns the Pipenv executable path.
+   *
+   * @return the path
+   */
+  public static String getPipenv() {
+    BasicCommand userBaseQuery = new BasicCommand("python3", "-m", "site", "--user-base");
+    userBaseQuery.outputToSysOut(false);
+    userBaseQuery.run();
+
+    if (userBaseQuery.exitValue() != Command.SUCCESS) {
+      error("Failed to retrieve user-base location!", userBaseQuery);
+      return null;
+    }
+
+    return userBaseQuery.getOutput() + "/bin/pipenv";
   }
 
   /**
@@ -89,6 +114,28 @@ public class DependencyManager {
   }
 
   private static boolean doGatorGrader() {
+    boolean success = doGatorGraderMain();
+    if (!success) {
+      Path path = Paths.get(GatorGradlePlugin.GATORGRADER_HOME);
+      Console.log("Deleting " + path);
+      try {
+        Files.walk(path)
+            .sorted(Comparator.reverseOrder())
+            .map(innerPath -> innerPath.toFile())
+            .forEach(file -> {
+              boolean deleted = file.delete();
+              if (!deleted) {
+                Console.error("Did not delete " + path + "!");
+              }
+            });
+      } catch (IOException ex) {
+        Console.error("Failed to delete " + path + "!");
+      }
+    }
+    return success;
+  }
+
+  private static boolean doGatorGraderMain() {
     Path workingDir = Paths.get(GatorGradlePlugin.GATORGRADER_HOME);
 
     boolean doDeps = false;
@@ -118,36 +165,57 @@ public class DependencyManager {
       Console.log("Installing GatorGrader...");
     }
 
-    // install gatorgrader, and block until complete (FIXME: this needs to be better)
-    updateOrInstall.run(true);
+    updateOrInstall.run();
     if (updateOrInstall.exitValue() != Command.SUCCESS) {
-      error("GatorGrader management failed! Perhaps we couldn't find git?", updateOrInstall);
+      error("GatorGrader management failed! Perhaps git wasn't installed?", updateOrInstall);
       return false;
     }
 
+    //TODO: refactor to include pip and Pipenv as Dependencies in their own right
     if (doDeps) {
-      // TODO: look into using pipenv or other virtual environment - can we activate those
-      // environments from java and have it continue to be activated for subsequent commands?
-
       Console.log("Installing GatorGrader dependencies...");
       Console.log("Ensuring pip is installed...");
-      BasicCommand pip = new BasicCommand("python3", "-m", "ensurepip");
-      pip.outputToSysOut(true);
+      BasicCommand pip = new BasicCommand("pip", "-V").outputToSysOut(false);
       pip.run();
       if (pip.exitValue() != Command.SUCCESS) {
-        error("GatorGrader management failed, could not install dependencies!", pip);
-        return false;
+        // pip is disabled or otherwise failed, try and see if ensurepip is available
+        pip = new BasicCommand("python3", "-m", "ensurepip");
+        pip.outputToSysOut(true);
+        pip.run();
+
+        if (pip.exitValue() != Command.SUCCESS) {
+          error("GatorGrader management failed, could not install pip!", pip);
+          return false;
+        }
       }
-      Console.log("Installing pipenv...");
-      pip = new BasicCommand("pip", "install", "pipenv");
-      pip.outputToSysOut(true);
-      pip.run();
-      if (pip.exitValue() != Command.SUCCESS) {
-        error("GatorGrader management failed, could not install dependencies!", pip);
-        return false;
+
+      Console.log("Ensuring Pipenv is installed...");
+      BasicCommand pipenv = new BasicCommand(getPipenv(), "--version").outputToSysOut(false);
+      pipenv.run();
+      if (pipenv.exitValue() != Command.SUCCESS) {
+        // pipenv is disabled or otherwise failed, try and install it
+        if (GatorGradlePlugin.OS != GatorGradlePlugin.LINUX) {
+          Console.log("You must install Pipenv! Please visit https://pipenv.readthedocs.io/en/latest/ to get started!");
+          return false;
+        } else {
+          pipenv = new BasicCommand("pip", "install", "--user", "pipenv");
+          pipenv.outputToSysOut(true);
+          pipenv.run();
+
+          if (pipenv.exitValue() != Command.SUCCESS) {
+            error("GatorGrader management failed, could not install Pipenv!", pipenv);
+            return false;
+          }
+        }
       }
+
+      // String userBase = addPipenvBin();
+      // if (userBase == null) {
+      //   return false;
+      // }
+
       Console.log("Installing dependencies...");
-      BasicCommand dep = new BasicCommand("pipenv", "install");
+      BasicCommand dep = new BasicCommand(getPipenv(), "install");
       dep.setWorkingDir(new File(GatorGradlePlugin.GATORGRADER_HOME));
       dep.outputToSysOut(true);
       dep.run();
@@ -161,6 +229,44 @@ public class DependencyManager {
     Console.newline(2);
     return true;
   }
+
+  // private static String addPipenvBin() {
+  //   Console.log("Adding python user-base bin to $PATH in ~/.bashrc");
+  //   Console.log("(ATTENTION: source the python user-base bin folder for other shells)");
+  //
+  //   BasicCommand userBaseQuery = new BasicCommand("python3", "-m", "site", "--user-base");
+  //   userBaseQuery.outputToSysOut(false);
+  //   userBaseQuery.run();
+  //
+  //   if (userBaseQuery.exitValue() != Command.SUCCESS) {
+  //     error("Failed to retrieve user-base location!", userBaseQuery);
+  //     return null;
+  //   }
+  //
+  //   String userBase = userBaseQuery.getOutput() + "/bin";
+  //   String bashPathUpdate = "export PATH=\"$PATH:" + userBase + "\";";
+  //
+  //   Path bashrc = Paths.get(GatorGradlePlugin.USER_HOME + "/.bashrc");
+  //
+  //   Console.log("Updating " + bashrc + "...");
+  //   try {
+  //     if (Files.lines(bashrc).anyMatch(line -> line.contains(bashPathUpdate))) {
+  //       Console.log("~/.bashrc already contains required path addition!");
+  //       return userBase;
+  //     }
+  //   } catch (IOException ex) {
+  //     Console.log("Failed to read ~/.bashrc");
+  //     return null;
+  //   }
+  //
+  //   try {
+  //     Files.write(bashrc, ("\n" + bashPathUpdate).getBytes("UTF-8"), StandardOpenOption.APPEND);
+  //     return userBase;
+  //   } catch (IOException e) {
+  //     Console.log("Failed to write to ~/.bashrc");
+  //     return null;
+  //   }
+  // }
 
   private static void error(String desc, BasicCommand cmd) {
     Console.error("ERROR:", desc);
