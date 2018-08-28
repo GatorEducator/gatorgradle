@@ -1,15 +1,14 @@
 package org.gatorgradle.internal;
 
-import static org.gatorgradle.GatorGradlePlugin.*;
-
-import org.gatorgradle.command.BasicCommand;
-import org.gatorgradle.command.Command;
-import org.gatorgradle.util.Console;
-
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import org.gatorgradle.GatorGradlePlugin;
+import org.gatorgradle.command.BasicCommand;
+import org.gatorgradle.command.Command;
+import org.gatorgradle.util.Console;
 
 public class DependencyManager {
   public static final String GATORGRADER_GIT_REPO =
@@ -24,7 +23,7 @@ public class DependencyManager {
   public static String getPython() {
     if (PYTHON_EXECUTABLE == null) {
       BasicCommand query = new BasicCommand("pipenv", "--venv");
-      query.setWorkingDir(new File(GATORGRADER_HOME));
+      query.setWorkingDir(new File(GatorGradlePlugin.GATORGRADER_HOME));
       query.outputToSysOut(false);
       query.run(true);
       if (query.exitValue() != 0) {
@@ -62,11 +61,11 @@ public class DependencyManager {
     if (cmd.exitValue() == Command.SUCCESS) {
       return true;
     }
-    if (OS.equals(MACOS)) {
+    if (GatorGradlePlugin.OS.equals(GatorGradlePlugin.MACOS)) {
       Console.log("You must install Git! An Xcode installation window should open to help you.");
       Console.log(
           "If a window did not open, please visit https://git-scm.com/downloads to get started!");
-    } else if (OS.equals(LINUX)) {
+    } else if (GatorGradlePlugin.OS.equals(GatorGradlePlugin.LINUX)) {
       Console.log(
           "You must install Git! Please issue the below command or visit https://git-scm.com/downloads.");
       Console.log("sudo apt-get install git");
@@ -90,14 +89,14 @@ public class DependencyManager {
   }
 
   private static boolean doGatorGrader() {
-    Path workingDir = Paths.get(GATORGRADER_HOME);
+    Path workingDir = Paths.get(GatorGradlePlugin.GATORGRADER_HOME);
 
     boolean doDeps = false;
 
     // quick git pull installation
     BasicCommand updateOrInstall = new BasicCommand();
     updateOrInstall.outputToSysOut(true).setWorkingDir(workingDir.toFile());
-    if (Files.exists(Paths.get(GATORGRADER_HOME))) {
+    if (Files.exists(Paths.get(GatorGradlePlugin.GATORGRADER_HOME))) {
       // gatorgrader repo exists (most likely)
       BasicCommand checkout = new BasicCommand("git", "checkout", "master");
       checkout.run();
@@ -111,7 +110,8 @@ public class DependencyManager {
       if (!workingDir.toFile().mkdirs()) {
         Console.error("Failed to make directories: " + workingDir);
       }
-      updateOrInstall.with("git", "clone", GATORGRADER_GIT_REPO, GATORGRADER_HOME);
+      updateOrInstall.with(
+          "git", "clone", GATORGRADER_GIT_REPO, GatorGradlePlugin.GATORGRADER_HOME);
 
       // configure gatorgrader dependencies
       doDeps = true;
@@ -148,7 +148,7 @@ public class DependencyManager {
       }
       Console.log("Installing dependencies...");
       BasicCommand dep = new BasicCommand("pipenv", "install");
-      dep.setWorkingDir(new File(GATORGRADER_HOME));
+      dep.setWorkingDir(new File(GatorGradlePlugin.GATORGRADER_HOME));
       dep.outputToSysOut(true);
       dep.run();
       Console.log("Finished GatorGrader install!");
