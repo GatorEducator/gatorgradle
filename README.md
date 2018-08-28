@@ -23,6 +23,10 @@ from there.Additionally, [Gradle](https://gradle.org/) is required to actually u
 GatorGradle. A complete example configuration of Gradle and GatorGradle is available
 in the [Sample Lab](https://github.com/GatorEducator/gatorgrader-samplelab) repository.
 
+NOTE: GatorGradle will automatically install [Pipenv](pipenv.readthedocs.io),
+but does not add the executable to `$PATH`. This can be done manually if the
+user wishes to use Pipenv for other projects.
+
 ## Configuring Checks
 
 The `grade` task reads the configuration provided in `config/gatorgrader.yml`
