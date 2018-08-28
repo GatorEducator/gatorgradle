@@ -1,13 +1,10 @@
 package org.gatorgradle.task;
 
-import org.gatorgradle.command.Command;
-import org.gradle.workers.WorkerExecutor;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import javax.inject.Inject;
+
+import org.gatorgradle.command.Command;
+
+import org.gradle.workers.WorkerExecutor;
 
 public class CommandExecutor implements Runnable {
   private Command command;
