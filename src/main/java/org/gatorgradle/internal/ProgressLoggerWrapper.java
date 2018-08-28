@@ -18,14 +18,14 @@
 
 package org.gatorgradle.internal;
 
+import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import org.gatorgradle.util.Console;
 
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
-
-import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 /**
  * Wraps around Gradle's internal progress logger. Uses reflection
