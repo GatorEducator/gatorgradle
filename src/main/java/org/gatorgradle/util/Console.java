@@ -49,8 +49,8 @@ public class Console {
    */
   public static void logToStream(PrintStream out, Object... logs) {
     if (logs.length > 0) {
-      out.println(
-          String.join(" ", Stream.of(logs).map(obj -> obj.toString()).toArray(String[] ::new)));
+      out.println(String.join(
+          " ", Stream.of(logs).map(obj -> obj.toString()).toArray(size -> new String[size])));
     }
   }
 }
