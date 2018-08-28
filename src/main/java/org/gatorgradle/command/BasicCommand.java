@@ -201,8 +201,11 @@ public class BasicCommand implements Command {
       output = out.toString().trim();
 
     } catch (Throwable thr) {
-      Logging.getLogger(BasicCommand.class)
+      //Only log if showing output
+      if (outSys) {
+        Logging.getLogger(BasicCommand.class)
           .error("Exception while running {}: {}", toString(), thr);
+      }
       exitVal = 127;
     } finally {
       fin = true;
