@@ -121,6 +121,9 @@ git pull origin "$PAGES_BRANCH"
 # update data file
 echo "\"$BUILD_VERSION\",\"$SEM_VERSION\",\"$DOC_DATE\",\"$DOC_FOLDER\"" >> $VERSION_DATA_FILE
 
+# update README.md
+git checkout master README.md
+
 # copy doc badge over
 command cp "images/docs-$DOC_STATUS.svg" "$DOC_BADGE"
 
