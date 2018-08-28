@@ -17,7 +17,7 @@ gradle grade
 
 ## Installing Dependencies
 GatorGradle requires that [Git](https://git-scm.com/) and a version of [Python](https://www.python.org/)
-is installed -- it will automatically bootstrap a valid GatorGrader installation from there.
+are installed -- it will automatically bootstrap a valid GatorGrader installation from there.
 Additionally, [Gradle](https://gradle.org/) is required to actually use GatorGradle. A complete example
 configuration of Gradle and GatorGradle is available in the
 [Sample Lab](https://github.com/GatorEducator/gatorgrader-samplelab) repository.
