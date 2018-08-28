@@ -16,11 +16,12 @@ gradle grade
 ```
 
 ## Installing Dependencies
+
 GatorGradle requires that [Git](https://git-scm.com/) and a version of [Python](https://www.python.org/)
-are installed -- it will automatically bootstrap a valid GatorGrader installation from there.
-Additionally, [Gradle](https://gradle.org/) is required to actually use GatorGradle. A complete example
-configuration of Gradle and GatorGradle is available in the
-[Sample Lab](https://github.com/GatorEducator/gatorgrader-samplelab) repository.
+are installed -- it will automatically bootstrap a valid GatorGrader installation
+from there.Additionally, [Gradle](https://gradle.org/) is required to actually use
+GatorGradle. A complete example configuration of Gradle and GatorGradle is available
+in the [Sample Lab](https://github.com/GatorEducator/gatorgrader-samplelab) repository.
 
 ## Configuring Checks
 
@@ -74,10 +75,10 @@ on the [Sample Lab](https://github.com/GatorEducator/gatorgrader-samplelab) is s
 below. Color is also added for easier visibility on a terminal screen, with red `✘`s
 for failed criterion and green `✔`s for passing ones. Diagnostics get a bold yellow
 `➔` along with colored text for added visibility. Finally, the large status box at
-the end of the output is colored according to the overall success (100%)/failure of the
-grading.
+the end of the output is colored according to the overall success (100%)/failure of
+the grading.
 
-```
+```text
 [...]
 
 ✔  The file writing/reflection.md passes mdl
