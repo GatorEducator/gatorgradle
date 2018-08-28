@@ -103,7 +103,7 @@ public class CommandOutputSummary {
     boolean failedChecks = failed.size() > 0;
 
     if (failedChecks) {
-      log.lifecycle("\n\n\u001B[1;33m  -~-  \u001B[1;31mFAILURES  \u001B[1;33m-~-\u001B[0m\n");
+      log.lifecycle("\n\n\u001B[1;33m-~-  \u001B[1;31mFAILURES  \u001B[1;33m-~-\u001B[0m\n");
       for (int i = 0; i < failed.size(); i++) {
         printCommandResult(failed.get(i), true);
       }
