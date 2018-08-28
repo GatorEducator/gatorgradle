@@ -75,8 +75,8 @@ on the [Sample Lab](https://github.com/GatorEducator/gatorgrader-samplelab) is s
 below. Color is also added for easier visibility on a terminal screen, with red `✘`s
 for failed criterion and green `✔`s for passing ones. Diagnostics get a bold yellow
 `➔` along with colored text for added visibility. Finally, the large status box at
-the end of the output is colored according to the overall success (100%)/failure of
-the grading.
+the end of the output is colored according to the overall success (100%)/failure
+of the grading.
 
 ```text
 [...]
@@ -131,4 +131,4 @@ plugins {
 
 If you'd like to contribute, the javadoc for all existing code is available:
 
- [![javadocs](https://gatoreducator.github.io/gatorgradle/docs/docs-status-badge.svg)](https://gatoreducator.github.io/gatorgradle/docs)
+[![javadocs](https://gatoreducator.github.io/gatorgradle/docs/docs-status-badge.svg)](https://gatoreducator.github.io/gatorgradle/docs)
