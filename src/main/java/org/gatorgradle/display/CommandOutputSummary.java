@@ -119,7 +119,8 @@ public class CommandOutputSummary {
         failedChecks ? "\u001B[1;35m" : "\u001B[1;32m", log);
 
     if (failedChecks) {
-      throw new GradleException("Grading checks failed!");
+      throw new GradleException(
+          StringUtil.color(StringUtil.BAD, "Grading checks failed -- scroll up for failures"));
     }
   }
 
