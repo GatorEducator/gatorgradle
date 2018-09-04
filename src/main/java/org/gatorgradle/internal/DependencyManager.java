@@ -48,16 +48,20 @@ public class DependencyManager {
    * @return the path
    */
   public static String getPipenv() {
-    BasicCommand userBaseQuery = new BasicCommand("python3", "-m", "site", "--user-base");
-    userBaseQuery.outputToSysOut(false);
-    userBaseQuery.run();
+    // BasicCommand userBaseQuery = new BasicCommand("python3", "-m", "site", "--user-base");
+    // userBaseQuery.outputToSysOut(false);
+    // userBaseQuery.run();
+    //
+    // if (userBaseQuery.exitValue() != Command.SUCCESS) {
+    //   error("Failed to retrieve user-base location!", userBaseQuery);
+    //   return null;
+    // }
+    //
+    // return userBaseQuery.getOutput() + "/bin/pipenv";
+    //
+    // FIXME: QUICK WORKAROUND
 
-    if (userBaseQuery.exitValue() != Command.SUCCESS) {
-      error("Failed to retrieve user-base location!", userBaseQuery);
-      return null;
-    }
-
-    return userBaseQuery.getOutput() + "/bin/pipenv";
+    return GatorGradlePlugin.USER_HOME + "/.local/bin/pipenv";
   }
 
   /**
@@ -145,11 +149,11 @@ public class DependencyManager {
     updateOrInstall.outputToSysOut(true).setWorkingDir(workingDir.toFile());
     if (Files.exists(Paths.get(GatorGradlePlugin.GATORGRADER_HOME))) {
       // gatorgrader repo exists (most likely)
-      BasicCommand checkout = new BasicCommand("git", "checkout", "master");
-      checkout.run();
-      if (checkout.exitValue() != Command.SUCCESS) {
-        error("GatorGrader management failed, could not checkout 'master' branch!", checkout);
-      }
+      // BasicCommand checkout = new BasicCommand("git", "checkout", "master");
+      // checkout.run();
+      // if (checkout.exitValue() != Command.SUCCESS) {
+      //   error("GatorGrader management failed, could not checkout 'master' branch!", checkout);
+      // }
       updateOrInstall.with("git", "pull");
       Console.log("Updating GatorGrader...");
     } else {
@@ -198,7 +202,7 @@ public class DependencyManager {
           Console.log("You must install Pipenv! Please visit https://pipenv.readthedocs.io/en/latest/ to get started!");
           return false;
         } else {
-          pipenv = new BasicCommand("pip", "install", "--user", "pipenv");
+          pipenv = new BasicCommand("pip", "install", "pipenv");
           pipenv.outputToSysOut(true);
           pipenv.run();
 
