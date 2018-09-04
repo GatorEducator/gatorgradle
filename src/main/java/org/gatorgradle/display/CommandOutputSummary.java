@@ -15,6 +15,7 @@ import org.gatorgradle.config.GatorGradleConfig;
 import org.gatorgradle.task.GatorGradleTask;
 import org.gatorgradle.util.StringUtil;
 
+import org.gradle.api.GradleException;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
 
@@ -68,7 +69,7 @@ public class CommandOutputSummary {
     if (fail && GatorGradleConfig.get().shouldBreakBuild()) {
       log.lifecycle("\n  -~-  \u001B[1;31mCHECKS FAILED\u001B[0m  -~-\n");
       nomore = true;
-      throw new RuntimeException("Check failed, ending execution!");
+      throw new GradleException("Check failed, ending execution!");
     }
   }
 
@@ -118,7 +119,7 @@ public class CommandOutputSummary {
         failedChecks ? "\u001B[1;35m" : "\u001B[1;32m", log);
 
     if (failedChecks) {
-        throw new RuntimeException("Grading checks failed!");
+      throw new GradleException("Grading checks failed!");
     }
   }
 
