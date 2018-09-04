@@ -66,10 +66,10 @@ public class CommandOutputSummary {
       return;
     }
     boolean fail = printCommandResult(cmd, false);
-    if (fail && GatorGradleConfig.get().shouldBreakBuild()) {
+    if (fail && GatorGradleConfig.get().shouldFastBreakBuild()) {
       log.lifecycle("\n  -~-  \u001B[1;31mCHECKS FAILED\u001B[0m  -~-\n");
       nomore = true;
-      throw new GradleException("Check failed, ending execution!");
+      throw new GradleException("Check failed!");
     }
   }
 
@@ -118,7 +118,7 @@ public class CommandOutputSummary {
         failedChecks ? "\u001B[1;31m" : "\u001B[1;32m",
         failedChecks ? "\u001B[1;35m" : "\u001B[1;32m", log);
 
-    if (failedChecks) {
+    if (failedChecks && GatorGradleConfig.get().shouldBreakBuild()) {
       throw new GradleException(
           StringUtil.color(StringUtil.BAD, "Grading checks failed -- scroll up for failures"));
     }
