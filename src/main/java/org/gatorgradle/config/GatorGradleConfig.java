@@ -35,6 +35,7 @@ public class GatorGradleConfig implements Iterable<Command> {
   public static final Collection<String> PROGRAMS;
   public static final Collection<String> FILENAME_EXCLUSIONS;
 
+  // TODO: make this list generate from something...
   static {
     Collection<String> set = new HashSet<>();
     set.add("mdl");
@@ -75,6 +76,7 @@ public class GatorGradleConfig implements Iterable<Command> {
   private static final Pattern commandPattern = Pattern.compile("([^\"]\\S*|\".+?\")\\s*");
 
   private boolean breakBuild = false;
+  private boolean fastBreakBuild = false;
   private String assignmentName = "this assignment";
 
   Set<Command> gradingCommands;
@@ -98,13 +100,15 @@ public class GatorGradleConfig implements Iterable<Command> {
   /**
    * Create a config that will use the given values.
    *
-   * @param breakBuild     should the build break on check failures
+   * @param breakBuild     should the build fail on check failures
+   * @param fastBreakBuild should the build immediately fail on check failures
    * @param assignmentName the assignment name
    * @param commands       the list of commands to run
    */
-  public GatorGradleConfig(
-      boolean breakBuild, String assignmentName, Collection<Command> commands) {
+  public GatorGradleConfig(boolean breakBuild, boolean fastBreakBuild, String assignmentName,
+      Collection<Command> commands) {
     this.breakBuild = breakBuild;
+    this.fastBreakBuild = fastBreakBuild;
     this.assignmentName = assignmentName;
     this.gradingCommands = new HashSet<>(commands);
   }
@@ -158,7 +162,18 @@ public class GatorGradleConfig implements Iterable<Command> {
   public void parse() {
     file.parse();
     assignmentName = file.getHeader("name").asString();
-    breakBuild = file.getHeader("break").asBoolean();
+
+    if (file.hasHeader("break")) {
+      breakBuild = file.getHeader("break").asBoolean();
+    } else {
+      breakBuild = false;
+    }
+
+    if (file.hasHeader("fastfail")) {
+      fastBreakBuild = file.getHeader("fastfail").asBoolean();
+    } else {
+      fastBreakBuild = false;
+    }
 
     file.getPaths().forEach(
         path -> file.getChecks(path).forEach(val -> with(makeCommand(path, val.asString()))));
@@ -192,6 +207,10 @@ public class GatorGradleConfig implements Iterable<Command> {
 
   public boolean shouldBreakBuild() {
     return breakBuild;
+  }
+
+  public boolean shouldFastBreakBuild() {
+    return fastBreakBuild;
   }
 
   public String getAssignmentName() {

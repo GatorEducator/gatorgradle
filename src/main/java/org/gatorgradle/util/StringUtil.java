@@ -99,7 +99,7 @@ public class StringUtil {
     String side = borderCol + vert + RESET;
     String below = borderCol + downleft + line + downright + RESET;
 
-    log.warn("\n\n\t{}\n\t{} {} {}\n\t{}", above, side, text, side, below);
+    log.warn("\n\n\t{}\n\t{} {} {}\n\t{}\n", above, side, text, side, below);
   }
 
   public static final String BAD = "\u001B[1;31m";

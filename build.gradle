@@ -5,21 +5,11 @@ plugins {
     id "ru.vyarus.quality" version "3.1.1"
 }
 
-ext.gitVersioner = [
-        /* defaultBranch           : "master",  // default "master" */
-        stableBranches          : ["master"], // the feature branch postfix (-dm4(6)) will not be appended on stable branches
-        yearFactor              : 500, 	  // default "1000", increasing every 8.57h
-        snapshotEnabled         : false,      // default false, the "-SNAPSHOT" postfix
-        localChangesCountEnabled: false,       // default false, the (<commitCount>) before -SNAPSHOT
-]
-// import the script which runs the version generation
-
-apply from: "scripts/versioner.gradle"
 group = "${artifact_group}"
-def sem_version = "${artifact_release}.${artifact_patch}"
-version = "${sem_version}-${gitVersionName}"
+version = "${artifact_release}.${artifact_patch}"
+def build = "git rev-list --count master".execute().text
 
-println("\u001B[1;36mVERSION ${version}\u001B[0m")
+println("\u001B[1;36mVERSION ${version}  --  BUILD ${build}\u001B[0m")
 
 pluginBundle {
     website = "https://gatoreducator.github.io/gatorgradle/"
@@ -54,14 +44,14 @@ uploadArchives {
 }
 
 task publishJavadocs(type: GradleBuild) {
-    def docFolder = "docs/${sem_version}"
+    def docFolder = "docs/${version}"
     project.tasks.findByName("javadoc").destinationDir = file(docFolder)
 
     tasks = ['clean', '_cleanJavadoc', 'javadoc', '_publishJavadocs']
 }
 
 task _cleanJavadoc(type: Delete) {
-    delete "docs/${sem_version}"
+    delete "docs/${version}"
 }
 
 task _publishJavadocs(type: Exec) {
@@ -69,10 +59,10 @@ task _publishJavadocs(type: Exec) {
 
     // TODO: determine this better
     def status = "passing"
-    def docFolder = "docs/${sem_version}"
+    def docFolder = "docs/${version}"
     def date = new Date().format("MMMM d, YYYY", TimeZone.getTimeZone("UTC"))
 
-    commandLine "./scripts/publishJavadocs.sh", docFolder, status, version, date
+    commandLine "./scripts/publishJavadocs.sh", docFolder, status, version, build, date
 }
 
 quality {

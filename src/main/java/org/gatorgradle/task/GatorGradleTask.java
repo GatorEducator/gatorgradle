@@ -99,6 +99,12 @@ public class GatorGradleTask extends DefaultTask {
     if (!DependencyManager.installOrUpdate(Dependency.PYTHON)) {
       throw new GradleException("Python not installed!");
     }
+    if (!DependencyManager.installOrUpdate(Dependency.PIP)) {
+      throw new GradleException("Pip not installed!");
+    }
+    if (!DependencyManager.installOrUpdate(Dependency.PIPENV)) {
+      throw new GradleException("Pipenv not installed!");
+    }
     if (!DependencyManager.installOrUpdate(Dependency.GATORGRADER)) {
       throw new GradleException("GatorGrader not installed!");
     }
@@ -164,9 +170,9 @@ public class GatorGradleTask extends DefaultTask {
     progLog.progress("Finished " + summary.getNumCompletedTasks() + " / " + totalTasks
         + " checks  >  100% complete!  >  Compiling Report...");
 
-    summary.showOutputSummary();
-
     // complete task submission
     progLog.completed();
+
+    summary.showOutputSummary();
   }
 }
