@@ -61,7 +61,7 @@ public class DependencyManager {
     //
     // FIXME: QUICK WORKAROUND
 
-    return GatorGradlePlugin.USER_HOME + "/.local/bin/pipenv";
+    return "pipenv";
   }
 
   /**
@@ -194,24 +194,25 @@ public class DependencyManager {
       }
 
       Console.log("Ensuring Pipenv is installed...");
-      BasicCommand pipenv = new BasicCommand(getPipenv(), "--version").outputToSysOut(false);
-      pipenv.run();
-      if (pipenv.exitValue() != Command.SUCCESS) {
-        // pipenv is disabled or otherwise failed, try and install it
-        if (GatorGradlePlugin.OS != GatorGradlePlugin.LINUX) {
-          Console.log("You must install Pipenv! Please visit https://pipenv.readthedocs.io/en/latest/ to get started!");
-          return false;
-        } else {
-          pipenv = new BasicCommand("pip", "install", "pipenv");
-          pipenv.outputToSysOut(true);
-          pipenv.run();
-
-          if (pipenv.exitValue() != Command.SUCCESS) {
-            error("GatorGrader management failed, could not install Pipenv!", pipenv);
-            return false;
-          }
-        }
-      }
+      //FIXME: do not handle pipenv installation for now
+      // BasicCommand pipenv = new BasicCommand(getPipenv(), "--version").outputToSysOut(false);
+      // pipenv.run();
+      // if (pipenv.exitValue() != Command.SUCCESS) {
+      //   // pipenv is disabled or otherwise failed, try and install it
+      //   if (GatorGradlePlugin.OS != GatorGradlePlugin.LINUX) {
+      //     Console.log("You must install Pipenv! Please visit https://pipenv.readthedocs.io/en/latest/ to get started!");
+      //     return false;
+      //   } else {
+      //     pipenv = new BasicCommand("pip", "install", "pipenv");
+      //     pipenv.outputToSysOut(true);
+      //     pipenv.run();
+      //
+      //     if (pipenv.exitValue() != Command.SUCCESS) {
+      //       error("GatorGrader management failed, could not install Pipenv!", pipenv);
+      //       return false;
+      //     }
+      //   }
+      // }
 
       // String userBase = addPipenvBin();
       // if (userBase == null) {
