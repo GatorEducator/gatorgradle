@@ -14,13 +14,10 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 title: GatorGradle
-email: saejinmh@gmail.com
 description: >- # this means to ignore newlines until next main tag
   GatorGradle is a plugin that enables a Gradle task to run GatorGrader grading checks.
-url: "https://gatored.github.io"
+url: "https://gatoreducator.github.io"
 baseurl: "/gatorgradle"
-twitter_username: "michionlion"
-github_username:  "michionlion"
 show_downloads: false
 
 # Build settings
