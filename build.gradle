@@ -5,19 +5,9 @@ plugins {
     id "ru.vyarus.quality" version "3.1.1"
 }
 
-ext.gitVersioner = [
-        /* defaultBranch           : "master",  // default "master" */
-        stableBranches          : ["master"], // the feature branch postfix (-dm4(6)) will not be appended on stable branches
-        yearFactor              : 500, 	  // default "1000", increasing every 8.57h
-        snapshotEnabled         : false,      // default false, the "-SNAPSHOT" postfix
-        localChangesCountEnabled: false,       // default false, the (<commitCount>) before -SNAPSHOT
-]
-// import the script which runs the version generation
-
-apply from: "scripts/versioner.gradle"
 group = "${artifact_group}"
 def sem_version = "${artifact_release}.${artifact_patch}"
-version = "${sem_version}-${gitVersionName}"
+version = "${sem_version}"
 
 println("\u001B[1;36mVERSION ${version}\u001B[0m")
 
