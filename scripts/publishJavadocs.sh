@@ -92,10 +92,6 @@ DOC_DATE="$4"
 #     esac
 # done
 
-# separate semver and build
-SEM_VERSION=${DOC_VERSION%-*}
-BUILD_VERSION=${DOC_VERSION##*-}
-
 # check for local changes and exit if there are any
 require_clean_work_tree "publish javadoc"
 
@@ -119,7 +115,7 @@ git fetch --all
 git pull origin "$PAGES_BRANCH"
 
 # update data file
-echo "\"$BUILD_VERSION\",\"$SEM_VERSION\",\"$DOC_DATE\",\"$DOC_FOLDER\"" >> $VERSION_DATA_FILE
+echo "\"$DOC_VERSION\",\"$DOC_DATE\",\"$DOC_FOLDER\"" >> $VERSION_DATA_FILE
 
 # update README.md
 git checkout master README.md
