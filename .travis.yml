@@ -7,12 +7,12 @@ language: Java
 # instead of using a ppa -- travis probably caches this gradle zip folder somewhere.
 before_install:
   - gem install mdl
-  - wget https://services.gradle.org/distributions/gradle-4.6-bin.zip
-  - unzip -d $HOME gradle-4.6-bin.zip
+  - wget https://services.gradle.org/distributions/gradle-4.9-bin.zip
+  - unzip -d $HOME gradle-4.9-bin.zip
   # probably don't need this but just to be sure
-  - rm -rf gradle-4.6-bin.zip
+  - rm -rf gradle-4.9-bin.zip
   # add gradle bin to path at the beginning to ensure it overwrites old gradle
-  - export PATH="$HOME/gradle-4.6/bin:$PATH"
+  - export PATH="$HOME/gradle-4.9/bin:$PATH"
 
 
 before_cache:
@@ -20,7 +20,7 @@ before_cache:
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
 cache:
   directories:
-    - $HOME/.gradle/caches/4.6
+    - $HOME/.gradle/caches/4.9
     - $HOME/.gradle/caches/jars-3
     - $HOME/.gradle/caches/modules-2
 
