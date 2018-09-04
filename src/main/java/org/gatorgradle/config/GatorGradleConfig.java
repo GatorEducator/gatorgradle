@@ -100,7 +100,8 @@ public class GatorGradleConfig implements Iterable<Command> {
   /**
    * Create a config that will use the given values.
    *
-   * @param breakBuild     should the build break on check failures
+   * @param breakBuild     should the build fail on check failures
+   * @param fastbreakBuild should the build immediately fail on check failures
    * @param assignmentName the assignment name
    * @param commands       the list of commands to run
    */
