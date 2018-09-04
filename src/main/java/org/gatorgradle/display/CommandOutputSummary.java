@@ -116,6 +116,10 @@ public class CommandOutputSummary {
             + " of checks for " + GatorGradleConfig.get().getAssignmentName() + "!",
         failedChecks ? "\u001B[1;31m" : "\u001B[1;32m",
         failedChecks ? "\u001B[1;35m" : "\u001B[1;32m", log);
+
+    if (failedChecks) {
+        throw new RuntimeException("Grading checks failed!");
+    }
   }
 
   private String parseCommandOutput(BasicCommand cmd, boolean includeDiagnostic) {
