@@ -23,7 +23,7 @@ from there. Additionally, [Gradle](https://gradle.org/) is required to actually 
 GatorGradle. A complete example configuration of Gradle and GatorGradle is available
 in the [Sample Lab](https://github.com/GatorEducator/gatorgrader-samplelab) repository.
 
-NOTE: GatorGradle will automatically **NOT** install [Pipenv](pipenv.readthedocs.io). Nothing other then GatorGradle will be installed automatically.
+NOTE: GatorGradle will **NOT** automatically install [Pipenv](pipenv.readthedocs.io). Nothing other then GatorGradle will be installed automatically.
 
 To install Pipenv please follow [these](https://pipenv.readthedocs.io/en/latest/#install-pipenv-today) instructions.
 ## Configuring Checks
