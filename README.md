@@ -27,6 +27,8 @@ NOTE: GatorGradle will **NOT** automatically install [Pipenv](https://pipenv.rea
 only GatorGrader is automatically installed. To install Pipenv manually please follow
 [these](https://pipenv.readthedocs.io/en/latest/#install-pipenv-today) instructions.
 
+NOTE: Other packages seemingly required: `python3-distutils`
+
 ## Configuring Checks
 
 The `grade` task reads the configuration provided in `config/gatorgrader.yml`
