@@ -93,20 +93,10 @@ public class GatorGradleTask extends DefaultTask {
   @TaskAction
   public void grade() {
     // ensure GatorGrader and dependencies are installed
-    if (!DependencyManager.installOrUpdate(Dependency.GIT)) {
-      throw new GradleException("Git not installed!");
-    }
-    if (!DependencyManager.installOrUpdate(Dependency.PYTHON)) {
-      throw new GradleException("Python not installed!");
-    }
-    if (!DependencyManager.installOrUpdate(Dependency.PIP)) {
-      throw new GradleException("Pip not installed!");
-    }
-    if (!DependencyManager.installOrUpdate(Dependency.PIPENV)) {
-      throw new GradleException("Pipenv not installed!");
-    }
-    if (!DependencyManager.installOrUpdate(Dependency.GATORGRADER)) {
-      throw new GradleException("GatorGrader not installed!");
+    for (Dependency dep : Dependency.values()) {
+      if (!DependencyManager.installOrUpdate(dep)) {
+        throw new GradleException(dep.name() + " not installed!");
+      }
     }
 
     // ensure we have a configuration

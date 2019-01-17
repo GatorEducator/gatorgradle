@@ -1,3 +1,3 @@
 package org.gatorgradle.internal;
 
-public enum Dependency { GATORGRADER, GIT, PYTHON, PIPENV }
+public enum Dependency { GIT, PYTHON, PIPENV, GATORGRADER }
