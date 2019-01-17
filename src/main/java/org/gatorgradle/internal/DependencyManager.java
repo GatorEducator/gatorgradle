@@ -56,8 +56,6 @@ public class DependencyManager {
         return doGatorGrader();
       case PYTHON:
         return doPython();
-      case PIP:
-        return doPip();
       case PIPENV:
         return doPipenv();
       case GIT:
@@ -98,16 +96,6 @@ public class DependencyManager {
     Console.log(
         "You must install Python 3! We recommend using Pyenv (https://github.com/pyenv/pyenv).");
     Console.log("You can also visit https://www.python.org/ to download Windows installers.");
-    return false;
-  }
-
-  private static boolean doPip() {
-    BasicCommand pip = new BasicCommand("pip", "-V").outputToSysOut(false);
-    pip.run();
-    if (pip.exitValue() == Command.SUCCESS) {
-      return true;
-    }
-    Console.log("You must install pip! We recommend using Pyenv (https://github.com/pyenv/pyenv).");
     return false;
   }
 
