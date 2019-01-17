@@ -143,7 +143,7 @@ To run the plugin on a local gradle project, first run `gradle install` inside
 your cloned GatorGradle repository. Then, add the groovy code below to your
 local gradle project, replacing the `plugin` block.
 
-```
+```groovy
 buildscript{
   repositories {
     mavenLocal()
