@@ -138,3 +138,27 @@ plugins {
 If you'd like to contribute, the javadoc for all existing code is available:
 
 [![javadocs](https://gatoreducator.github.io/gatorgradle/docs/docs-status-badge.svg)](https://gatoreducator.github.io/gatorgradle/docs)
+
+#### Testing
+
+To run the plugin on a local gradle project, first run `gradle install` inside
+your cloned GatorGradle repository. Then, add the groovy code below to your
+local gradle project, replacing the `plugin` block.
+
+```
+buildscript{
+  repositories {
+    mavenLocal()
+    dependencies {
+      classpath 'org.gatored:gatorgradle:+'
+    }
+  }
+}
+
+plugins {
+  //id "org.gatored.gatorgradle" version "0.3.0"
+  id "java"
+}
+apply plugin: 'org.gatored.gatorgradle'
+
+```
