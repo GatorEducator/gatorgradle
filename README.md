@@ -17,15 +17,15 @@ gradle grade
 
 ## Installing Dependencies
 
-GatorGradle requires that [Git](https://git-scm.com/) and a version of [Python](https://www.python.org/)
-are installed -- it will automatically bootstrap a valid GatorGrader installation
-from there.Additionally, [Gradle](https://gradle.org/) is required to actually use
+GatorGradle requires that [Git](https://git-scm.com/), a version of
+[Python](https://www.python.org/) greater than 3.6, and
+[Pipenv](https://pipenv.readthedocs.io/en/latest) are installed -- it will
+automatically bootstrap a valid GatorGrader installation from there.
+Additionally, [Gradle](https://gradle.org/) is required to actually use
 GatorGradle. A complete example configuration of Gradle and GatorGradle is available
 in the [Sample Lab](https://github.com/GatorEducator/gatorgrader-samplelab) repository.
 
-NOTE: GatorGradle will automatically install [Pipenv](pipenv.readthedocs.io),
-but does not add the executable to `$PATH`. This can be done manually if the
-user wishes to use Pipenv for other projects.
+NOTE: GatorGradle will **ONLY** automatically install GatorGrader.
 
 ## Configuring Checks
 
@@ -136,3 +136,27 @@ plugins {
 If you'd like to contribute, the javadoc for all existing code is available:
 
 [![javadocs](https://gatoreducator.github.io/gatorgradle/docs/docs-status-badge.svg)](https://gatoreducator.github.io/gatorgradle/docs)
+
+#### Testing
+
+To run the plugin on a local gradle project, first run `gradle install` inside
+your cloned GatorGradle repository. Then, add the groovy code below to your
+local gradle project, replacing the `plugin` block.
+
+```groovy
+buildscript{
+  repositories {
+    mavenLocal()
+    dependencies {
+      classpath 'org.gatored:gatorgradle:+'
+    }
+  }
+}
+
+plugins {
+  //id "org.gatored.gatorgradle" version "0.3.0"
+  id "java"
+}
+apply plugin: 'org.gatored.gatorgradle'
+
+```
