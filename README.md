@@ -17,17 +17,15 @@ gradle grade
 
 ## Installing Dependencies
 
-GatorGradle requires that [Git](https://git-scm.com/) and a version of [Python](https://www.python.org/)
-are installed -- it will automatically bootstrap a valid GatorGrader installation
-from there. Additionally, [Gradle](https://gradle.org/) is required to actually use
+GatorGradle requires that [Git](https://git-scm.com/), a version of
+[Python](https://www.python.org/) greater than 3.6, and
+[Pipenv](https://pipenv.readthedocs.io/en/latest) are installed -- it will
+automatically bootstrap a valid GatorGrader installation from there.
+Additionally, [Gradle](https://gradle.org/) is required to actually use
 GatorGradle. A complete example configuration of Gradle and GatorGradle is available
 in the [Sample Lab](https://github.com/GatorEducator/gatorgrader-samplelab) repository.
 
-NOTE: GatorGradle will **NOT** automatically install [Pipenv](https://pipenv.readthedocs.io/en/latest/);
-only GatorGrader is automatically installed. To install Pipenv manually please follow
-[these](https://pipenv.readthedocs.io/en/latest/#install-pipenv-today) instructions.
-
-NOTE: Other packages seemingly required: `python3-distutils`
+NOTE: GatorGradle will **ONLY** automatically install GatorGrader.
 
 ## Configuring Checks
 
@@ -145,7 +143,7 @@ To run the plugin on a local gradle project, first run `gradle install` inside
 your cloned GatorGradle repository. Then, add the groovy code below to your
 local gradle project, replacing the `plugin` block.
 
-```
+```groovy
 buildscript{
   repositories {
     mavenLocal()
