@@ -28,7 +28,7 @@ public class GatorGradlePlugin implements Plugin<Project> {
   public static final String OS;
 
   static {
-    F_SEP = System.getProperty("file.separator");
+    F_SEP = File.separator;
     USER_HOME = System.getProperty("user.home");
 
     String os = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
