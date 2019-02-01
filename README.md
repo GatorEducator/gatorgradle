@@ -121,13 +121,13 @@ of the grading.
 
 Including GatorGradle in your project is simple. If no extra configuration is
 required, simply insert the following code block at the beginning of your
-`build.gradle` to use version `0.2.0-141`. Find out what version is current by
+`build.gradle` to use version `0.3.2`. Find out what version is current by
 visiting the [gradle plugin portal](https://plugins.gradle.org/plugin/org.gatored.gatorgradle).
 Other configuration and installation information is also available there.
 
 ```groovy
 plugins {
-  id "org.gatored.gatorgradle" version "0.2.0-141"
+  id "org.gatored.gatorgradle" version "0.3.2"
 }
 ```
 
