@@ -21,9 +21,11 @@ GatorGradle requires that [Git](https://git-scm.com/), a version of
 [Python](https://www.python.org/) greater than 3.6, and
 [Pipenv](https://pipenv.readthedocs.io/en/latest) are installed -- it will
 automatically bootstrap a valid GatorGrader installation from there.
-Additionally, [Gradle](https://gradle.org/) is required to actually use
-GatorGradle. A complete example configuration of Gradle and GatorGradle is available
-in the [Sample Lab](https://github.com/GatorEducator/gatorgrader-samplelab) repository.
+Additionally, [Gradle 5.0+](https://gradle.org/) is required to actually use
+GatorGradle (GatorGradle is compatible with 4.0+ as well) . A complete example
+configuration of Gradle and GatorGradle is available in the
+[Java Sample Assignment](https://github.com/GatorEducator/java-assigment-starter)
+repository.
 
 NOTE: GatorGradle will **ONLY** automatically install GatorGrader.
 
@@ -121,13 +123,13 @@ of the grading.
 
 Including GatorGradle in your project is simple. If no extra configuration is
 required, simply insert the following code block at the beginning of your
-`build.gradle` to use version `0.2.0-141`. Find out what version is current by
+`build.gradle` to use version `0.3.2`. Find out what version is current by
 visiting the [gradle plugin portal](https://plugins.gradle.org/plugin/org.gatored.gatorgradle).
 Other configuration and installation information is also available there.
 
 ```groovy
 plugins {
-  id "org.gatored.gatorgradle" version "0.2.0-141"
+  id "org.gatored.gatorgradle" version "0.3.2"
 }
 ```
 
