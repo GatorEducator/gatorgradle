@@ -15,6 +15,7 @@ import org.gatorgradle.util.Console;
 
 import org.gradle.api.GradleException;
 
+
 public class DependencyManager {
   public static final String GATORGRADER_GIT_REPO =
       "https://github.com/GatorEducator/gatorgrader.git";
@@ -36,9 +37,11 @@ public class DependencyManager {
         throw new GradleException("Failed to run pipenv --venv! -- Was GatorGrader installed?");
       }
       if (GatorGradlePlugin.OS.equals(GatorGradlePlugin.WINDOWS)) {
-        PYTHON_EXECUTABLE = query.getOutput() + "\\Scripts\\python";
+        PYTHON_EXECUTABLE = query.getOutput() + GatorGradlePlugin.F_SEP + "Scripts"
+            + GatorGradlePlugin.F_SEP + "python";
       } else {
-        PYTHON_EXECUTABLE = query.getOutput() + "/bin/python";
+        PYTHON_EXECUTABLE = query.getOutput() + GatorGradlePlugin.F_SEP + "bin"
+            + GatorGradlePlugin.F_SEP + "python";
       }
     }
     return PYTHON_EXECUTABLE;

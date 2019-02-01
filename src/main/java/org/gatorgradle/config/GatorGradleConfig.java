@@ -128,7 +128,9 @@ public class GatorGradleConfig implements Iterable<Command> {
       splits.add(mtc.group(1).replace("\"", ""));
     }
 
-    int sep = path.lastIndexOf(GatorGradlePlugin.F_SEP);
+    // FIXME: there should be a better method of determining which path separator is used
+    // in the config file -- it is independent of the OS.
+    int sep = Math.max(path.lastIndexOf("/"), path.lastIndexOf("\\"));
     String name = path;
     String dir = "";
     if (sep >= 0) {
