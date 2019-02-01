@@ -22,8 +22,10 @@ GatorGradle requires that [Git](https://git-scm.com/), a version of
 [Pipenv](https://pipenv.readthedocs.io/en/latest) are installed -- it will
 automatically bootstrap a valid GatorGrader installation from there.
 Additionally, [Gradle 5.0+](https://gradle.org/) is required to actually use
-GatorGradle (GatorGradle is compatible with 4.0+ as well) . A complete example configuration of Gradle and GatorGradle is available
-in the [Java Sample Assignment](https://github.com/GatorEducator/java-assigment-starter) repository.
+GatorGradle (GatorGradle is compatible with 4.0+ as well) . A complete example
+configuration of Gradle and GatorGradle is available in the
+[Java Sample Assignment](https://github.com/GatorEducator/java-assigment-starter)
+repository.
 
 NOTE: GatorGradle will **ONLY** automatically install GatorGrader.
 
