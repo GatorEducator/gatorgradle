@@ -55,7 +55,7 @@ public class ConfigMap {
     }
 
     public boolean isEmpty() {
-      return content == null || content.length() == 0;
+      return content == null || content.trim().length() == 0;
     }
 
     public String toString() {
