@@ -173,7 +173,7 @@ public class DependencyManager {
 
     if (doDeps) {
       Console.log("Installing GatorGrader python dependencies...");
-      BasicCommand dep = new BasicCommand("pipenv", "install");
+      BasicCommand dep = new BasicCommand("pipenv", "install", "--deploy");
       dep.setWorkingDir(new File(GatorGradlePlugin.GATORGRADER_HOME));
       dep.outputToSysOut(true);
       dep.run();
@@ -183,7 +183,8 @@ public class DependencyManager {
         return false;
       }
     } else {
-      BasicCommand dep = new BasicCommand("pipenv", "update");
+      Console.log("Updating GatorGrader python dependencies...");
+      BasicCommand dep = new BasicCommand("pipenv", "install", "--deploy");
       dep.setWorkingDir(new File(GatorGradlePlugin.GATORGRADER_HOME));
       dep.outputToSysOut(true);
       dep.run();

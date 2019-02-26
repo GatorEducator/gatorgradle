@@ -131,7 +131,7 @@ public class CommandOutputSummary {
       try {
         result = new CheckResult(output);
       } catch (CheckResult.MalformedJsonException ex) {
-        log.error(cmd.toString() + " produced unparsable json: " + ex.getMessage());
+        log.error(cmd.toString() + " produced unparsable json: \'" + ex.getMessage() + "\'");
       }
     } else if (GatorGradleConfig.PROGRAMS.contains(cmd.executable())) {
       StringBuilder diagnostic = new StringBuilder();
