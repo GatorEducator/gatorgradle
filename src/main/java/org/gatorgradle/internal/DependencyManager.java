@@ -182,6 +182,12 @@ public class DependencyManager {
         error("GatorGrader management failed, could not install dependencies!", dep);
         return false;
       }
+    } else {
+      BasicCommand dep = new BasicCommand("pipenv", "update");
+      dep.setWorkingDir(new File(GatorGradlePlugin.GATORGRADER_HOME));
+      dep.outputToSysOut(true);
+      dep.run();
+      Console.log("Finished GatorGrader update!");
     }
 
     Console.newline(2);
