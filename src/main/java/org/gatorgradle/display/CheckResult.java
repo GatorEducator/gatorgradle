@@ -4,9 +4,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
-
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.gatorgradle.util.Console;
 import org.gatorgradle.util.StringUtil;
@@ -21,6 +20,13 @@ public class CheckResult {
       super("Failed to parse json -- " + reason + (json != null ? ":\n\"" + json + "\"" : ""));
     }
   }
+
+  public static final Pattern CHECK_REGEX =
+      Pattern.compile(".*\"check\":\\s*\"(.*?)\".*", Pattern.DOTALL);
+  public static final Pattern OUTCOME_REGEX =
+      Pattern.compile(".*\"outcome\":\\s*([Tt]rue|[Ff]alse).*", Pattern.DOTALL);
+  public static final Pattern DIAGNOSTIC_REGEX =
+      Pattern.compile(".*\"diagnostic\":\\s*\"(.*?)\".*", Pattern.DOTALL);
 
   public String check;
   public Boolean outcome;
@@ -50,27 +56,31 @@ public class CheckResult {
    * @throws MalformedJsonException if the json given is not valid for a CheckResult
    *
    */
-  @SuppressWarnings("unchecked")
   public CheckResult(String json) throws MalformedJsonException {
-    try {
-      // Extremely hacky implementation using nashorn scripting to
-      // not require external dependencies or do JSON parsing here.
-      ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
-      json = json.replaceAll("\"", "\\\"");
-      json = json.replaceAll("'", "\\'");
-      String script = "Java.asJSONCompatible(" + json + ")";
-      Object evaled = engine.eval(script);
-      Map<String, Object> map = (Map<String, Object>) evaled;
-      this.check = (String) map.get("check");
-      this.outcome = (Boolean) map.get("outcome");
-      this.diagnostic = (String) map.get("diagnostic");
-    } catch (Throwable ex) {
-      throw new MalformedJsonException(ex.getMessage(), json);
-    }
+    // handle escaped quotes by replacing them with '
+    json = json.replaceAll("\\\\\"", "'");
 
-    if (check == null || outcome == null || diagnostic == null) {
-      throw new MalformedJsonException("required values not present in", json);
+    Matcher matcher = CHECK_REGEX.matcher(json);
+    if (!matcher.matches()) {
+      throw new MalformedJsonException("Could not find 'check' key in", json);
     }
+    this.check = matcher.group(1);
+
+
+    matcher.usePattern(OUTCOME_REGEX);
+    matcher.reset();
+    if (!matcher.matches()) {
+      throw new MalformedJsonException("Could not find 'outcome' key in", json);
+    }
+    this.outcome = Boolean.parseBoolean(matcher.group(1));
+
+
+    matcher.usePattern(DIAGNOSTIC_REGEX);
+    matcher.reset();
+    if (!matcher.matches()) {
+      throw new MalformedJsonException("Could not find 'diagnostic' key in", json);
+    }
+    this.diagnostic = matcher.group(1);
   }
 
   public static final String PASS_SYMBOL =
