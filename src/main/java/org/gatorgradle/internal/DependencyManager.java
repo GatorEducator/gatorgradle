@@ -11,6 +11,7 @@ import java.util.Comparator;
 import org.gatorgradle.GatorGradlePlugin;
 import org.gatorgradle.command.BasicCommand;
 import org.gatorgradle.command.Command;
+import org.gatorgradle.config.GatorGradleConfig;
 import org.gatorgradle.util.Console;
 
 import org.gradle.api.GradleException;
@@ -142,12 +143,6 @@ public class DependencyManager {
     BasicCommand updateOrInstall = new BasicCommand();
     updateOrInstall.outputToSysOut(true).setWorkingDir(workingDir.toFile());
     if (Files.exists(Paths.get(GatorGradlePlugin.GATORGRADER_HOME))) {
-      // FIXME: should we checkout to the master branch or version tag?
-      // BasicCommand checkout = new BasicCommand("git", "checkout", "master");
-      // checkout.run();
-      // if (checkout.exitValue() != Command.SUCCESS) {
-      //   error("GatorGrader management failed, could not checkout 'master' branch!", checkout);
-      // }
       updateOrInstall.with("git", "pull");
       Console.log("Updating GatorGrader...");
     } else {
@@ -166,6 +161,14 @@ public class DependencyManager {
     if (updateOrInstall.exitValue() != Command.SUCCESS) {
       error("GatorGrader management failed!", updateOrInstall);
       return false;
+    }
+
+    String revision = GatorGradleConfig.get().getGatorGraderRevision();
+    Console.log("Checking out to '" + revision + "'");
+    BasicCommand checkout = new BasicCommand("git", "checkout", revision);
+    checkout.run();
+    if (checkout.exitValue() != Command.SUCCESS) {
+      error("GatorGrader management failed, could not checkout to '" + revision + "'!", checkout);
     }
 
     Console.log("Managing GatorGrader python dependencies...");
