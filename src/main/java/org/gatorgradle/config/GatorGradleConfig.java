@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -32,21 +33,6 @@ import org.gradle.api.GradleException;
  * TODO: make this configurable via DSL blocks in build.gradle
  */
 public class GatorGradleConfig implements Iterable<Command> {
-  public static final Collection<String> PROGRAMS;
-  public static final Collection<String> FILENAME_EXCLUSIONS;
-
-  // TODO: make this list generate from something...
-  static {
-    Collection<String> set = new HashSet<>();
-    set.add("mdl");
-    set.add("htmlhint");
-    set.add("proselint");
-    PROGRAMS = Collections.unmodifiableCollection(set);
-
-    set = new HashSet<>();
-    set.add("gg");
-    FILENAME_EXCLUSIONS = Collections.unmodifiableCollection(set);
-  }
 
   private static GatorGradleConfig singleton;
 
@@ -78,12 +64,17 @@ public class GatorGradleConfig implements Iterable<Command> {
   private boolean breakBuild = false;
   private boolean fastBreakBuild = false;
   private String assignmentName = "this assignment";
-
-  Set<Command> gradingCommands;
-  ConfigMap file;
+  private String gatorgraderRevision = "master";
+  private Collection<String> commandLineExecutables;
+  private Set<Command> gradingCommands;
+  private ConfigMap file;
 
   private GatorGradleConfig() {
     gradingCommands = new HashSet<>();
+    commandLineExecutables = new HashSet<>();
+    commandLineExecutables.add("mdl");
+    commandLineExecutables.add("htmlhint");
+    commandLineExecutables.add("proselint");
   }
 
   /**
@@ -93,7 +84,6 @@ public class GatorGradleConfig implements Iterable<Command> {
    */
   private GatorGradleConfig(Path configFile) {
     this();
-    // TODO: parse configFile to build gradingCommands
     this.file = new ConfigMap(configFile);
   }
 
@@ -107,6 +97,7 @@ public class GatorGradleConfig implements Iterable<Command> {
    */
   public GatorGradleConfig(boolean breakBuild, boolean fastBreakBuild, String assignmentName,
       Collection<Command> commands) {
+    this();
     this.breakBuild = breakBuild;
     this.fastBreakBuild = fastBreakBuild;
     this.assignmentName = assignmentName;
@@ -119,7 +110,7 @@ public class GatorGradleConfig implements Iterable<Command> {
    * @param  line a line to parse
    * @return      a command
    */
-  private static Command makeCommand(String path, String line) {
+  private Command makeCommand(String path, String line) {
     // need to deal with adding checkfiles and directories associated with path
 
     List<String> splits = new ArrayList<>();
@@ -138,12 +129,12 @@ public class GatorGradleConfig implements Iterable<Command> {
       dir = path.substring(0, sep);
     }
     BasicCommand cmd;
-    if (PROGRAMS.contains(splits.get(0))) {
+    if (commandLineExecutables.contains(splits.get(0))) {
       cmd = new BasicCommand().outputToSysOut(false);
       splits.add(path.length() > 0 ? path : ".");
     } else {
       cmd = new GatorGraderCommand().outputToSysOut(false);
-      if (name.length() > 0 && !FILENAME_EXCLUSIONS.contains(name)) {
+      if (name.length() > 0) {
         splits.add(0, name);
         splits.add(0, "--file");
       }
@@ -167,14 +158,19 @@ public class GatorGradleConfig implements Iterable<Command> {
 
     if (file.hasHeader("break")) {
       breakBuild = file.getHeader("break").asBoolean();
-    } else {
-      breakBuild = false;
     }
 
     if (file.hasHeader("fastfail")) {
       fastBreakBuild = file.getHeader("fastfail").asBoolean();
-    } else {
-      fastBreakBuild = false;
+    }
+
+    if (file.hasHeader("version")) {
+      gatorgraderRevision = file.getHeader("version").asString();
+    }
+
+    if (file.hasHeader("executables")) {
+      String list = file.getHeader("executables").asString();
+      commandLineExecutables.addAll(Arrays.asList(list.split(",")));
     }
 
     file.getPaths().forEach(
@@ -217,6 +213,14 @@ public class GatorGradleConfig implements Iterable<Command> {
 
   public String getAssignmentName() {
     return assignmentName;
+  }
+
+  public String getGatorGraderRevision() {
+    return gatorgraderRevision;
+  }
+
+  public boolean isCommandLineExecutable(String exec) {
+    return commandLineExecutables.contains(exec);
   }
 
   public int size() {
