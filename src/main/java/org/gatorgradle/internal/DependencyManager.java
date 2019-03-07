@@ -168,15 +168,16 @@ public class DependencyManager {
       return false;
     }
 
-    Console.log("Updating GatorGrader python dependencies...");
+    Console.log("Managing GatorGrader python dependencies...");
     BasicCommand dep = new BasicCommand("pipenv", "sync", "--bare");
     dep.setWorkingDir(new File(GatorGradlePlugin.GATORGRADER_HOME));
-    dep.outputToSysOut(true);
+    dep.outputToSysOut(false);
     dep.run();
     if (dep.exitValue() != Command.SUCCESS) {
       error("GatorGrader management failed, could not install dependencies!", dep);
       return false;
     }
+    Console.log("Finished!");
 
     Console.newline(2);
     return true;
