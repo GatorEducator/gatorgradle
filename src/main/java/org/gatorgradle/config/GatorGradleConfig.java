@@ -169,8 +169,9 @@ public class GatorGradleConfig implements Iterable<Command> {
     }
 
     if (file.hasHeader("executables")) {
-      String list = file.getHeader("executables").asString();
-      commandLineExecutables.addAll(Arrays.asList(list.split(",")));
+      List<String> lst = Arrays.asList(file.getHeader("executables").asString().split(","));
+      lst.replaceAll(String::trim);
+      commandLineExecutables.addAll(lst);
     }
 
     file.getPaths().forEach(
