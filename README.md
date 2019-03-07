@@ -66,7 +66,6 @@ src/main:
             --fragment "int " --count 1
 writing/reflection.md:
     mdl
-    # proselint
     --paragraphs 2
     --words 6
 --commits 18
@@ -123,13 +122,14 @@ of the grading.
 
 Including GatorGradle in your project is simple. If no extra configuration is
 required, simply insert the following code block at the beginning of your
-`build.gradle` to use version `0.3.2`. Find out what version is current by
+`build.gradle` to use version `0.3.4`. Find out what version is current by
 visiting the [gradle plugin portal](https://plugins.gradle.org/plugin/org.gatored.gatorgradle).
-Other configuration and installation information is also available there.
+Other configuration and installation information is also available there,
+including a different script that will always use the most recent version!
 
 ```groovy
 plugins {
-  id "org.gatored.gatorgradle" version "0.3.2"
+  id "org.gatored.gatorgradle" version "0.3.4"
 }
 ```
 
@@ -155,10 +155,6 @@ buildscript{
   }
 }
 
-plugins {
-  //id "org.gatored.gatorgradle" version "0.3.0"
-  id "java"
-}
 apply plugin: 'org.gatored.gatorgradle'
 
 ```
