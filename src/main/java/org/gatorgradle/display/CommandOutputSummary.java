@@ -133,7 +133,7 @@ public class CommandOutputSummary {
       } catch (CheckResult.MalformedJsonException ex) {
         log.error(cmd.toString() + " produced unparsable json: \'" + ex.getMessage() + "\'");
       }
-    } else if (GatorGradleConfig.PROGRAMS.contains(cmd.executable())) {
+    } else if (GatorGradleConfig.get().isCommandLineExecutable(cmd.executable())) {
       StringBuilder diagnostic = new StringBuilder();
       if (output != null && !output.isEmpty() && includeDiagnostic) {
         Scanner scan = new Scanner(output);
