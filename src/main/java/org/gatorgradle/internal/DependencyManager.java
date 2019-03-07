@@ -138,13 +138,11 @@ public class DependencyManager {
   private static boolean doGatorGraderMain() {
     Path workingDir = Paths.get(GatorGradlePlugin.GATORGRADER_HOME);
 
-    boolean doDeps = false;
-
     // quick git pull installation
     BasicCommand updateOrInstall = new BasicCommand();
     updateOrInstall.outputToSysOut(true).setWorkingDir(workingDir.toFile());
     if (Files.exists(Paths.get(GatorGradlePlugin.GATORGRADER_HOME))) {
-      // FIXME: should we checkout to the master branch?
+      // FIXME: should we checkout to the master branch or version tag?
       // BasicCommand checkout = new BasicCommand("git", "checkout", "master");
       // checkout.run();
       // if (checkout.exitValue() != Command.SUCCESS) {
@@ -161,7 +159,6 @@ public class DependencyManager {
           "git", "clone", GATORGRADER_GIT_REPO, GatorGradlePlugin.GATORGRADER_HOME);
 
       // configure gatorgrader dependencies
-      doDeps = true;
       Console.log("Installing GatorGrader...");
     }
 
@@ -171,24 +168,14 @@ public class DependencyManager {
       return false;
     }
 
-    if (doDeps) {
-      Console.log("Installing GatorGrader python dependencies...");
-      BasicCommand dep = new BasicCommand("pipenv", "sync");
-      dep.setWorkingDir(new File(GatorGradlePlugin.GATORGRADER_HOME));
-      dep.outputToSysOut(true);
-      dep.run();
-      Console.log("Finished GatorGrader install!");
-      if (dep.exitValue() != Command.SUCCESS) {
-        error("GatorGrader management failed, could not install dependencies!", dep);
-        return false;
-      }
-    } else {
-      Console.log("Updating GatorGrader python dependencies...");
-      BasicCommand dep = new BasicCommand("pipenv", "sync");
-      dep.setWorkingDir(new File(GatorGradlePlugin.GATORGRADER_HOME));
-      dep.outputToSysOut(true);
-      dep.run();
-      Console.log("Finished GatorGrader update!");
+    Console.log("Updating GatorGrader python dependencies...");
+    BasicCommand dep = new BasicCommand("pipenv", "sync", "--bare");
+    dep.setWorkingDir(new File(GatorGradlePlugin.GATORGRADER_HOME));
+    dep.outputToSysOut(true);
+    dep.run();
+    if (dep.exitValue() != Command.SUCCESS) {
+      error("GatorGrader management failed, could not install dependencies!", dep);
+      return false;
     }
 
     Console.newline(2);
