@@ -70,7 +70,5 @@ public class GatorGradlePlugin implements Plugin<Project> {
       task.setConfig(config);
       task.setWorkingDir(project.getProjectDir());
     });
-
-    grade.dependsOn("build");
   }
 }
