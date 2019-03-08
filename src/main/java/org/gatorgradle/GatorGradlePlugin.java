@@ -65,7 +65,7 @@ public class GatorGradlePlugin implements Plugin<Project> {
         GatorGradleConfig.create(project.file(CONFIG_FILE_LOCATION).toPath());
 
     // create gatorgradle 'grade' task
-    GatorGradleTask grade = project.getTasks().create("grade", GatorGradleTask.class, task -> {
+    project.getTasks().create("grade", GatorGradleTask.class, task -> {
       // default grade task uses config from above and project dir as grade
       task.setConfig(config);
       task.setWorkingDir(project.getProjectDir());
