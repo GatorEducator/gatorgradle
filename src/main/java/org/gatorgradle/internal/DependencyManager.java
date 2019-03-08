@@ -166,6 +166,7 @@ public class DependencyManager {
     String revision = GatorGradleConfig.get().getGatorGraderRevision();
     Console.log("Checking out to '" + revision + "'");
     BasicCommand checkout = new BasicCommand("git", "checkout", revision);
+    checkout.setWorkingDir(workingDir.toFile());
     checkout.run();
     if (checkout.exitValue() != Command.SUCCESS) {
       error("GatorGrader management failed, could not checkout to '" + revision + "'!", checkout);
