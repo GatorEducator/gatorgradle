@@ -13,11 +13,11 @@ import org.gatorgradle.util.StringUtil;
 public class CheckResult {
   public static class MalformedJsonException extends Exception {
     public MalformedJsonException(String json) {
-      super("Failed to parse json:\n\"" + json + "\"");
+      super("Failed to parse json:\n---\n" + json + "\n---");
     }
 
     public MalformedJsonException(String reason, String json) {
-      super("Failed to parse json -- " + reason + (json != null ? ":\n\"" + json + "\"" : ""));
+      super("Failed to parse json -- " + reason + (json != null ? ":\n---\n" + json + "\n---" : ""));
     }
   }
 
@@ -57,8 +57,11 @@ public class CheckResult {
    *
    */
   public CheckResult(String json) throws MalformedJsonException {
+    if (json == null) {
+      throw new MalformedJsonException("Null JSON text", null);
+    }
     // handle escaped quotes by replacing them with '
-    json = json.replaceAll("\\\\\"", "'");
+    json = json.replaceAll("\\\\\"", "'").trim();
 
     Matcher matcher = CHECK_REGEX.matcher(json);
     if (!matcher.matches()) {

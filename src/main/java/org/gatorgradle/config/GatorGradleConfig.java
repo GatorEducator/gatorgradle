@@ -130,10 +130,12 @@ public class GatorGradleConfig implements Iterable<Command> {
     }
     BasicCommand cmd;
     if (commandLineExecutables.contains(splits.get(0))) {
-      cmd = new BasicCommand().outputToSysOut(false);
+      cmd = new BasicCommand();
+      cmd.outputToSysOut(false);
       splits.add(path.length() > 0 ? path : ".");
     } else {
-      cmd = new GatorGraderCommand().outputToSysOut(false);
+      cmd = new GatorGraderCommand();
+      cmd.outputToSysOut(false);
       if (name.length() > 0) {
         splits.add(0, name);
         splits.add(0, "--file");
