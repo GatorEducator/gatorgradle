@@ -207,7 +207,7 @@ public class BasicCommand implements Command {
     } finally {
       fin = true;
 
-      if(out != null) {
+      if (out != null) {
         output = out.toString();
       }
       if (callback != null) {

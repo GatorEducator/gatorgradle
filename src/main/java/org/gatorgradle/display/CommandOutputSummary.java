@@ -22,7 +22,6 @@ import org.gradle.api.logging.Logger;
 public class CommandOutputSummary {
   private static final String YES = StringUtil.color(StringUtil.GOOD, "Yes");
   private static final String NO = StringUtil.color(StringUtil.BAD, "No");
-  private static final String ERROR = "ERROR";
 
   private List<Command> completedCommands;
   private final Logger log;
@@ -83,9 +82,7 @@ public class CommandOutputSummary {
     // actual output of the command should be parsed and colored, etc
     if (cmd instanceof BasicCommand) {
       String output = parseCommandOutput((BasicCommand) cmd, includeDiagnostic);
-      if(!output.equals(ERROR)) {
-        log.lifecycle(output);
-      }
+      log.lifecycle(output);
     }
     if (cmd.exitValue() != Command.SUCCESS) {
       log.info("Check failed!");
