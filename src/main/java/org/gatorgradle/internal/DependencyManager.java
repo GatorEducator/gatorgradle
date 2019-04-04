@@ -38,10 +38,10 @@ public class DependencyManager {
         throw new GradleException("Failed to run pipenv --venv! -- Was GatorGrader installed?");
       }
       if (GatorGradlePlugin.OS.equals(GatorGradlePlugin.WINDOWS)) {
-        PYTHON_EXECUTABLE = query.getOutput() + GatorGradlePlugin.F_SEP + "Scripts"
+        PYTHON_EXECUTABLE = query.getOutput().trim() + GatorGradlePlugin.F_SEP + "Scripts"
             + GatorGradlePlugin.F_SEP + "python";
       } else {
-        PYTHON_EXECUTABLE = query.getOutput() + GatorGradlePlugin.F_SEP + "bin"
+        PYTHON_EXECUTABLE = query.getOutput().trim() + GatorGradlePlugin.F_SEP + "bin"
             + GatorGradlePlugin.F_SEP + "python";
       }
     }
