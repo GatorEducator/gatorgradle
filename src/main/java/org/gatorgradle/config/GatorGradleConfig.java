@@ -170,6 +170,10 @@ public class GatorGradleConfig implements Iterable<Command> {
       gatorgraderRevision = file.getHeader("version").asString();
     }
 
+    if (file.hasHeader("revision")) {
+      gatorgraderRevision = file.getHeader("revision").asString();
+    }
+
     if (file.hasHeader("executables")) {
       List<String> lst = Arrays.asList(file.getHeader("executables").asString().split(","));
       lst.replaceAll(String::trim);
