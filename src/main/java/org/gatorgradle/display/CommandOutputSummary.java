@@ -22,6 +22,7 @@ import org.gradle.api.logging.Logger;
 public class CommandOutputSummary {
   private static final String YES = StringUtil.color(StringUtil.GOOD, "Yes");
   private static final String NO = StringUtil.color(StringUtil.BAD, "No");
+  private static final String ERROR = "ERROR";
 
   private List<Command> completedCommands;
   private final Logger log;
@@ -82,7 +83,9 @@ public class CommandOutputSummary {
     // actual output of the command should be parsed and colored, etc
     if (cmd instanceof BasicCommand) {
       String output = parseCommandOutput((BasicCommand) cmd, includeDiagnostic);
-      log.lifecycle(output);
+      if(!output.equals(ERROR)) {
+        log.lifecycle(output);
+      }
     }
     if (cmd.exitValue() != Command.SUCCESS) {
       log.info("Check failed!");
@@ -131,7 +134,12 @@ public class CommandOutputSummary {
       try {
         result = new CheckResult(output);
       } catch (CheckResult.MalformedJsonException ex) {
-        log.error(cmd.toString() + " produced unparsable json: \'" + ex.getMessage() + "\'");
+        // only log error when not requesting diagnostic
+        // generally the diagnostic request is a second or third print
+        if(!includeDiagnostic) {
+          log.error(cmd.toString() + " errored: \'" + ex.getMessage() + "\'");
+        }
+        result = new CheckResult(StringUtil.clamp(cmd.toString(), 70), false, "The command errored");
       }
     } else if (GatorGradleConfig.get().isCommandLineExecutable(cmd.executable())) {
       StringBuilder diagnostic = new StringBuilder();
@@ -148,7 +156,7 @@ public class CommandOutputSummary {
         diagnostic.append("No diagnostic available");
       }
       result = new CheckResult("The file " + cmd.last() + " passes " + cmd.executable(),
-          cmd.exitValue() == cmd.SUCCESS, diagnostic.toString());
+          cmd.exitValue() == cmd.SUCCESS, diagnostic.toString().trim());
     } else {
       result = new CheckResult(
           cmd + " passes", cmd.exitValue() == cmd.SUCCESS, "No diagnostic available");
@@ -157,6 +165,7 @@ public class CommandOutputSummary {
     if (result != null) {
       output = result.textReport(includeDiagnostic);
     }
+
     return output;
   }
 }
