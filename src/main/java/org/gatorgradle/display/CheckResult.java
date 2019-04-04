@@ -17,7 +17,8 @@ public class CheckResult {
     }
 
     public MalformedJsonException(String reason, String json) {
-      super("Failed to parse json -- " + reason + (json != null ? ":\n---\n" + json + "\n---" : ""));
+      super("Failed to parse json -- " + reason
+          + (json != null ? ":\n---\n" + json + "\n---" : ""));
     }
   }
 
