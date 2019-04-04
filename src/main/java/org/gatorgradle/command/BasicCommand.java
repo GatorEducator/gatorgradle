@@ -178,12 +178,13 @@ public class BasicCommand implements Command {
     }
     pb.redirectErrorStream(true);
     BufferedReader in = null;
+    StringBuilder out = null;
     try {
       Process proc = pb.start();
 
       in = new BufferedReader(new InputStreamReader(proc.getInputStream(), "UTF-8"));
 
-      StringBuilder out = new StringBuilder();
+      out = new StringBuilder();
       int newChar;
       while (true) {
         newChar = in.read();
@@ -198,17 +199,17 @@ public class BasicCommand implements Command {
 
       proc.waitFor();
       exitVal = proc.exitValue();
-      output = out.toString().trim();
 
     } catch (Throwable thr) {
-      //Only log if showing output
-      if (outSys) {
-        Logging.getLogger(BasicCommand.class)
-          .error("Exception while running {}: {}", toString(), thr);
-      }
+      Logging.getLogger(BasicCommand.class)
+        .error("Exception while running {}: {}", toString(), thr);
       exitVal = 127;
     } finally {
       fin = true;
+
+      if(out != null) {
+        output = out.toString();
+      }
       if (callback != null) {
         callback.accept(this);
       }
