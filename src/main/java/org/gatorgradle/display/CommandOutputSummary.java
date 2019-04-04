@@ -124,45 +124,76 @@ public class CommandOutputSummary {
     }
   }
 
-  private String parseCommandOutput(BasicCommand cmd, boolean includeDiagnostic) {
-    String output = cmd.getOutput();
+  private CheckResult parseGatorGraderCommand(GatorGraderCommand cmd, boolean includeDiagnostic) {
     CheckResult result = null;
-    if (cmd instanceof GatorGraderCommand) {
-      try {
-        result = new CheckResult(output);
-      } catch (CheckResult.MalformedJsonException ex) {
-        // only log error when not requesting diagnostic
+    String output = cmd.getOutput();
+    try {
+      result = new CheckResult(output);
+    } catch (CheckResult.MalformedJsonException ex) {
+
+      // test if the problem was an unsupported argument
+      int index = -1;
+      String unrec = "gatorgrader.py: error: unrecognized arguments:";
+      if ((index = output.indexOf(unrec)) >= 0) {
+        index += unrec.length();
+        unrec = output.substring(index).trim();
+        result = new CheckResult(
+            "Unrecognized GatorGrader check",
+            false,
+            "The " + unrec + " check is not supported"
+        );
+      } else {
+        // only log unknown error when not requesting diagnostic
         // generally the diagnostic request is a second or third print
-        if(!includeDiagnostic) {
+        if (!includeDiagnostic) {
           log.error(cmd.toString() + " errored: \'" + ex.getMessage() + "\'");
         }
-        result = new CheckResult(StringUtil.clamp(cmd.toString(), 70), false, "The command errored");
+        result = new CheckResult(
+            "Unknown GatorGrader check",
+            false,
+            "The check failed with an unknown error"
+        );
       }
-    } else if (GatorGradleConfig.get().isCommandLineExecutable(cmd.executable())) {
-      StringBuilder diagnostic = new StringBuilder();
-      if (output != null && !output.isEmpty() && includeDiagnostic) {
-        Scanner scan = new Scanner(output);
-        diagnostic.append(cmd.executable() + " diagnostics:\n");
-        while (scan.hasNext()) {
-          String line = scan.nextLine().trim();
-          if (!line.isEmpty()) {
-            diagnostic.append(line).append("\n");
-          }
+    }
+    return result;
+  }
+
+  private CheckResult parseCommandLineExecutable(BasicCommand cmd, boolean includeDiagnostic) {
+    String output = cmd.getOutput();
+    StringBuilder diagnostic = new StringBuilder();
+    if (output != null && !output.isEmpty() && includeDiagnostic) {
+      Scanner scan = new Scanner(output);
+      diagnostic.append(cmd.executable() + " diagnostics:\n");
+      while (scan.hasNext()) {
+        String line = scan.nextLine().trim();
+        if (!line.isEmpty()) {
+          diagnostic.append(line).append("\n");
         }
-      } else {
-        diagnostic.append("No diagnostic available");
       }
-      result = new CheckResult("The file " + cmd.last() + " passes " + cmd.executable(),
-          cmd.exitValue() == cmd.SUCCESS, diagnostic.toString().trim());
+    } else {
+      diagnostic.append("No diagnostic available");
+    }
+    return new CheckResult(
+        "The file " + cmd.last() + " passes " + cmd.executable(),
+        cmd.exitValue() == cmd.SUCCESS,
+        diagnostic.toString().trim()
+    );
+  }
+
+  private String parseCommandOutput(BasicCommand cmd, boolean includeDiagnostic) {
+    CheckResult result = null;
+    if (cmd instanceof GatorGraderCommand) {
+      result = parseGatorGraderCommand((GatorGraderCommand) cmd, includeDiagnostic);
+    } else if (GatorGradleConfig.get().isCommandLineExecutable(cmd.executable())) {
+      result = parseCommandLineExecutable(cmd, includeDiagnostic);
     } else {
       result = new CheckResult(
-          cmd + " passes", cmd.exitValue() == cmd.SUCCESS, "No diagnostic available");
+          cmd.toString() + " passes",
+          cmd.exitValue() == cmd.SUCCESS,
+          "No diagnostic available"
+      );
     }
 
-    if (result != null) {
-      output = result.textReport(includeDiagnostic);
-    }
-
-    return output;
+    return result.textReport(includeDiagnostic);
   }
 }
