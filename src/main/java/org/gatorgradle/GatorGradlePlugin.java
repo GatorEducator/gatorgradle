@@ -7,8 +7,10 @@ import org.gatorgradle.config.GatorGradleConfig;
 import org.gatorgradle.task.GatorGradleTask;
 import org.gatorgradle.util.Console;
 
+import org.gradle.api.GradleException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
+import org.gradle.api.logging.Logger;
 
 /**
  * GatorGradlePlugin applies the plugin to a project, registers
@@ -58,11 +60,24 @@ public class GatorGradlePlugin implements Plugin<Project> {
    * @param project the project to apply GatorGrader to
    */
   public void apply(final Project project) {
-    // Logger logger = project.getLogger();
+    Logger logger = project.getLogger();
     // set config file location, then generate config
     // TODO: what should we do for config file location?
     GatorGradleConfig config =
         GatorGradleConfig.create(project.file(CONFIG_FILE_LOCATION).toPath());
+
+    // ensure we got a configuration
+    if (config == null) {
+      throw new GradleException(
+          "GatorGradle grade task's configuration was not specified correctly!");
+    }
+
+    config.parse();
+    // System.out.println("Using config:");
+    // System.out.println(config);
+
+    logger.lifecycle("Configured GatorGradle {}",
+        GatorGradlePlugin.class.getPackage().getImplementationVersion());
 
     // create gatorgradle 'grade' task
     project.getTasks().create("grade", GatorGradleTask.class, task -> {

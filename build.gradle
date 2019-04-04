@@ -43,6 +43,13 @@ uploadArchives {
     }
 }
 
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'GatorGradle',
+                   'Implementation-Version': version
+    }
+}
+
 task publishJavadocs(type: GradleBuild) {
     def docFolder = "docs/${version}"
     project.tasks.findByName("javadoc").destinationDir = file(docFolder)
@@ -105,6 +112,3 @@ repositories {
         task.setEnabled(false)
     }
 } */
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8

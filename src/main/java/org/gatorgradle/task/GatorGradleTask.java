@@ -92,15 +92,8 @@ public class GatorGradleTask extends DefaultTask {
    */
   @TaskAction
   public void grade() {
-    // ensure we have a configuration
-    if (config == null) {
-      throw new GradleException(
-          "GatorGradle grade task's configuration was not specified correctly!");
-    }
-
-    config.parse();
-    // System.out.println("Using config:");
-    // System.out.println(config);
+    // assume we have a valid config
+    // (we parse it in GatorGradlePlugin
 
     // ensure GatorGrader and dependencies are installed
     for (Dependency dep : Dependency.values()) {
