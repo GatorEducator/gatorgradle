@@ -72,10 +72,6 @@ public class GatorGradlePlugin implements Plugin<Project> {
           "GatorGradle grade task's configuration was not specified correctly!");
     }
 
-    config.parse();
-    // System.out.println("Using config:");
-    // System.out.println(config);
-
     logger.lifecycle("Configured GatorGradle {}",
         GatorGradlePlugin.class.getPackage().getImplementationVersion());
 
