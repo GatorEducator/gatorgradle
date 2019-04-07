@@ -202,7 +202,7 @@ public class BasicCommand implements Command {
 
     } catch (Throwable thr) {
       Logging.getLogger(BasicCommand.class)
-        .error("Exception while running {}: {}", toString(), thr);
+        .error("Exception while running {}: {}", toString(), thr.toString());
       exitVal = 127;
     } finally {
       fin = true;
