@@ -1,10 +1,11 @@
 # use Java
 language: Java
 
-# install junit?
-# install mdl for checking Markdown
-# ensure the use of the latest version of gradle - much faster to download just the bin
-# instead of using a ppa -- travis probably caches this gradle zip folder somewhere.
+# LATER: install junit?
+# Step 1: install mdl for checking Markdown
+# Step 2: ensure the use of the latest version of gradle
+# Note for Step 2: much faster to download the bin instead of using a PPA
+# This may be due to the fact that travis caches the Gradle zip folder
 before_install:
   - gem install mdl
   - wget https://services.gradle.org/distributions/gradle-4.9-bin.zip
