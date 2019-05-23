@@ -16,7 +16,15 @@ import org.gatorgradle.util.Console;
 
 import org.gradle.api.GradleException;
 
-
+/**
+ * Checks for, and (in the case of GatorGrader) downloads, installs, and
+ * configures dependencies. The standard dependencies to handle include:
+ * -- GatorGrader from GitHub
+ * -- Python version 3
+ * -- Pipenv
+ * -- Git
+ * @author Saejin Mahlau-Heinert
+ */
 public class DependencyManager {
   public static final String GATORGRADER_GIT_REPO =
       "https://github.com/GatorEducator/gatorgrader.git";
