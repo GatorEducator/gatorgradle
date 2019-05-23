@@ -107,7 +107,7 @@ public class DependencyManager {
     }
     Console.log(
         "You must install Python 3! We recommend using Pyenv (https://github.com/pyenv/pyenv).");
-    Console.log("You can also visit https://www.python.org/ to download Windows installers.");
+    Console.log("You can also visit https://www.python.org/ to download installers for Windows.");
     return false;
   }
 
