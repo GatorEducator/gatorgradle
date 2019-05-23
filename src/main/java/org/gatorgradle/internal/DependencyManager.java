@@ -180,7 +180,7 @@ public class DependencyManager {
       error("GatorGrader management failed, could not checkout to '" + revision + "'!", checkout);
     }
 
-    Console.log("Managing GatorGrader python dependencies...");
+    Console.log("Managing GatorGrader's Python dependencies...");
     BasicCommand dep = new BasicCommand("pipenv", "sync", "--bare");
     dep.setWorkingDir(new File(GatorGradlePlugin.GATORGRADER_HOME));
     dep.outputToSysOut(false);
