@@ -42,8 +42,8 @@ public class DependencyManager {
       query.outputToSysOut(false);
       query.run(true);
       if (query.exitValue() != 0) {
-        error("Query for python executable failed -- try reinstalling GatorGrader", query);
-        throw new GradleException("Failed to run pipenv --venv! -- Was GatorGrader installed?");
+        error("Query for the Python executable failed! Try to reinstall GatorGrader", query);
+        throw new GradleException("Failed to run 'pipenv --venv'! Was GatorGrader installed?");
       }
       if (GatorGradlePlugin.OS.equals(GatorGradlePlugin.WINDOWS)) {
         PYTHON_EXECUTABLE = query.getOutput().trim() + GatorGradlePlugin.F_SEP + "Scripts"
