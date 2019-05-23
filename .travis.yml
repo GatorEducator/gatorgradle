@@ -14,7 +14,6 @@ before_install:
   # add gradle bin to path at the beginning to ensure it overwrites old gradle
   - export PATH="$HOME/gradle-4.9/bin:$PATH"
 
-
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
