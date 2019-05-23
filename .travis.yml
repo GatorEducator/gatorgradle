@@ -7,10 +7,12 @@ language: Java
 # Note for Step 2: much faster to download the bin instead of using a PPA
 # This may be due to the fact that travis caches the Gradle zip folder
 before_install:
+  # Install the Markdown linting tool called mdl
   - gem install mdl
+  # Download the Gradle bin zip file
   - wget https://services.gradle.org/distributions/gradle-4.9-bin.zip
   - unzip -d $HOME gradle-4.9-bin.zip
-  # probably don't need this but just to be sure
+  # Delete the downloaded zip file; probably don't need this but just to be sure
   - rm -rf gradle-4.9-bin.zip
   # add gradle bin to path at the beginning to ensure it overwrites old gradle
   - export PATH="$HOME/gradle-4.9/bin:$PATH"
