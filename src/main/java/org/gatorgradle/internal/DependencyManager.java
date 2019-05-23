@@ -90,7 +90,7 @@ public class DependencyManager {
           "If a window did not open, please visit https://git-scm.com/downloads to get started!");
     } else if (GatorGradlePlugin.OS.equals(GatorGradlePlugin.LINUX)) {
       Console.log(
-          "You must install Git! Please issue the below command or visit https://git-scm.com/downloads.");
+          "You must install Git! Please issue the following command or visit https://git-scm.com/downloads.");
       Console.log("sudo apt-get install git");
     } else {
       Console.log(
