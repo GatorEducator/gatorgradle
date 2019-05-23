@@ -14,22 +14,25 @@ before_install:
   - unzip -d $HOME gradle-4.9-bin.zip
   # Delete the downloaded zip file; probably don't need this but just to be sure
   - rm -rf gradle-4.9-bin.zip
-  # add gradle bin to path at the beginning to ensure it overwrites old gradle
+  # Add gradle bin to path at the beginning to ensure it overwrites old gradle
   - export PATH="$HOME/gradle-4.9/bin:$PATH"
 
+# Step: Delete old files
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+# Step: Set the cache directories
 cache:
   directories:
     - $HOME/.gradle/caches/4.9
     - $HOME/.gradle/caches/jars-3
     - $HOME/.gradle/caches/modules-2
 
-# need to run unit tests
+# GOAL: need to run unit tests
 script:
-  # java checks
+  # Step: Java checks
   - gradle clean check
+  # Step: build the plugin
   - gradle build
   # other linting
   - mdl README.md
