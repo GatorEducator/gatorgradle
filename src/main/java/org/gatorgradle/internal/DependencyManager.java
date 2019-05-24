@@ -16,7 +16,15 @@ import org.gatorgradle.util.Console;
 
 import org.gradle.api.GradleException;
 
-
+/**
+ * Checks for, and (in the case of GatorGrader) downloads, installs, and
+ * configures dependencies. The standard dependencies to handle include:
+ * -- GatorGrader from GitHub
+ * -- Python version 3
+ * -- Pipenv
+ * -- Git
+ * @author Saejin Mahlau-Heinert
+ */
 public class DependencyManager {
   public static final String GATORGRADER_GIT_REPO =
       "https://github.com/GatorEducator/gatorgrader.git";
@@ -34,8 +42,8 @@ public class DependencyManager {
       query.outputToSysOut(false);
       query.run(true);
       if (query.exitValue() != 0) {
-        error("Query for python executable failed -- try reinstalling GatorGrader", query);
-        throw new GradleException("Failed to run pipenv --venv! -- Was GatorGrader installed?");
+        error("Query for the Python executable failed! Try to reinstall GatorGrader", query);
+        throw new GradleException("Failed to run 'pipenv --venv'! Was GatorGrader installed?");
       }
       if (GatorGradlePlugin.OS.equals(GatorGradlePlugin.WINDOWS)) {
         PYTHON_EXECUTABLE = query.getOutput().trim() + GatorGradlePlugin.F_SEP + "Scripts"
@@ -82,7 +90,7 @@ public class DependencyManager {
           "If a window did not open, please visit https://git-scm.com/downloads to get started!");
     } else if (GatorGradlePlugin.OS.equals(GatorGradlePlugin.LINUX)) {
       Console.log(
-          "You must install Git! Please issue the below command or visit https://git-scm.com/downloads.");
+          "You must install Git! Please issue the following command or visit https://git-scm.com/downloads.");
       Console.log("sudo apt-get install git");
     } else {
       Console.log(
@@ -98,8 +106,8 @@ public class DependencyManager {
       return true;
     }
     Console.log(
-        "You must install Python 3! We recommend using Pyenv (https://github.com/pyenv/pyenv).");
-    Console.log("You can also visit https://www.python.org/ to download Windows installers.");
+        "You must install Python 3! We recommend using Pyenv, available at https://github.com/pyenv/pyenv.");
+    Console.log("You can also visit https://www.python.org/ to download installers for Windows.");
     return false;
   }
 
@@ -172,7 +180,7 @@ public class DependencyManager {
       error("GatorGrader management failed, could not checkout to '" + revision + "'!", checkout);
     }
 
-    Console.log("Managing GatorGrader python dependencies...");
+    Console.log("Managing GatorGrader's Python dependencies...");
     BasicCommand dep = new BasicCommand("pipenv", "sync", "--bare");
     dep.setWorkingDir(new File(GatorGradlePlugin.GATORGRADER_HOME));
     dep.outputToSysOut(false);

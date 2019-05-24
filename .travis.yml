@@ -1,33 +1,38 @@
 # use Java
 language: Java
 
-# install junit?
-# install mdl for checking Markdown
-# ensure the use of the latest version of gradle - much faster to download just the bin
-# instead of using a ppa -- travis probably caches this gradle zip folder somewhere.
+# LATER: install junit?
+# Step 1: install mdl for checking Markdown
+# Step 2: ensure the use of the latest version of gradle
+# Note for Step 2: much faster to download the bin instead of using a PPA
+# This may be due to the fact that travis caches the Gradle zip folder
 before_install:
+  # Install the Markdown linting tool called mdl
   - gem install mdl
+  # Download the Gradle bin zip file
   - wget https://services.gradle.org/distributions/gradle-4.9-bin.zip
   - unzip -d $HOME gradle-4.9-bin.zip
-  # probably don't need this but just to be sure
+  # Delete the downloaded zip file; probably don't need this but just to be sure
   - rm -rf gradle-4.9-bin.zip
-  # add gradle bin to path at the beginning to ensure it overwrites old gradle
+  # Add gradle bin to path at the beginning to ensure it overwrites old gradle
   - export PATH="$HOME/gradle-4.9/bin:$PATH"
 
-
+# Step: Delete old files
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+# Step: Set the cache directories
 cache:
   directories:
     - $HOME/.gradle/caches/4.9
     - $HOME/.gradle/caches/jars-3
     - $HOME/.gradle/caches/modules-2
 
-# need to run unit tests
+# GOAL: need to run unit tests
 script:
-  # java checks
+  # Step: Java checks
   - gradle clean check
+  # Step: build the plugin
   - gradle build
   # other linting
   - mdl README.md
