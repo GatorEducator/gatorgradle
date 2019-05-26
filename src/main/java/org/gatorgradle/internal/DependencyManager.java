@@ -170,19 +170,28 @@ public class DependencyManager {
       error("GatorGrader management failed!", updateOrInstall);
       return false;
     }
+    
+    BasicCommand checkout = new BasicCommand("git", "checkout", "master");
+    checkout.setWorkingDir(workingDir.toFile());
+    checkout.run();
+    if (checkout.exitValue() != Command.SUCCESS) {
+      error("GatorGrader management failed, could not checkout to 'master'!", checkout);
+      return false;
+    }
 
     String revision = GatorGradleConfig.get().getGatorGraderRevision();
     Console.log("Checking out to '" + revision + "'");
-    BasicCommand checkout = new BasicCommand("git", "checkout", revision);
+    checkout = new BasicCommand("git", "checkout", revision);
     checkout.setWorkingDir(workingDir.toFile());
     checkout.run();
     if (checkout.exitValue() != Command.SUCCESS) {
       error("GatorGrader management failed, could not checkout to '" + revision + "'!", checkout);
+      return false;
     }
 
     Console.log("Managing GatorGrader's Python dependencies...");
     BasicCommand dep = new BasicCommand("pipenv", "sync", "--bare");
-    dep.setWorkingDir(new File(GatorGradlePlugin.GATORGRADER_HOME));
+    dep.setWorkingDir(workingDir.toFile());
     dep.outputToSysOut(false);
     dep.run();
     if (dep.exitValue() != Command.SUCCESS) {
