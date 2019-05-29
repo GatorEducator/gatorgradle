@@ -8,9 +8,9 @@
     </Match>
 
     <!-- Disable check -->
-    <!--<Match>-->
-        <!--<Bug pattern="DM_CONVERT_CASE" />-->
-    <!--</Match>-->
+    <Match>
+        <Bug pattern="RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE" />
+    </Match>
 
     <!-- Do not check class -->
     <!--<Match>-->
