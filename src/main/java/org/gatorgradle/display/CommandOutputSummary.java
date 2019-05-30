@@ -23,16 +23,29 @@ public class CommandOutputSummary {
   private static final String YES = StringUtil.color(StringUtil.GOOD, "Yes");
   private static final String NO = StringUtil.color(StringUtil.BAD, "No");
 
-  private List<Command> completedCommands;
+  private List<CheckResult> completedChecks;
   private final Logger log;
 
+  /**
+   * Create an empty output summary.
+   *
+   * @param log the Logger to use
+   */
   public CommandOutputSummary(Logger log) {
-    this.completedCommands = new ArrayList<>();
+    this.completedChecks = new ArrayList<>();
     this.log = log;
   }
 
+  /**
+   * Create an output summary from the given commands.
+   *
+   * @param completedCommands the commands to build a summary of
+   * @param log the Logger to use
+   */
   public CommandOutputSummary(List<Command> completedCommands, Logger log) {
-    this.completedCommands = new ArrayList<>(completedCommands);
+    this.completedChecks = completedCommands.stream()
+                           .map(cmd -> parseCommandOutput(cmd))
+                           .collect(Collectors.toList());
     this.log = log;
   }
 
@@ -42,16 +55,17 @@ public class CommandOutputSummary {
    * @param cmd the command to add
    */
   public void addCompletedCommand(Command cmd) {
-    if (!completedCommands.contains(cmd)) {
-      completedCommands.add(cmd);
-      showInProgressSummary(cmd);
+    CheckResult result = parseCommandOutput(cmd);
+    if (!completedChecks.contains(result)) {
+      completedChecks.add(result);
+      showInProgressSummary(result);
     } else {
-      log.info("Duplicate command: " + cmd.toString());
+      log.info("Duplicate results from: " + cmd.toString());
     }
   }
 
   public int getNumCompletedTasks() {
-    return completedCommands.size();
+    return completedChecks.size();
   }
 
   boolean nomore = false;
@@ -59,37 +73,35 @@ public class CommandOutputSummary {
   /**
    * Output a description of what just finished, or maybe a status.
    *
-   * @param cmd the command that just finished
+   * @param result the check that just finished
    */
-  public void showInProgressSummary(Command cmd) {
+  public void showInProgressSummary(CheckResult result) {
     if (nomore) {
       return;
     }
-    boolean fail = printCommandResult(cmd, false);
-    if (fail && GatorGradleConfig.get().shouldFastBreakBuild()) {
+    printResult(result, false);
+    if (result.outcome == false && GatorGradleConfig.get().shouldFastBreakBuild()) {
       log.lifecycle("\n  -~-  \u001B[1;31mCHECKS FAILED\u001B[0m  -~-\n");
       nomore = true;
       throw new GradleException("Check failed!");
     }
   }
 
-  private boolean printCommandResult(Command cmd, boolean includeDiagnostic) {
+  private void printResult(CheckResult result, boolean includeDiagnostic) {
     // debug output for TAs
-    log.info("COMMAND: {}", cmd.toString());
-    log.info("EXIT VALUE: {}", cmd.exitValue());
+    log.info("COMMAND: '{}'", result.command.toString());
+    log.info("EXIT VALUE: '{}'", result.command.exitValue());
     log.info("OUTPUT:");
 
     // actual output of the command should be parsed and colored, etc
-    if (cmd instanceof BasicCommand) {
-      String output = parseCommandOutput((BasicCommand) cmd, includeDiagnostic);
-      log.lifecycle(output);
-    }
-    if (cmd.exitValue() != Command.SUCCESS) {
-      log.info("Check failed!");
-      return true;
-    }
+    log.lifecycle(result.textReport(includeDiagnostic));
+  }
 
-    return false;
+  /**
+   * Output the compiled summary to the project's configured endpoint, if existant.
+   */
+  public void uploadOutputSummary() {
+
   }
 
   /**
@@ -97,28 +109,30 @@ public class CommandOutputSummary {
    */
   public void showOutputSummary() {
     // log.lifecycle("\n\n  -~-  \u001B[1;36mBeginning check summary\u001B[1;0m  -~-\n\n");
-    int totalChecks = completedCommands.size();
-    List<Command> failed = completedCommands.stream()
-                               .filter(cmd -> cmd.exitValue() != Command.SUCCESS)
+    int totalChecks = getNumCompletedTasks();
+    List<CheckResult> failed = completedChecks.stream()
+                               .filter(result -> result.outcome == false)
                                .collect(Collectors.toList());
-    boolean failedChecks = failed.size() > 0;
+    boolean isFailure = failed.size() > 0;
 
-    if (failedChecks) {
+    if (isFailure) {
       log.lifecycle("\n\n\u001B[1;33m-~-  \u001B[1;31mFAILURES  \u001B[1;33m-~-\u001B[0m\n");
       for (int i = 0; i < failed.size(); i++) {
-        printCommandResult(failed.get(i), true);
+        printResult(failed.get(i), true);
       }
     }
 
-    int passedChecks = completedCommands.size() - failed.size();
+    int passedChecks = totalChecks - failed.size();
 
     StringUtil.border("Passed " + passedChecks + "/" + totalChecks + " ("
             + (Math.round((passedChecks * 100) / (float) totalChecks)) + "%)"
             + " of checks for " + GatorGradleConfig.get().getAssignmentName() + "!",
-        failedChecks ? "\u001B[1;31m" : "\u001B[1;32m",
-        failedChecks ? "\u001B[1;35m" : "\u001B[1;32m", log);
+        isFailure ? "\u001B[1;31m" : "\u001B[1;32m",
+        isFailure ? "\u001B[1;35m" : "\u001B[1;32m", log);
 
-    if (failedChecks && GatorGradleConfig.get().shouldBreakBuild()) {
+    uploadOutputSummary();
+
+    if (isFailure && GatorGradleConfig.get().shouldBreakBuild()) {
       throw new GradleException(
           StringUtil.color(StringUtil.BAD, "Grading checks failed -- scroll up for failures"));
     }
@@ -128,7 +142,7 @@ public class CommandOutputSummary {
     CheckResult result = null;
     String output = cmd.getOutput();
     try {
-      result = new CheckResult(output);
+      result = new CheckResult(cmd, output);
     } catch (CheckResult.MalformedJsonException ex) {
 
       // test if the problem was an unsupported argument
@@ -138,17 +152,17 @@ public class CommandOutputSummary {
         index += unrec.length();
         unrec = output.substring(index).trim();
         result = new CheckResult(
+            cmd,
             "Unrecognized GatorGrader check",
             false,
             "The " + unrec + " check is not supported"
         );
       } else {
-        // only log unknown error when not requesting diagnostic
-        // generally the diagnostic request is a second or third print
         if (!includeDiagnostic) {
           log.error(cmd.toString() + " errored: \'" + ex.getMessage() + "\'");
         }
         result = new CheckResult(
+            cmd,
             "Unknown GatorGrader check",
             false,
             "The check failed with an unknown error"
@@ -171,9 +185,12 @@ public class CommandOutputSummary {
         }
       }
     } else {
-      diagnostic.append("No diagnostic available");
+      diagnostic.append("No diagnostic available; '");
+      diagnostic.append(cmd.executable());
+      diagnostic.append("' may not be installed");
     }
     return new CheckResult(
+        cmd,
         "The file " + cmd.last() + " passes " + cmd.executable(),
         cmd.exitValue() == Command.SUCCESS,
         diagnostic.toString().trim()
@@ -202,16 +219,16 @@ public class CommandOutputSummary {
     );
   }
 
-  private String parseCommandOutput(BasicCommand cmd, boolean includeDiagnostic) {
-    CheckResult result = null;
+  private CheckResult parseCommandOutput(BasicCommand cmd, boolean includeDiagnostic) {
+    CheckResult result;
     if (cmd instanceof GatorGraderCommand) {
       result = parseGatorGraderCommand((GatorGraderCommand) cmd, includeDiagnostic);
     } else if (GatorGradleConfig.get().isCommandLineExecutable(cmd.executable())) {
-      result = parseCommandLineExecutable(cmd, includeDiagnostic);
+      result = parseExecutableCommand(cmd, includeDiagnostic);
     } else {
       result = parsePureCommandOutput(cmd, includeDiagnostic);
     }
 
-    return result.textReport(includeDiagnostic);
+    return result;
   }
 }
