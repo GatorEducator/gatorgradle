@@ -30,12 +30,20 @@ public class DependencyManager {
       "https://github.com/GatorEducator/gatorgrader.git";
   private static String PYTHON_EXECUTABLE = null;
 
+  private static boolean managed = false;
+
   /**
    * Returns the python executable path.
    *
    * @return the path
    */
   public static String getPython() {
+    if (!managed) {
+      String dep = manage();
+      if (!dep.isEmpty()) {
+        throw new GradleException(dep);
+      }
+    }
     if (PYTHON_EXECUTABLE == null) {
       BasicCommand query = new BasicCommand("pipenv", "--venv");
       query.setWorkingDir(new File(GatorGradlePlugin.GATORGRADER_HOME));
@@ -57,25 +65,32 @@ public class DependencyManager {
   }
 
   /**
-   * Install or Update the given dependency.
+   * Manage dependencies.
    *
-   * @param  dep the dependency to update or install
-   * @return     a boolean indicating success or failure
+   * @return an empty String indicating success or a dependency name String indicating failure
    */
-  public static boolean installOrUpdate(Dependency dep) {
-    switch (dep) {
-      case GATORGRADER:
-        return doGatorGrader();
-      case PYTHON:
-        return doPython();
-      case PIPENV:
-        return doPipenv();
-      case GIT:
-        return doGit();
-      default:
-        Console.error("Unsupported Dependency: " + dep);
-        return false;
+  public static String manage() {
+    if (managed) {
+      return "";
     }
+    String error = "Git not installed!";
+    if (!doGit()) {
+      return error;
+    }
+    error = "Python not installed!";
+    if (!doPython()) {
+      return error;
+    }
+    error = "Pipenv not installed!";
+    if (!doPipenv()) {
+      return error;
+    }
+    error = "GatorGrader management failed; see above for details.";
+    if (!doGatorGrader()) {
+      return error;
+    }
+    managed = true;
+    return "";
   }
 
   private static boolean doGit() {
@@ -191,6 +206,17 @@ public class DependencyManager {
         && !checkout.getOutput().contains("You are not currently on a branch")) {
       error("GatorGrader management failed, could update '" + revision + "'!", checkout);
       return false;
+    }
+
+    Console.log("Pulling branch...");
+    checkout = new BasicCommand("git", "pull");
+    checkout.setWorkingDir(workingDir.toFile());
+    checkout.outputToSysOut(false);
+    checkout.run();
+    if (checkout.exitValue() == Command.SUCCESS) {
+      Console.log("Updated!");
+    } else {
+      Console.log("No change.");
     }
 
     Console.log("Managing GatorGrader's Python dependencies...");
