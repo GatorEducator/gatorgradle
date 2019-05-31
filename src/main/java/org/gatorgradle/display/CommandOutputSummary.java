@@ -123,7 +123,8 @@ public class CommandOutputSummary {
     builder.append("\"").append(Instant.now()).append("\"").append(",");
 
     builder.append("\"assignment\":");
-    builder.append("\"").append(GatorGradleConfig.get().getAssignmentName()).append("\"").append(",");
+    builder.append("\"").append(GatorGradleConfig.get().getAssignmentName());
+    builder.append("\"").append(",");
 
     // report
     builder.append("\"report\":{");
