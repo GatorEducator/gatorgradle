@@ -1,5 +1,9 @@
 package org.gatorgradle.display;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -128,17 +132,40 @@ public class CommandOutputSummary {
 
     String resultListJson = builder.toString();
 
+    HttpURLConnection con = null;
     try {
       URL url = new URL(GatorGradleConfig.get().getReportEndpoint());
-      HttpURLConnection con = (HttpURLConnection) url.openConnection();
+      con = (HttpURLConnection) url.openConnection();
       con.setRequestMethod("POST");
-
-      // set body
+      con.setRequestProperty("Content-Type", "application/json; utf-8");
+      con.setRequestProperty("Accept", "application/json");
+      con.setUseCaches(false);
+      con.setDoInput(true);
+      con.setDoOutput(true);
 
       // send request
+      try (OutputStream os = con.getOutputStream()) {
+        byte[] input = resultListJson.getBytes("utf-8");
+        os.write(input, 0, input.length);
+      }
 
-    } catch (Exception ex) {
+      // get response  
+      try (BufferedReader br = new BufferedReader(
+          new InputStreamReader(con.getInputStream(), "utf-8"))) {
+        StringBuilder response = new StringBuilder();
+        String responseLine = null;
+        while ((responseLine = br.readLine()) != null) {
+          response.append(responseLine.trim());
+        }
+        log.info("Got data upload response: {}", response.toString());
+      }
+      
+    } catch (IOException ex) {
       log.error("Exception while uploading check data: {}", ex.toString());
+    } finally {
+      if (con != null) {
+        con.disconnect();
+      }
     }
   }
 
