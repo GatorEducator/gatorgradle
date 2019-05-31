@@ -167,7 +167,10 @@ public class ConfigMap {
       // parse header
       lines.subList(0, divider).forEach(line -> {
         String[] spl = line.content.split(KEYVAL_SEP, 2);
-        header.put(spl[0].trim(), new Value(spl[1].trim(), line.number));
+        header.put(
+          spl[0].trim().toLowerCase(Locale.ENGLISH),
+          new Value(spl[1].trim(), line.number)
+        );
       });
 
       if (hasHeader("indent")) {
