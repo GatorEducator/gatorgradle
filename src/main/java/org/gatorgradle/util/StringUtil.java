@@ -107,7 +107,34 @@ public class StringUtil {
   public static final String FIX = "\u001B[33m";
   public static final String RESET = "\u001B[0m";
 
+  /**
+   * Color a string.
+   *
+   * @param with     the color to use for the text
+   * @param contents the text to print
+   * @return the colored string
+   */
   public static String color(String with, String contents) {
     return with + contents + RESET;
+  }
+
+
+  /**
+   * Escape all JSON special characters in a String.
+   *
+   * @param text the text to escape
+   * @return the escaped string
+   */
+  public static String jsonEscape(String text) {
+    String escaped = text;
+    escaped = escaped.replace("\\", "\\\\");
+    escaped = escaped.replace("\"", "\\\"");
+    escaped = escaped.replace("\b", "\\b");
+    escaped = escaped.replace("\f", "\\f");
+    escaped = escaped.replace("\n", "\\n");
+    escaped = escaped.replace("\r", "\\r");
+    escaped = escaped.replace("\t", "\\t");
+    // escape other non-printing characters using uXXXX notation
+    return escaped;
   }
 }
