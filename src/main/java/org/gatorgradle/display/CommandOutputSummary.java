@@ -7,6 +7,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -115,13 +116,25 @@ public class CommandOutputSummary {
     StringBuilder builder = new StringBuilder();
     builder.append("{");
 
-    builder.append("\"numberOfChecks\": ");
+    builder.append("\"user\":");
+    builder.append("\"example@gmail.com\"").append(",");
+
+    builder.append("\"time\":");
+    builder.append("\"").append(Instant.now()).append("\"").append(",");
+
+    builder.append("\"assignment\":");
+    builder.append("\"").append(GatorGradleConfig.get().getAssignmentName()).append("\"").append(",");
+
+    // report
+    builder.append("\"report\":{");
+
+    builder.append("\"numberOfChecks\":");
     builder.append(Integer.toString(all.size())).append(",");
 
-    builder.append("\"numberOfFailures\": ");
+    builder.append("\"numberOfFailures\":");
     builder.append(Integer.toString(failed.size())).append(",");
 
-    builder.append("\"results\": ").append("[");
+    builder.append("\"results\":").append("[");
     builder.append(
         String.join(
           ",",
@@ -130,6 +143,10 @@ public class CommandOutputSummary {
         )
     );
     builder.append("]").append("}");
+    // end report
+
+
+    builder.append("}");
 
     String resultListJson = builder.toString();
 
