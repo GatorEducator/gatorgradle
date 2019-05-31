@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -168,8 +169,8 @@ public class ConfigMap {
       lines.subList(0, divider).forEach(line -> {
         String[] spl = line.content.split(KEYVAL_SEP, 2);
         header.put(
-          spl[0].trim().toLowerCase(Locale.ENGLISH),
-          new Value(spl[1].trim(), line.number)
+            spl[0].trim().toLowerCase(Locale.ENGLISH),
+            new Value(spl[1].trim(), line.number)
         );
       });
 

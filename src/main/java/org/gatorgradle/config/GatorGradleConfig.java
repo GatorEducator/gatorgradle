@@ -66,6 +66,7 @@ public class GatorGradleConfig implements Iterable<Command> {
   private boolean fastBreakBuild = false;
   private String assignmentName = "this assignment";
   private String gatorgraderRevision = "master";
+  private String reportEndpoint = null;
   private Collection<String> commandLineExecutables;
   private Command startupCommand = null;
   private Set<Command> gradingCommands;
@@ -199,12 +200,20 @@ public class GatorGradleConfig implements Iterable<Command> {
       fastBreakBuild = file.getHeader("fastfail").asBoolean();
     }
 
-    if (file.hasHeader("version")) {
+    if (file.hasHeader("revision")) {
+      gatorgraderRevision = file.getHeader("revision").asString();
+    } else if (file.hasHeader("version")) {
       gatorgraderRevision = file.getHeader("version").asString();
     }
 
-    if (file.hasHeader("revision")) {
-      gatorgraderRevision = file.getHeader("revision").asString();
+    if (file.hasHeader("reportendpoint")) {
+      reportEndpoint = file.getHeader("reportendpoint").asString();
+    } else if (file.hasHeader("endpoint")) {
+      reportEndpoint = file.getHeader("endpoint").asString();
+    } else if (file.hasHeader("report")) {
+      reportEndpoint = file.getHeader("report").asString();
+    } else if (file.hasHeader("lambda")) {
+      reportEndpoint = file.getHeader("lambda").asString();
     }
 
     if (file.hasHeader("executables")) {
@@ -283,6 +292,10 @@ public class GatorGradleConfig implements Iterable<Command> {
 
   public Command getStartupCommand() {
     return startupCommand;
+  }
+
+  public String getReportEndpoint() {
+    return reportEndpoint;
   }
 
   public boolean isCommandLineExecutable(String exec) {
