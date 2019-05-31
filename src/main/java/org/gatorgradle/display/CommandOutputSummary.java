@@ -1,5 +1,7 @@
 package org.gatorgradle.display;
 
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -99,9 +101,45 @@ public class CommandOutputSummary {
 
   /**
    * Output the compiled summary to the project's configured endpoint, if existant.
+   *
+   *
+   * @param failed the failed check results
+   * @param all    the completed check results
    */
-  public void uploadOutputSummary() {
+  public void uploadOutputSummary(List<CheckResult> failed, List<CheckResult> all) {
+    StringBuilder builder = new StringBuilder();
+    builder.append("{");
 
+    builder.append("\"numberOfChecks\": ");
+    builder.append(Integer.toString(all.size())).append(",");
+
+    builder.append("\"numberOfFailures\": ");
+    builder.append(Integer.toString(failed.size())).append(",");
+
+    builder.append("\"results\": ").append("[");
+    builder.append(
+        String.join(
+          ",",
+          all.stream().map(res -> res.jsonReport())
+          .collect(Collectors.toList())
+        )
+    );
+    builder.append("]").append("}");
+
+    String resultListJson = builder.toString();
+
+    try {
+      URL url = new URL(GatorGradleConfig.get().getReportEndpoint());
+      HttpURLConnection con = (HttpURLConnection) url.openConnection();
+      con.setRequestMethod("POST");
+
+      // set body
+
+      // send request
+
+    } catch (Exception ex) {
+      log.error("Exception while uploading check data: {}", ex.toString());
+    }
   }
 
   /**
@@ -130,7 +168,7 @@ public class CommandOutputSummary {
         isFailure ? "\u001B[1;31m" : "\u001B[1;32m",
         isFailure ? "\u001B[1;35m" : "\u001B[1;32m", log);
 
-    uploadOutputSummary();
+    uploadOutputSummary(failed, completedChecks);
 
     if (isFailure && GatorGradleConfig.get().shouldBreakBuild()) {
       throw new GradleException(
