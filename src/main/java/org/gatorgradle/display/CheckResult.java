@@ -148,4 +148,16 @@ public class CheckResult {
       return output;
     }
   }
+
+  /**
+   * Returns a string representation of this result.
+   *
+   * @return a string
+   **/
+  public String jsonReport() {
+    return "{\"check\": \"" + check + "\",\"outcome\": "
+      + outcome.toString().toLowerCase(Locale.ENGLISH)
+      + ",\"diagnostic\": \""
+      + diagnostic + "\"}";
+  }
 }
