@@ -155,9 +155,8 @@ public class CheckResult {
    * @return a string
    **/
   public String jsonReport() {
-    return "{\"check\": \"" + check + "\",\"outcome\": "
-      + outcome.toString().toLowerCase(Locale.ENGLISH)
-      + ",\"diagnostic\": \""
-      + diagnostic + "\"}";
+    return "{\"check\": \"" + StringUtil.jsonEscape(check) + "\",\"outcome\": "
+      + StringUtil.jsonEscape(outcome.toString().toLowerCase(Locale.ENGLISH))
+      + ",\"diagnostic\": \"" + StringUtil.jsonEscape(diagnostic) + "\"}";
   }
 }
