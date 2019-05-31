@@ -20,7 +20,6 @@ import org.gatorgradle.command.Command;
 import org.gatorgradle.command.GatorGraderCommand;
 import org.gatorgradle.config.GatorGradleConfig;
 import org.gatorgradle.display.CommandOutputSummary;
-import org.gatorgradle.internal.Dependency;
 import org.gatorgradle.internal.DependencyManager;
 import org.gatorgradle.internal.ProgressLoggerWrapper;
 import org.gatorgradle.util.Console;
@@ -96,10 +95,9 @@ public class GatorGradleTask extends DefaultTask {
     config.parseHeader();
 
     // ensure GatorGrader and dependencies are installed
-    for (Dependency dep : Dependency.values()) {
-      if (!DependencyManager.installOrUpdate(dep)) {
-        throw new GradleException(dep.name() + " not installed!");
-      }
+    String dep = DependencyManager.manage();
+    if (!dep.isEmpty()) {
+      throw new GradleException(dep);
     }
 
     Console.newline(1);
