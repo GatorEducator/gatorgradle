@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -132,9 +133,16 @@ public class CommandOutputSummary {
 
     String resultListJson = builder.toString();
 
+    log.info("Result JSON: {}", resultListJson);
+
     HttpURLConnection con = null;
     try {
-      URL url = new URL(GatorGradleConfig.get().getReportEndpoint());
+      String endpoint = GatorGradleConfig.get().getReportEndpoint();
+      if (endpoint == null || endpoint.isEmpty()) {
+        log.info("No report endpoint specified, not uploading results.");
+        return;
+      }
+      URL url = new URL(endpoint);
       con = (HttpURLConnection) url.openConnection();
       con.setRequestMethod("POST");
       con.setRequestProperty("Content-Type", "application/json; utf-8");
@@ -160,6 +168,8 @@ public class CommandOutputSummary {
         log.info("Got data upload response: {}", response.toString());
       }
       
+    } catch (MalformedURLException ex) {
+      log.error("Failed to upload data; report endpoint specified in configuration is malformed.");
     } catch (IOException ex) {
       log.error("Exception while uploading check data: {}", ex.toString());
     } finally {
