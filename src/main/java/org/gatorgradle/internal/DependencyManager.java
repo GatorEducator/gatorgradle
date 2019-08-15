@@ -147,11 +147,13 @@ public class DependencyManager {
   private static boolean doGatorGraderMain() {
     Path workingDir = Paths.get(GatorGradlePlugin.GATORGRADER_HOME);
 
-    // quick git pull installation
+    // quick git fetch installation
     BasicCommand updateOrInstall = new BasicCommand();
     updateOrInstall.outputToSysOut(true).setWorkingDir(workingDir.toFile());
     if (Files.exists(Paths.get(GatorGradlePlugin.GATORGRADER_HOME))) {
-      updateOrInstall.with("git", "pull");
+      // This could be problematic -- will fetch all current development branches
+      // as well, but needed if `version` is pointing to a non-local branch or tag
+      updateOrInstall.with("git", "fetch", "--all");
       Console.log("Updating GatorGrader...");
     } else {
       // make dirs
@@ -167,25 +169,26 @@ public class DependencyManager {
 
     updateOrInstall.run();
     if (updateOrInstall.exitValue() != Command.SUCCESS) {
-      error("GatorGrader management failed!", updateOrInstall);
-      return false;
-    }
-    
-    BasicCommand checkout = new BasicCommand("git", "checkout", "master");
-    checkout.setWorkingDir(workingDir.toFile());
-    checkout.run();
-    if (checkout.exitValue() != Command.SUCCESS) {
-      error("GatorGrader management failed, could not checkout to 'master'!", checkout);
+      error("GatorGrader management failed, could not get updated code!", updateOrInstall);
       return false;
     }
 
     String revision = GatorGradleConfig.get().getGatorGraderRevision();
     Console.log("Checking out to '" + revision + "'");
-    checkout = new BasicCommand("git", "checkout", revision);
+    BasicCommand checkout = new BasicCommand("git", "checkout", revision);
     checkout.setWorkingDir(workingDir.toFile());
     checkout.run();
     if (checkout.exitValue() != Command.SUCCESS) {
       error("GatorGrader management failed, could not checkout to '" + revision + "'!", checkout);
+      return false;
+    }
+
+    checkout = new BasicCommand("git", "pull");
+    checkout.setWorkingDir(workingDir.toFile());
+    checkout.outputToSysOut(false);
+    checkout.run();
+    if (checkout.exitValue() != Command.SUCCESS && !checkout.getOutput().contains("You are not currently on a branch")) {
+      error("GatorGrader management failed, could update '" + revision + "'!", checkout);
       return false;
     }
 
