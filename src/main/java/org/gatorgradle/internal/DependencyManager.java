@@ -187,7 +187,8 @@ public class DependencyManager {
     checkout.setWorkingDir(workingDir.toFile());
     checkout.outputToSysOut(false);
     checkout.run();
-    if (checkout.exitValue() != Command.SUCCESS && !checkout.getOutput().contains("You are not currently on a branch")) {
+    if (checkout.exitValue() != Command.SUCCESS
+        && !checkout.getOutput().contains("You are not currently on a branch")) {
       error("GatorGrader management failed, could update '" + revision + "'!", checkout);
       return false;
     }
