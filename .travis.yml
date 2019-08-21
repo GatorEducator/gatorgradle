@@ -10,12 +10,12 @@ before_install:
   # Install the Markdown linting tool called mdl
   - gem install mdl
   # Download the Gradle bin zip file
-  - wget https://services.gradle.org/distributions/gradle-4.9-bin.zip
-  - unzip -d $HOME gradle-4.9-bin.zip
+  - wget https://services.gradle.org/distributions/gradle-5.4.1-bin.zip
+  - unzip -d $HOME gradle-5.4.1-bin.zip
   # Delete the downloaded zip file; probably don't need this but just to be sure
-  - rm -rf gradle-4.9-bin.zip
+  - rm -rf gradle-5.4.1-bin.zip
   # Add gradle bin to path at the beginning to ensure it overwrites old gradle
-  - export PATH="$HOME/gradle-4.9/bin:$PATH"
+  - export PATH="$HOME/gradle-5.4.1/bin:$PATH"
 
 # Step: Delete old files
 before_cache:
