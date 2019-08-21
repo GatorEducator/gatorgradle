@@ -92,9 +92,6 @@ public class GatorGradleTask extends DefaultTask {
    */
   @TaskAction
   public void grade() {
-    
-    // parse config before dependencies managed
-    config.parse();
 
     // ensure GatorGrader and dependencies are installed
     for (Dependency dep : Dependency.values()) {
@@ -102,6 +99,9 @@ public class GatorGradleTask extends DefaultTask {
         throw new GradleException(dep.name() + " not installed!");
       }
     }
+    
+    config.parse();
+
 
     // get a progress logger
     ProgressLoggerWrapper progLog =
