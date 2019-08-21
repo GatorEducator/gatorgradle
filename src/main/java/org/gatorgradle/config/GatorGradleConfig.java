@@ -152,9 +152,9 @@ public class GatorGradleConfig implements Iterable<Command> {
   }
 
   /**
-   * Parses the config file.
+   * Parses the config file's header.
    */
-  public void parse() {
+  public void parseHeader() {
     file.parse();
     assignmentName = file.getHeader("name").asString();
 
@@ -179,9 +179,23 @@ public class GatorGradleConfig implements Iterable<Command> {
       lst.replaceAll(String::trim);
       commandLineExecutables.addAll(lst);
     }
+  }
+
+  /**
+   * Parses the config file's body.
+   */
+  public void parseBody() {
 
     file.getPaths().forEach(
         path -> file.getChecks(path).forEach(val -> with(makeCommand(path, val.asString()))));
+  }
+
+  /**
+   * Parse the entire configuration file.
+   */
+  public void parse() {
+    parseHeader();
+    parseBody();
   }
 
   /**
