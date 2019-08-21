@@ -4,7 +4,8 @@ GatorGradle integrates [GatorGrader](https://github.com/GatorEducator/gatorgrade
 into a Gradle project.
 
 [![Build Status](https://travis-ci.org/GatorEducator/gatorgradle.svg?branch=master)](https://travis-ci.org/GatorEducator/gatorgradle)
-[![javadocs](https://gatoreducator.github.io/gatorgradle/docs/docs-status-badge.svg)](https://gatoreducator.github.io/gatorgradle/docs)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/8267c156c2874fc39f89effbdfdb8f5b)](https://app.codacy.com/app/GatorEducator/gatorgradle?utm_source=github.com&utm_medium=referral&utm_content=GatorEducator/gatorgradle&utm_campaign=Badge_Grade_Dashboard)
+[![Javadocs](https://gatoreducator.github.io/gatorgradle/docs/docs-status-badge.svg)](https://gatoreducator.github.io/gatorgradle/docs)
 
 ## Running Checks
 
@@ -123,7 +124,7 @@ of the grading.
 Including GatorGradle in your project is simple. If no extra configuration is
 required, simply insert the following code block at the beginning of your
 `build.gradle` to use version `0.3.4`. Find out what version is current by
-visiting the [gradle plugin portal](https://plugins.gradle.org/plugin/org.gatored.gatorgradle).
+visiting the [Gradle Plugin Portal](https://plugins.gradle.org/plugin/org.gatored.gatorgradle).
 Other configuration and installation information is also available there,
 including a different script that will always use the most recent version!
 
@@ -158,3 +159,24 @@ buildscript{
 apply plugin: 'org.gatored.gatorgradle'
 
 ```
+
+#### Publishing
+
+First, log into the Gradle Plugin Portal with `gradle login`; this will add your
+publishing key and secret in the following format to `~/.gradle/gradle.properties`:
+
+```text
+#Updated secret and key with server message: Generated key 'walle' for 'michionlion'
+#Tue, 20 Aug 2019 20:40:22 -0400
+
+gradle.publish.key=<key>
+gradle.publish.secret=<secret>
+```
+
+You'll need to request the key and secret from the maintainer if you are not
+publishing to your own account. Next, ensure that the project is entirely built
+and tested with `gradle clean build check`, and then execute `gradle publishPlugins`
+to publish the plugin to the [Gradle Plugin Portal](https://plugins.gradle.org/plugin/org.gatored.gatorgradle).
+Finally, publish the Javadocs by running `gradle publishJavadocs`. Throughout this
+entire process, ensure you have no unstaged changes and the remote repository
+is completely identical to the one your are publishing from your local machine.
