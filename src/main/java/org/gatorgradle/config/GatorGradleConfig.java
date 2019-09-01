@@ -67,6 +67,7 @@ public class GatorGradleConfig implements Iterable<Command> {
   private String assignmentName = "this assignment";
   private String gatorgraderRevision = "master";
   private Collection<String> commandLineExecutables;
+  private Command startupCommand = null;
   private Set<Command> gradingCommands;
   private ConfigMap file;
 
@@ -209,6 +210,10 @@ public class GatorGradleConfig implements Iterable<Command> {
       lst.replaceAll(String::trim);
       commandLineExecutables.addAll(lst);
     }
+
+    if (file.hasHeader("startup")) {
+      startup = makeCommand(null, file.getHeader("startup"), true);
+    }
   }
 
   /**
@@ -268,6 +273,14 @@ public class GatorGradleConfig implements Iterable<Command> {
 
   public String getGatorGraderRevision() {
     return gatorgraderRevision;
+  }
+
+  public Command hasStartupCommand() {
+    return startupCommand != null;
+  }
+
+  public Command getStartupCommand() {
+    return startupCommand;
   }
 
   public boolean isCommandLineExecutable(String exec) {
