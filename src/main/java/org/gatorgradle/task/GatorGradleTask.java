@@ -102,6 +102,15 @@ public class GatorGradleTask extends DefaultTask {
       }
     }
 
+    if(config.hasStartupCommand()) {
+      Command startup = config.getStartupCommand();
+      startup.outputToSysOut(true);
+      startup.run();
+      if(startup.exitValue() != Command.SUCCESS) {
+        throw new GradleException("Startup command '" + startup + "' failed with exit code " + startup.exitValue() + "!");
+      }
+    }
+
     config.parseBody();
 
 
