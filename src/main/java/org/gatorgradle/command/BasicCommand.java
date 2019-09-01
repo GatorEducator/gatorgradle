@@ -161,7 +161,7 @@ public class BasicCommand implements Command {
   }
 
   /**
-   * Run the Command (execute provides better control, and should be called instead of run).
+   * Run the Command (run(true/false) provides better control, and should be called instead of this).
    *
    */
   public void run() {
