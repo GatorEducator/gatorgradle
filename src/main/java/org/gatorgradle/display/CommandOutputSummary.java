@@ -188,7 +188,7 @@ public class CommandOutputSummary {
       result = parseCommandLineExecutable(cmd, includeDiagnostic);
     } else {
       result = new CheckResult(
-          cmd.toString() + " passes",
+          cmd.toString() + " runs",
           cmd.exitValue() == cmd.SUCCESS,
           "No diagnostic available"
       );
