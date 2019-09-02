@@ -29,6 +29,19 @@ public class CheckResult {
   public static final Pattern DIAGNOSTIC_REGEX =
       Pattern.compile(".*\"diagnostic\":\\s*\"(.*?)\".*", Pattern.DOTALL);
 
+  public static final String INDENT = "  ";
+  public static final String CONTINUE_SYMBOL_RAW = "\u2503"; // vertical line (┃)
+  public static final String PASS_SYMBOL_RAW = "\u2714"; // heavy check (✔)
+  public static final String FAIL_SYMBOL_RAW = "\u2718"; // heavy cross (✘)
+  public static final String FIX_SYMBOL_RAW = "\u2794"; // right arrow (➔)
+
+  public static final String PASS_SYMBOL =
+      StringUtil.color(StringUtil.GOOD, PASS_SYMBOL_RAW);
+  public static final String FAIL_SYMBOL =
+      StringUtil.color(StringUtil.BAD, FAIL_SYMBOL_RAW);
+  public static final String FIX_SYMBOL =
+      StringUtil.color("\u001B[1;33m", FIX_SYMBOL_RAW);
+
   public String check;
   public Boolean outcome;
   public String diagnostic;
@@ -87,12 +100,6 @@ public class CheckResult {
     this.diagnostic = matcher.group(1);
   }
 
-  public static final String PASS_SYMBOL =
-      StringUtil.color(StringUtil.GOOD, "\u2714"); // heavy check (✔)
-  public static final String FAIL_SYMBOL =
-      StringUtil.color(StringUtil.BAD, "\u2718"); // heavy cross (✘)
-  public static final String FIX_SYMBOL =
-      StringUtil.color("\u001B[1;33m", "\u2794"); // right arrow (➔)
 
   /**
    * Returns a string representation of this result.
@@ -102,11 +109,14 @@ public class CheckResult {
    **/
   public String textReport(boolean includeDiagnostic) {
     if (outcome) {
-      return PASS_SYMBOL + "  " + check;
+      return PASS_SYMBOL + INDENT + check;
     } else {
-      String output = FAIL_SYMBOL + "  " + check;
+      String output = FAIL_SYMBOL + INDENT + check;
       if (includeDiagnostic) {
-        output += "\n   " + FIX_SYMBOL + "  " + StringUtil.color(StringUtil.FIX, diagnostic);
+        output += "\n " + INDENT + FIX_SYMBOL + INDENT + StringUtil.color(StringUtil.FIX,
+            diagnostic.trim().replaceAll("\\n", "\n")
+            .replaceAll("\n", "\n" + INDENT + INDENT + CONTINUE_SYMBOL_RAW + INDENT)
+        );
       }
       return output;
     }

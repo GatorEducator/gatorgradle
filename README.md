@@ -42,33 +42,56 @@ is given below.
 ```yaml
 # comments are possible by using `#`
 ---
-# the first block contains project configuration like the name,
+# Specify the name of this assignment, displayed in the output
 name: gatorgrader-samplelab
-# an option to break the build on failures,
-break: false
-# and the indentation to use for this file
+# Should we break the build if any checks fail?
+break: true
+# Should we break the build as soon as a single check fails?
+fastfail: false
+# Specify an indentation level in spaces to be used in this file
 indent: 4
+# Specify a reference to checkout to in GatorGrader
+version: v0.2.0
+# Specify 'executables' that can be run as checks
+executables: cat, bash
+# Specify a script or executable to run on startup
+startup: ./config/startup.sh
 ---
-# the second block consists of a tree-structure for file access,
-# with commands to run in a list below each path. Any commands
-# not inside a path will be run on their own, without the file.
+# Form paths with these tree-like structures: they will
+# be used to determine where and to what file a given check is tested against
 src/main:
     java:
         samplelab/SampleLabMain.java:
-            # These checks will all be run on the file
-            # src/main/java/samplelab/SampleLabMain.java
+            # Specify checks by simply writing arguments to GatorGrader
+            --exists
             --single 1 --language Java
             --multi 3 --language Java
-            --fragment "println(" --count 2 --exact
+            --fragment "println(" --count 2
             --fragment "new DataClass(" --count 1
-            --fragment "new Date(" --count 2
+            --regex "new\s+\S+?\(.*?\)" --count 2 --exact
         samplelab/DataClass.java:
+            --exists
             --multi 1 --language Java
+            --single 1 --language Java
             --fragment "int " --count 1
-writing/reflection.md:
-    mdl
-    --paragraphs 2
-    --words 6
+
+writing:
+    # A pure check is simply a call-out to the OS to run
+    # whatever program you desire; the working directory
+    # is set by the context (in this case, 'writing/')
+    (pure) ./writing-check.sh reflection.md param2
+    reflection.md:
+        # for checks that are 'executables', the context
+        # is given after the executable: this check results
+        # in executing 'mdl writing/reflection.md'
+        mdl
+        cat
+        --paragraphs 2
+        --words 6
+
+# Any checks outside of the tree structure will not have
+# a file or directory based context; if a directory is needed
+# it will be the base project directory
 --commits 18
 ```
 

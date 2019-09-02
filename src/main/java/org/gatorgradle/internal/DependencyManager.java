@@ -203,8 +203,6 @@ public class DependencyManager {
       return false;
     }
     Console.log("Finished!");
-
-    Console.newline(2);
     return true;
   }
 

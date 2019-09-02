@@ -66,8 +66,14 @@ public class BasicCommand implements Command {
     return output;
   }
 
+  /**
+   * Builds a descriptive string by recreating the command run.
+   * @return a descriptive string
+   */
   public String toString() {
-    return "\'" + String.join("\' \'", command) + "\'";
+    List<String> strs = new ArrayList<>(command);
+    strs.replaceAll(str -> str.matches("\\S+") ? str : "'" + str + "'");
+    return "[" + String.join(" ", strs) + "]";
   }
 
   public String executable() {
@@ -161,7 +167,7 @@ public class BasicCommand implements Command {
   }
 
   /**
-   * Run the Command (execute provides better control, and should be called instead of run).
+   * Execute the Command, blocking.
    *
    */
   public void run() {

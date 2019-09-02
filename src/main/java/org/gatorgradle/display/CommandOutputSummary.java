@@ -113,7 +113,7 @@ public class CommandOutputSummary {
     int passedChecks = completedCommands.size() - failed.size();
 
     StringUtil.border("Passed " + passedChecks + "/" + totalChecks + " ("
-            + ((int) Math.round((passedChecks * 100) / (float) totalChecks)) + "%)"
+            + (Math.round((passedChecks * 100) / (float) totalChecks)) + "%)"
             + " of checks for " + GatorGradleConfig.get().getAssignmentName() + "!",
         failedChecks ? "\u001B[1;31m" : "\u001B[1;32m",
         failedChecks ? "\u001B[1;35m" : "\u001B[1;32m", log);
@@ -161,7 +161,7 @@ public class CommandOutputSummary {
   private CheckResult parseCommandLineExecutable(BasicCommand cmd, boolean includeDiagnostic) {
     String output = cmd.getOutput();
     StringBuilder diagnostic = new StringBuilder();
-    if (output != null && !output.isEmpty() && includeDiagnostic) {
+    if (includeDiagnostic && output != null && !output.trim().isEmpty()) {
       Scanner scan = new Scanner(output);
       diagnostic.append(cmd.executable() + " diagnostics:\n");
       while (scan.hasNext()) {
@@ -175,7 +175,29 @@ public class CommandOutputSummary {
     }
     return new CheckResult(
         "The file " + cmd.last() + " passes " + cmd.executable(),
-        cmd.exitValue() == cmd.SUCCESS,
+        cmd.exitValue() == Command.SUCCESS,
+        diagnostic.toString().trim()
+    );
+  }
+
+  private CheckResult parsePureCommandOutput(BasicCommand cmd, boolean includeDiagnostic) {
+    String output = cmd.getOutput();
+    StringBuilder diagnostic = new StringBuilder();
+    if (includeDiagnostic && output != null && !output.trim().isEmpty()) {
+      Scanner scan = new Scanner(output);
+      diagnostic.append(cmd + " printed:\n");
+      while (scan.hasNext()) {
+        String line = scan.nextLine().trim();
+        if (!line.isEmpty()) {
+          diagnostic.append(line).append("\n");
+        }
+      }
+    } else {
+      diagnostic.append("No diagnostic available");
+    }
+    return new CheckResult(
+        cmd.toString() + " executes",
+        cmd.exitValue() == Command.SUCCESS,
         diagnostic.toString().trim()
     );
   }
@@ -187,11 +209,7 @@ public class CommandOutputSummary {
     } else if (GatorGradleConfig.get().isCommandLineExecutable(cmd.executable())) {
       result = parseCommandLineExecutable(cmd, includeDiagnostic);
     } else {
-      result = new CheckResult(
-          cmd.toString() + " passes",
-          cmd.exitValue() == cmd.SUCCESS,
-          "No diagnostic available"
-      );
+      result = parsePureCommandOutput(cmd, includeDiagnostic);
     }
 
     return result.textReport(includeDiagnostic);

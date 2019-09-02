@@ -60,12 +60,14 @@ public class GatorGradleConfig implements Iterable<Command> {
   }
 
   private static final Pattern commandPattern = Pattern.compile("([^\"]\\S*|\".+?\")\\s*");
+  private static final String pureIndicator = "(pure)";
 
   private boolean breakBuild = false;
   private boolean fastBreakBuild = false;
   private String assignmentName = "this assignment";
   private String gatorgraderRevision = "master";
   private Collection<String> commandLineExecutables;
+  private Command startupCommand = null;
   private Set<Command> gradingCommands;
   private ConfigMap file;
 
@@ -107,12 +109,27 @@ public class GatorGradleConfig implements Iterable<Command> {
   /**
    * Utility method to convert a line of text to a Command.
    *
+   * @param  path the path in the config file this line is in the context of
    * @param  line a line to parse
    * @return      a command
    */
   private Command makeCommand(String path, String line) {
-    // need to deal with adding checkfiles and directories associated with path
+    return makeCommand(path, line, false);
+  }
 
+  /**
+   * Utility method to convert a line of text to a Command.
+   *
+   * @param  path the path in the config file this line is in the context of
+   * @param  line a line to parse
+   * @param  pure this command is a pure command (pass directly to shell)
+   * @return      a command
+   */
+  private Command makeCommand(String path, String line, boolean pure) {
+    // need to deal with adding checkfiles and directories associated with path
+    if (path == null) {
+      path = "";
+    }
     List<String> splits = new ArrayList<>();
     Matcher mtc = commandPattern.matcher(line);
     while (mtc.find()) {
@@ -129,7 +146,23 @@ public class GatorGradleConfig implements Iterable<Command> {
       dir = path.substring(0, sep);
     }
     BasicCommand cmd;
-    if (commandLineExecutables.contains(splits.get(0))) {
+    if (pureIndicator.equals(splits.get(0)) || pure) {
+      if (pureIndicator.equals(splits.get(0))) {
+        splits.remove(0);
+      }
+      cmd = new BasicCommand();
+      cmd.outputToSysOut(false);
+      if (path.length() > 0) {
+        File workDir = new File(path);
+        if (!workDir.isDirectory()) {
+          throw new GradleException(
+              "Pure command '" + line + "' inside path '"
+              + path + "' must be in a directory context"
+          );
+        }
+        cmd.setWorkingDir(workDir);
+      }
+    } else if (commandLineExecutables.contains(splits.get(0))) {
       cmd = new BasicCommand();
       cmd.outputToSysOut(false);
       splits.add(path.length() > 0 ? path : ".");
@@ -178,6 +211,10 @@ public class GatorGradleConfig implements Iterable<Command> {
       List<String> lst = Arrays.asList(file.getHeader("executables").asString().split(","));
       lst.replaceAll(String::trim);
       commandLineExecutables.addAll(lst);
+    }
+
+    if (file.hasHeader("startup")) {
+      startupCommand = makeCommand(null, file.getHeader("startup").asString(), true);
     }
   }
 
@@ -238,6 +275,14 @@ public class GatorGradleConfig implements Iterable<Command> {
 
   public String getGatorGraderRevision() {
     return gatorgraderRevision;
+  }
+
+  public boolean hasStartupCommand() {
+    return startupCommand != null;
+  }
+
+  public Command getStartupCommand() {
+    return startupCommand;
   }
 
   public boolean isCommandLineExecutable(String exec) {
