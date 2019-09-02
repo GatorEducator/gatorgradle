@@ -114,7 +114,7 @@ public class GatorGradleConfig implements Iterable<Command> {
    * @return      a command
    */
   private Command makeCommand(String path, String line) {
-    makeCommand(path, line, false);
+    return makeCommand(path, line, false);
   }
 
   /**
@@ -147,17 +147,20 @@ public class GatorGradleConfig implements Iterable<Command> {
     }
     BasicCommand cmd;
     if (pureIndicator.equals(splits.get(0)) || pure) {
-      if(pureIndicator.equals(splits.get(0))) {
+      if (pureIndicator.equals(splits.get(0))) {
         splits.remove(0);
       }
       cmd = new BasicCommand();
       cmd.outputToSysOut(false);
-      if(path.length() > 0) {
-        File dir = new File(path);
-        if(!dir.isDirectory()) {
-          throw new GradleException("Pure command '" + line + "' inside path '" + path + "' must be in a directory context");
+      if (path.length() > 0) {
+        File workDir = new File(path);
+        if (!workDir.isDirectory()) {
+          throw new GradleException(
+              "Pure command '" + line + "' inside path '"
+              + path + "' must be in a directory context"
+          );
         }
-        cmd.setWorkingDir(dir);
+        cmd.setWorkingDir(workDir);
       }
       cmd.with(splits);
     } else if (commandLineExecutables.contains(splits.get(0))) {
@@ -212,7 +215,7 @@ public class GatorGradleConfig implements Iterable<Command> {
     }
 
     if (file.hasHeader("startup")) {
-      startup = makeCommand(null, file.getHeader("startup"), true);
+      startupCommand = makeCommand(null, file.getHeader("startup").asString(), true);
     }
   }
 
@@ -275,7 +278,7 @@ public class GatorGradleConfig implements Iterable<Command> {
     return gatorgraderRevision;
   }
 
-  public Command hasStartupCommand() {
+  public boolean hasStartupCommand() {
     return startupCommand != null;
   }
 
