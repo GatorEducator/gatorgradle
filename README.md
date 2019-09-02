@@ -42,17 +42,27 @@ is given below.
 ```yaml
 # comments are possible by using `#`
 ---
+# Specify the name of this assignment, displayed in the output
 name: gatorgrader-samplelab
+# Should we break the build if any checks fail?
 break: true
+# Should we break the build as soon as a single check fails?
 fastfail: false
+# Specify an indentation level in spaces to be used in this file
 indent: 4
+# Specify a reference to checkout to in GatorGrader
 version: v0.2.0
+# Specify 'executables' that can be run as checks
 executables: cat, bash
+# Specify a script or executable to run on startup
 startup: ./config/startup.sh
 ---
+# Form paths with these tree-like structures: they will
+# be used to determine where and to what file a given check is tested against
 src/main:
     java:
         samplelab/SampleLabMain.java:
+            # Specify checks by simply writing arguments to GatorGrader
             --exists
             --single 1 --language Java
             --multi 3 --language Java
@@ -64,14 +74,24 @@ src/main:
             --multi 1 --language Java
             --single 1 --language Java
             --fragment "int " --count 1
+
 writing:
+    # A pure check is simply a call-out to the OS to run
+    # whatever program you desire; the working directory
+    # is set by the context (in this case, 'writing/')
     (pure) ./writing-check.sh reflection.md param2
     reflection.md:
+        # for checks that are 'executables', the context
+        # is given after the executable: this check results
+        # in executing 'mdl writing/reflection.md'
         mdl
         cat
         --paragraphs 2
         --words 6
 
+# Any checks outside of the tree structure will not have
+# a file or directory based context; if a directory is needed
+# it will be the base project directory
 --commits 18
 ```
 
