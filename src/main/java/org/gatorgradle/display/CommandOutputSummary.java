@@ -196,7 +196,7 @@ public class CommandOutputSummary {
       diagnostic.append("No diagnostic available");
     }
     return new CheckResult(
-        cmd.toString() + " runs",
+        cmd.toString() + " executes",
         cmd.exitValue() == Command.SUCCESS,
         diagnostic.toString().trim()
     );
