@@ -102,7 +102,10 @@ public class GatorGradleTask extends DefaultTask {
       }
     }
 
+    Console.newline(1);
+
     if (config.hasStartupCommand()) {
+      Console.log("Starting up...");
       BasicCommand startup = (BasicCommand) config.getStartupCommand();
       startup.outputToSysOut(true);
       startup.run();
@@ -112,7 +115,10 @@ public class GatorGradleTask extends DefaultTask {
             + startup.exitValue() + "!"
         );
       }
+      Console.log("Ready!");
     }
+
+    Console.newline(2);
 
     config.parseBody();
 
