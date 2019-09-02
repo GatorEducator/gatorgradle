@@ -1,6 +1,10 @@
 # use Java
 language: Java
 
+env:
+  global:
+    - secure: 0oFcUaPtLQy3KbDtr1mqT1FJixs0yjpHcK8T3LZQ0AENOtFjeaFKDf5JxqFmWL2NFAaB3Wd0tGdDMFRK114K1H8UYQUhKidViv+sNREFGpg32gpVTV8qC4R9IkPytQLyPwmGc+xXwQ+n7X7s2Bgnmga9LbNLWutOfwiw7n2+BPlcQvEfk/XXSJndVxEi0LQJXewuUpNhgpL3tRC99blqEn3UX+2ucb+vJ9DQSGCBLhKlefgbvc6GvXuK1sxAnBadEET8VkXesU8GUibJ3lh8EwZP5mg/MhfQHDRYMkKxlCcRplfAv5ZrwQ0SmipsPw8TKMk7a9EtYG11DdUl5RjBboy0uRThOkA1sWkJhLy+LeQsFRCkxkkl6r4sA3g2fF/9FD6OKHmxXy37nzAyvrGouec2eI0cwGMMeRrAYQEPUaDr/Sk33swWKSY5VSJZIFFvO8Phza3FelumM7UsgRkkpsUy7CfbG3Xsv5lyN9a3zsM+BBzu0iVf0eyiVSo8gQVgVVpNfhJU9+nK23KMQe5dPs2f9sHHdv3xai22bEO9oNqURmOuQD3eqCU/uJvBFDFDZ0D08zLAUk3wyRIeih9VWo4ngX0KxwFkFsN3PE9uQjTaOKn8Haw/umIs9ynZEDX/I7CtR9uHeUgee7PcSQuuhlYSV1dv66ZiFRuosrOsss=
+
 # LATER: install junit?
 # Step 1: install mdl for checking Markdown
 # Step 2: ensure the use of the latest version of gradle
@@ -36,3 +40,16 @@ script:
   - gradle build
   # other linting
   - mdl README.md
+
+after_success:
+  - wget https://github.com/Michionlion/pr-tag-release/releases/latest/download/pr_tag_release.sh &&
+    source pr_tag_release.sh
+
+# deploy to GitHub Releases on PR merge
+deploy:
+  provider: releases
+  api_key: "$GITHUB_OAUTH_TOKEN"
+  skip_cleanup: true
+  on:
+    branch: master
+    condition: $DO_GITHUB_RELEASE = true
