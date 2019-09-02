@@ -72,7 +72,7 @@ public class BasicCommand implements Command {
    */
   public String toString() {
     List<String> strs = new ArrayList<>(command);
-    strs.replaceAll(str -> str.matches("\\S+") ? "'" + str + "'" : str);
+    strs.replaceAll(str -> str.matches("\\S+") ? str : "'" + str + "'");
     return "[" + String.join(" ", strs) + "]";
   }
 
