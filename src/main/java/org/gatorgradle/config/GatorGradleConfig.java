@@ -162,7 +162,6 @@ public class GatorGradleConfig implements Iterable<Command> {
         }
         cmd.setWorkingDir(workDir);
       }
-      cmd.with(splits);
     } else if (commandLineExecutables.contains(splits.get(0))) {
       cmd = new BasicCommand();
       cmd.outputToSysOut(false);
