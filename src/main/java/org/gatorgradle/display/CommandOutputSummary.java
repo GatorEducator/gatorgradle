@@ -117,10 +117,10 @@ public class CommandOutputSummary {
     builder.append("{");
 
     String userEmail = "unknown";
-    BasicCommand getGitUser = new BasicCommand("git", "config", "-global", "user.email");
+    BasicCommand getGitUser = new BasicCommand("git", "config", "--global", "user.email");
     getGitUser.run();
-    if (getGitUser.exitValue() != Command.SUCCESS) {
-      userEmail = getGitUser.getOutput();
+    if (getGitUser.exitValue() == Command.SUCCESS) {
+      userEmail = getGitUser.getOutput().trim();
     }
 
     builder.append("\"user\":");
@@ -152,7 +152,6 @@ public class CommandOutputSummary {
     );
     builder.append("]").append("}");
     // end report
-
 
     builder.append("}");
 
@@ -285,9 +284,7 @@ public class CommandOutputSummary {
         }
       }
     } else {
-      diagnostic.append("No diagnostic available; '");
-      diagnostic.append(cmd.executable());
-      diagnostic.append("' may not be installed");
+      diagnostic.append("No diagnostic available");
     }
     return new CheckResult(
         cmd,
