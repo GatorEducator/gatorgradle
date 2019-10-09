@@ -50,9 +50,9 @@ public class CommandOutputSummary {
    * @param completedCommands the commands to build a summary of
    * @param log the Logger to use
    */
-  public CommandOutputSummary(List<Command> completedCommands, Logger log) {
+  public CommandOutputSummary(List<BasicCommand> completedCommands, Logger log) {
     this.completedChecks = completedCommands.stream()
-                           .map(cmd -> parseCommandOutput(cmd))
+                           .map(cmd -> parseCommandOutput(cmd, false))
                            .collect(Collectors.toList());
     this.log = log;
   }
@@ -63,7 +63,7 @@ public class CommandOutputSummary {
    * @param cmd the command to add
    */
   public void addCompletedCommand(Command cmd) {
-    CheckResult result = parseCommandOutput(cmd);
+    CheckResult result = parseCommandOutput((BasicCommand)cmd, false);
     if (!completedChecks.contains(result)) {
       completedChecks.add(result);
       showInProgressSummary(result);
@@ -119,7 +119,7 @@ public class CommandOutputSummary {
     String userEmail = "unknown";
     BasicCommand getGitUser = new BasicCommand("git", "config", "-global", "user.email");
     getGitUser.run();
-    if(getGitUser.exitValue() != Command.SUCCESS) {
+    if (getGitUser.exitValue() != Command.SUCCESS) {
       userEmail = getGitUser.getOutput();
     }
 
@@ -182,7 +182,7 @@ public class CommandOutputSummary {
         os.write(input, 0, input.length);
       }
 
-      // get response  
+      // get response
       try (BufferedReader br = new BufferedReader(
           new InputStreamReader(con.getInputStream(), "utf-8"))) {
         StringBuilder response = new StringBuilder();
@@ -192,7 +192,7 @@ public class CommandOutputSummary {
         }
         log.info("Got data upload response: {}", response.toString());
       }
-      
+
     } catch (MalformedURLException ex) {
       log.error("Failed to upload data; report endpoint specified in configuration is malformed.");
     } catch (IOException ex) {
@@ -313,6 +313,7 @@ public class CommandOutputSummary {
       diagnostic.append("No diagnostic available");
     }
     return new CheckResult(
+        cmd,
         cmd.toString() + " executes",
         cmd.exitValue() == Command.SUCCESS,
         diagnostic.toString().trim()
@@ -324,7 +325,7 @@ public class CommandOutputSummary {
     if (cmd instanceof GatorGraderCommand) {
       result = parseGatorGraderCommand((GatorGraderCommand) cmd, includeDiagnostic);
     } else if (GatorGradleConfig.get().isCommandLineExecutable(cmd.executable())) {
-      result = parseExecutableCommand(cmd, includeDiagnostic);
+      result = parseCommandLineExecutable(cmd, includeDiagnostic);
     } else {
       result = parsePureCommandOutput(cmd, includeDiagnostic);
     }
