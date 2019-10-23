@@ -1,13 +1,8 @@
 package org.gatorgradle.display;
 
-import java.util.Locale;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.gatorgradle.util.Console;
 import org.gatorgradle.util.StringUtil;
 
 public class CheckResult {
