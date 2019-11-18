@@ -176,5 +176,15 @@ public class GatorGradleTask extends DefaultTask {
     progLog.completed();
 
     summary.showOutputSummary();
+    // summary.uploadOutputSummary(summary.getFailed(), summary.getCompletedchecks());
+  }
+
+
+  /**
+   * Upload the OutputSummary
+   */
+  @TaskAction
+  public void report() {
+    summary.uploadOutputSummary(summary.getFailed(), summary.getCompletedchecks());
   }
 }
