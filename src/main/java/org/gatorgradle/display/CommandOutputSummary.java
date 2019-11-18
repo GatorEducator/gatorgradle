@@ -241,12 +241,17 @@ public class CommandOutputSummary {
     }
   }
 
-
+  /**
+   * Return the completed checks.
+   */
   public List<CheckResult> getCompletedchecks() {
     return completedChecks;
   }
 
 
+  /**
+   * Return the failed checks.
+   */
   public List<CheckResult> getFailed() {
     List<CheckResult> failed = completedChecks.stream()
                                .filter(result -> result.outcome == false)
