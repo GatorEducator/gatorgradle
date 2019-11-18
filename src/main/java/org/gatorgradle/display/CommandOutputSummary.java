@@ -198,6 +198,7 @@ public class CommandOutputSummary {
       log.error("Failed to upload data; report endpoint specified in configuration is malformed.");
     } catch (IOException ex) {
       log.error("Exception while uploading check data: {}", ex.toString());
+      log.error("-!!!!!!!!!!!!!{}", resultListJson);
     } finally {
       if (con != null) {
         con.disconnect();
@@ -231,13 +232,28 @@ public class CommandOutputSummary {
         isFailure ? "\u001B[1;31m" : "\u001B[1;32m",
         isFailure ? "\u001B[1;35m" : "\u001B[1;32m", log);
 
-    uploadOutputSummary(failed, completedChecks);
+    // Comment out here, for this step is used directly in the report Task
+    // uploadOutputSummary(failed, completedChecks);
 
     if (isFailure && GatorGradleConfig.get().shouldBreakBuild()) {
       throw new GradleException(
           StringUtil.color(StringUtil.BAD, "Grading checks failed -- scroll up for failures"));
     }
   }
+
+
+  public List<CheckResult> getCompletedchecks() {
+    return completedChecks;
+  }
+
+
+  public List<CheckResult> getFailed() {
+    List<CheckResult> failed = completedChecks.stream()
+                               .filter(result -> result.outcome == false)
+                               .collect(Collectors.toList());
+    return failed;
+  }
+
 
   private CheckResult parseGatorGraderCommand(GatorGraderCommand cmd, boolean includeDiagnostic) {
     CheckResult result = null;
