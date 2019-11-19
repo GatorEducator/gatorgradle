@@ -35,10 +35,10 @@ import org.gradle.workers.WorkerExecutor;
 
 public class GatorGradleTask extends DefaultTask {
   // The executor to use to execute the grading
-  private final WorkerExecutor executor;
+  protected final WorkerExecutor executor;
 
-  private GatorGradleConfig config;
-  private File workingDir;
+  protected GatorGradleConfig config;
+  protected File workingDir;
 
   @Inject
   public GatorGradleTask(WorkerExecutor executor) {
@@ -65,15 +65,15 @@ public class GatorGradleTask extends DefaultTask {
 
   // because of Java serialization limitations, along with
   // how gradle implements logging, these must be static
-  private static int totalTasks;
-  private static CommandOutputSummary summary;
+  protected static int totalTasks;
+  protected static CommandOutputSummary summary;
 
   /**
    * Static handler to call when a subtask completes.
    *
    * @param complete the command that was run
    */
-  private static synchronized void completedTask(Command complete) {
+  protected static synchronized void completedTask(Command complete) {
     summary.addCompletedCommand(complete);
     // Console.log("FINISHED " + complete.toString());
 
@@ -81,110 +81,10 @@ public class GatorGradleTask extends DefaultTask {
     // throw new GradleException(this);
   }
 
-  private static synchronized void initTasks(int total, Logger logger) {
+  protected static synchronized void initTasks(int total, Logger logger) {
     totalTasks = total;
     summary = new CommandOutputSummary(logger);
   }
 
-  /**
-   * Execute the grading checks assigned to this GatorGradleTask.
-   */
-  @TaskAction
-  public void grade() {
 
-    config.parseHeader();
-
-    // ensure GatorGrader and dependencies are installed
-    String dep = DependencyManager.manage();
-    if (!dep.isEmpty()) {
-      throw new GradleException(dep);
-    }
-
-    Console.newline(1);
-
-    if (config.hasStartupCommand()) {
-      Console.log("Starting up...");
-      BasicCommand startup = (BasicCommand) config.getStartupCommand();
-      startup.outputToSysOut(true);
-      startup.run();
-      if (startup.exitValue() != Command.SUCCESS) {
-        throw new GradleException(
-            "Startup command '" + startup + "' failed with exit code "
-            + startup.exitValue() + "!"
-        );
-      }
-      Console.log("Ready!");
-    }
-
-    Console.newline(2);
-
-    config.parseBody();
-
-
-    // get a progress logger
-    ProgressLoggerWrapper progLog =
-        new ProgressLoggerWrapper(super.getProject(), config.getAssignmentName());
-
-    // start task submission
-    progLog.started();
-    initTasks(config.size(), this.getLogger());
-
-    if (totalTasks > 0) {
-      // submit commands to executor
-      for (Command cmd : config) {
-        // configure command
-        cmd.setCallback((Command.Callback) GatorGradleTask::completedTask);
-        if (cmd.getWorkingDir() == null) {
-          cmd.setWorkingDir(workingDir);
-        }
-
-        // configure command executor
-        executor.submit(CommandExecutor.class, (conf) -> {
-          conf.setIsolationMode(IsolationMode.NONE);
-          conf.setDisplayName(cmd.toString());
-          conf.setParams(cmd);
-        });
-      }
-
-      int percentComplete = 0;
-      while (percentComplete < 100) {
-        percentComplete = (summary.getNumCompletedTasks() * 100) / totalTasks;
-        progLog.progress("Finished " + summary.getNumCompletedTasks() + " / " + totalTasks
-            + " checks  >  " + percentComplete + "% complete!");
-        try {
-          Thread.sleep(100);
-        } catch (InterruptedException ex) {
-          Console.error("Failed to sleep");
-        }
-      }
-
-      // make sure tasks have ended
-      executor.await();
-
-      // this is impossible now because of the for loop above, FIXME
-      if (summary.getNumCompletedTasks() != totalTasks) {
-        // silent failure somewhere, break the build
-        throw new GradleException("Silent failure in task execution! Only completed "
-            + summary.getNumCompletedTasks() + " tasks but should have completed " + totalTasks);
-      }
-    }
-
-    progLog.progress("Finished " + summary.getNumCompletedTasks() + " / " + totalTasks
-        + " checks  >  100% complete!  >  Compiling Report...");
-
-    // complete task submission
-    progLog.completed();
-
-    summary.showOutputSummary();
-    // summary.uploadOutputSummary(summary.getFailed(), summary.getCompletedchecks());
-  }
-
-
-  /**
-   * Upload the OutputSummary
-   */
-  @TaskAction
-  public void report() {
-    summary.uploadOutputSummary(summary.getFailed(), summary.getCompletedchecks());
-  }
 }
