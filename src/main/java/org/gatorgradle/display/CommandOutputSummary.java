@@ -134,6 +134,12 @@ public class CommandOutputSummary {
     builder.append("\"").append(GatorGradleConfig.get().getAssignmentName());
     builder.append("\"").append(",");
 
+    // reflection
+    builder.append("\"reflection\":");
+    builder.append("\"").append(GatorGradleConfig.get().getReflection());
+    builder.append("\"").append(",");
+    // end reflection
+
     // report
     builder.append("\"report\":{");
 
