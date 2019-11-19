@@ -67,6 +67,7 @@ public class GatorGradleConfig implements Iterable<Command> {
   private String assignmentName = "this assignment";
   private String gatorgraderRevision = "master";
   private String reportEndpoint = null;
+  private String reflection = null;
   private Collection<String> commandLineExecutables;
   private Command startupCommand = null;
   private Set<Command> gradingCommands;
@@ -185,6 +186,27 @@ public class GatorGradleConfig implements Iterable<Command> {
     return cmd;
   }
 
+  private String readFile(String fileName) throws IOException {
+    BufferedReader br = new BufferedReader(new FileReader(fileName));
+    try {
+        StringBuilder sb = new StringBuilder();
+        String line = br.readLine();
+
+        while (line != null) {
+            sb.append(line);
+            sb.append("\n");
+            line = br.readLine();
+        }
+        return sb.toString();
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }finally {
+      br.close();
+    }
+}
+
   /**
    * Parses the config file's header.
    */
@@ -214,6 +236,10 @@ public class GatorGradleConfig implements Iterable<Command> {
       reportEndpoint = file.getHeader("report").asString();
     } else if (file.hasHeader("lambda")) {
       reportEndpoint = file.getHeader("lambda").asString();
+    }
+
+    if (file.hasHeader("reflection")) {
+      reflection = readFile(file.getHeader("reflection").asString());
     }
 
     if (file.hasHeader("executables")) {
@@ -296,6 +322,10 @@ public class GatorGradleConfig implements Iterable<Command> {
 
   public String getReportEndpoint() {
     return reportEndpoint;
+  }
+
+  public String getReflection() {
+    return reflection;
   }
 
   public boolean isCommandLineExecutable(String exec) {
