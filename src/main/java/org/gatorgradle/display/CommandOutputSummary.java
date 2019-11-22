@@ -188,6 +188,7 @@ public class CommandOutputSummary {
       try (OutputStream os = con.getOutputStream()) {
         byte[] input = resultListJson.getBytes(StandardCharsets.UTF_8);
         os.write(input, 0, input.length);
+        log.info("Compiled JSON to send:{}", resultListJson);
       }
 
       // get response
@@ -205,7 +206,6 @@ public class CommandOutputSummary {
       log.error("Failed to upload data; report endpoint specified in configuration is malformed.");
     } catch (IOException ex) {
       log.error("Exception while uploading check data: {}", ex.toString());
-      log.error("-!!!!!!!!!!!!!{}", resultListJson);
     } finally {
       if (con != null) {
         con.disconnect();
