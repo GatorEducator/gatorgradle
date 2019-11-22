@@ -15,10 +15,6 @@ import org.gradle.workers.WorkerExecutor;
 
 public class GatorGradleReportTask extends GatorGradleTask {
 
-  @Inject
-  public GatorGradleReportTask(WorkerExecutor executor) {
-    this.executor = executor;
-  }
 
   /**
    * Execute the grading checks assigned to this GatorGradleReportTask.
