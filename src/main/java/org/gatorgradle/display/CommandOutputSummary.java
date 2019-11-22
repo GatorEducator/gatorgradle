@@ -22,6 +22,7 @@ import org.gatorgradle.command.Command;
 import org.gatorgradle.command.GatorGraderCommand;
 import org.gatorgradle.config.GatorGradleConfig;
 import org.gatorgradle.task.GatorGradleTask;
+import org.gatorgradle.util.Read;
 import org.gatorgradle.util.StringUtil;
 
 import org.gradle.api.GradleException;
@@ -136,7 +137,7 @@ public class CommandOutputSummary {
 
     // reflection
     builder.append("\"reflection\":");
-    builder.append("\"").append(GatorGradleConfig.get().getReflection());
+    builder.append("\"").append(Read.readFile(GatorGradleConfig.get().getReflection()));
     builder.append("\"").append(",");
     // end reflection
 
