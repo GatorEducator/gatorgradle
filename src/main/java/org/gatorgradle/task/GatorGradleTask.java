@@ -34,16 +34,9 @@ import org.gradle.workers.IsolationMode;
 import org.gradle.workers.WorkerExecutor;
 
 public class GatorGradleTask extends DefaultTask {
-  // The executor to use to execute the grading
-  private final WorkerExecutor executor;
 
   protected GatorGradleConfig config;
   protected File workingDir;
-
-  @Inject
-  public GatorGradleTask(WorkerExecutor executor) {
-    this.executor = executor;
-  }
 
   public void setConfig(GatorGradleConfig config) {
     this.config = config;
@@ -62,29 +55,4 @@ public class GatorGradleTask extends DefaultTask {
   public File getWorkingDir() {
     return workingDir;
   }
-
-  // because of Java serialization limitations, along with
-  // how gradle implements logging, these must be static
-  protected static int totalTasks;
-  private static CommandOutputSummary summary;
-
-  /**
-   * Static handler to call when a subtask completes.
-   *
-   * @param complete the command that was run
-   */
-  private static synchronized void completedTask(Command complete) {
-    summary.addCompletedCommand(complete);
-    // Console.log("FINISHED " + complete.toString());
-
-    // To break the build if wanted, throw a GradleException here
-    // throw new GradleException(this);
-  }
-
-  private static synchronized void initTasks(int total, Logger logger) {
-    totalTasks = total;
-    summary = new CommandOutputSummary(logger);
-  }
-
-
 }

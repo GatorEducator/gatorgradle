@@ -14,10 +14,35 @@ import org.gradle.api.tasks.TaskAction;
 import org.gradle.workers.WorkerExecutor;
 
 public class GatorGradleGradleTask extends GatorGradleTask {
+  // The executor to use to execute the gradin
+  private final WorkerExecutor executor;
 
   @Inject
   public GatorGradleGradeTask(WorkerExecutor executor) {
     this.executor = executor;
+  }
+
+  // because of Java serialization limitations, along with
+  // how gradle implements logging, these must be static
+  private static int totalTasks;
+  private static CommandOutputSummary summary;
+
+  /**
+   * Static handler to call when a subtask completes.
+   *
+   * @param complete the command that was run
+   */
+  private static synchronized void completedTask(Command complete) {
+    summary.addCompletedCommand(complete);
+    // Console.log("FINISHED " + complete.toString());
+
+    // To break the build if wanted, throw a GradleException here
+    // throw new GradleException(this);
+  }
+
+  private static synchronized void initTasks(int total, Logger logger) {
+    totalTasks = total;
+    summary = new CommandOutputSummary(logger);
   }
 
   /**
