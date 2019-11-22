@@ -77,17 +77,18 @@ public class GatorGradlePlugin implements Plugin<Project> {
         GatorGradlePlugin.class.getPackage().getImplementationVersion());
 
     // create gatorgradle 'grade' task
-    project.getTasks().create("grade", GatorGradleGradeTask.class, task -> {
+    Task gradeTask = project.getTasks().create("grade", GatorGradleGradeTask.class, task -> {
       // default grade task uses config from above and project dir as grade
       task.setConfig(config);
       task.setWorkingDir(project.getProjectDir());
     });
 
     // create gatorgradle 'report' task
-    project.getTasks().create("report", GatorGradleReportTask.class, task -> {
+    Task reportTask = project.getTasks().create("report", GatorGradleReportTask.class, task -> {
       // default grade task uses config from above and project dir as grade
       task.setConfig(config);
       task.setWorkingDir(project.getProjectDir());
     });
+    reportTask.dependsOn(gradeTask);
   }
 }
