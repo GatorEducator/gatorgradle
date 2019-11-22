@@ -186,26 +186,6 @@ public class GatorGradleConfig implements Iterable<Command> {
     return cmd;
   }
 
-  private String readFile(String fileName) throws IOException {
-    BufferedReader br = new BufferedReader(new FileReader(fileName));
-    try {
-        StringBuilder sb = new StringBuilder();
-        String line = br.readLine();
-
-        while (line != null) {
-            sb.append(line);
-            sb.append("\n");
-            line = br.readLine();
-        }
-        return sb.toString();
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }finally {
-      br.close();
-    }
-}
 
   /**
    * Parses the config file's header.
@@ -239,7 +219,7 @@ public class GatorGradleConfig implements Iterable<Command> {
     }
 
     if (file.hasHeader("reflection")) {
-      reflection = readFile(file.getHeader("reflection").asString());
+      reflectionPath = file.getHeader("reflection").asString();
     }
 
     if (file.hasHeader("executables")) {
