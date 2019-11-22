@@ -238,9 +238,6 @@ public class CommandOutputSummary {
         isFailure ? "\u001B[1;31m" : "\u001B[1;32m",
         isFailure ? "\u001B[1;35m" : "\u001B[1;32m", log);
 
-    // Comment out here, for this step is used directly in the report Task
-    // uploadOutputSummary(failed, completedChecks);
-
     if (isFailure && GatorGradleConfig.get().shouldBreakBuild()) {
       throw new GradleException(
           StringUtil.color(StringUtil.BAD, "Grading checks failed -- scroll up for failures"));
