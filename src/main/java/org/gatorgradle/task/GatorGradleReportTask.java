@@ -15,12 +15,11 @@ import org.gradle.workers.WorkerExecutor;
 
 public class GatorGradleReportTask extends GatorGradleTask {
 
-
   /**
    * Execute the grading checks assigned to this GatorGradleReportTask.
    */
   @TaskAction
-  public void grade() {
+  public void report() {
 
     config.parseHeader();
 
@@ -106,14 +105,7 @@ public class GatorGradleReportTask extends GatorGradleTask {
     progLog.completed();
 
     summary.showOutputSummary();
-  }
-
-
-  /**
-   * Upload the OutputSummary
-   */
-  @TaskAction
-  public void report() {
     summary.uploadOutputSummary(summary.getFailed(), summary.getCompletedchecks());
+
   }
 }
