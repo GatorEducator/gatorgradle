@@ -1,5 +1,7 @@
 package org.gatorgradle.task;
 
+import javax.inject.Inject;
+
 import org.gatorgradle.task.GatorGradleTask;
 import org.gatorgradle.command.BasicCommand;
 import org.gatorgradle.command.Command;
@@ -10,6 +12,7 @@ import org.gatorgradle.internal.ProgressLoggerWrapper;
 import org.gatorgradle.util.Console;
 
 import org.gradle.api.GradleException;
+import org.gradle.api.logging.Logger;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.workers.WorkerExecutor;
 
