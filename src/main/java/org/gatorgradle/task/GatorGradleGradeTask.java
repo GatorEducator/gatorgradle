@@ -13,7 +13,7 @@ import org.gradle.api.GradleException;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.workers.WorkerExecutor;
 
-public class GatorGradleGradleTask extends GatorGradleTask {
+public class GatorGradleGradeTask extends GatorGradleTask {
   // The executor to use to execute the gradin
   private final WorkerExecutor executor;
 
