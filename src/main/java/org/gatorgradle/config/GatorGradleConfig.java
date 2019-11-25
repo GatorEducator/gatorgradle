@@ -67,7 +67,7 @@ public class GatorGradleConfig implements Iterable<Command> {
   private String assignmentName = "this assignment";
   private String gatorgraderRevision = "master";
   private String reportEndpoint = null;
-  private String reflection = null;
+  private String reflectionPath = null;
   private Collection<String> commandLineExecutables;
   private Command startupCommand = null;
   private Set<Command> gradingCommands;
@@ -305,7 +305,7 @@ public class GatorGradleConfig implements Iterable<Command> {
   }
 
   public String getReflection() {
-    return reflection;
+    return reflectionPath;
   }
 
   public boolean isCommandLineExecutable(String exec) {
