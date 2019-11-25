@@ -12,6 +12,7 @@ import org.gradle.api.GradleException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
+import org.gradle.api.Task;
 
 /**
  * GatorGradlePlugin applies the plugin to a project, registers
@@ -84,11 +85,11 @@ public class GatorGradlePlugin implements Plugin<Project> {
     });
 
     // create gatorgradle 'report' task
-    Task reportTask = project.getTasks().create("report", GatorGradleReportTask.class, task -> {
-      // default grade task uses config from above and project dir as grade
-      task.setConfig(config);
-      task.setWorkingDir(project.getProjectDir());
-    });
-    reportTask.dependsOn(gradeTask);
+    // Task reportTask = project.getTasks().create("report", GatorGradleReportTask.class, task -> {
+    //   // default grade task uses config from above and project dir as grade
+    //   task.setConfig(config);
+    //   task.setWorkingDir(project.getProjectDir());
+    // });
+    // reportTask.dependsOn(gradeTask);
   }
 }
