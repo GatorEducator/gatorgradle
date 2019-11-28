@@ -304,7 +304,7 @@ public class GatorGradleConfig implements Iterable<Command> {
     return reportEndpoint;
   }
 
-  public String getReflection() {
+  public String getReflectionPath() {
     return reflectionPath;
   }
 

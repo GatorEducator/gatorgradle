@@ -143,7 +143,7 @@ public class CommandOutputSummary {
           "\n",
           Files.readAllLines(
               Paths.get(
-                  GatorGradleConfig.get().getReflection()
+                  GatorGradleConfig.get().getReflectionPath()
               )
           )
         )
