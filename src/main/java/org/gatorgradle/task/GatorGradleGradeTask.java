@@ -15,6 +15,7 @@ import org.gradle.api.GradleException;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.workers.WorkerExecutor;
+import org.gradle.workers.IsolationMode;
 
 public class GatorGradleGradeTask extends GatorGradleTask {
   // The executor to use to execute the gradin
@@ -28,7 +29,7 @@ public class GatorGradleGradeTask extends GatorGradleTask {
   // because of Java serialization limitations, along with
   // how gradle implements logging, these must be static
   private static int totalTasks;
-  private static CommandOutputSummary summary;
+  
 
   /**
    * Static handler to call when a subtask completes.

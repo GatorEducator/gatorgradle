@@ -38,6 +38,8 @@ public class GatorGradleTask extends DefaultTask {
   protected GatorGradleConfig config;
   protected File workingDir;
 
+  protected static CommandOutputSummary summary;
+
   public void setConfig(GatorGradleConfig config) {
     this.config = config;
   }
