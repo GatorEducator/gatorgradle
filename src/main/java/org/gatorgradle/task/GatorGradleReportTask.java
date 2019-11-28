@@ -16,7 +16,7 @@ import org.gradle.workers.IsolationMode;
 public class GatorGradleReportTask extends GatorGradleTask {
 
   /**
-   * Execute the grading checks assigned to this GatorGradleReportTask.
+   * Upload the check report executed by the dependOn GatorGradleGradeTask.
    */
   @TaskAction
   public void report() {
