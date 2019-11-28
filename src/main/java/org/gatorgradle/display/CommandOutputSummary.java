@@ -140,14 +140,17 @@ public class CommandOutputSummary {
     builder.append("\"reflection\":");
     try {
       builder.append("\"").append(
-          String.join(
-            "\n",
-            Files.readAllLines(
-                Paths.get(
-                    GatorGradleConfig.get().getReflectionPath()
-                )
+          StringUtil.jsonEscape(
+            String.join(
+              "\n",
+              Files.readAllLines(
+                  Paths.get(
+                      GatorGradleConfig.get().getReflectionPath()
+                  )
+              )
             )
           )
+
       );
     } catch (IOException IOException) {
       IOException.printStackTrace();
