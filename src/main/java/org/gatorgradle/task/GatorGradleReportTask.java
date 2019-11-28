@@ -20,8 +20,6 @@ public class GatorGradleReportTask extends GatorGradleTask {
    */
   @TaskAction
   public void report() {
-
-     // summary.uploadOutputSummary(summary.getFailed(), summary.getCompletedchecks());
-
+    summary.uploadOutputSummary();
   }
 }
