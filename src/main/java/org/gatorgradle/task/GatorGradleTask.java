@@ -44,6 +44,39 @@ public class GatorGradleTask extends DefaultTask {
     this.config = config;
   }
 
+  /**
+   * Dependency management.
+   */
+  protected void act() {
+    config.parseHeader();
+
+    // ensure GatorGrader and dependencies are installed
+    String dep = DependencyManager.manage();
+    if (!dep.isEmpty()) {
+      throw new GradleException(dep);
+    }
+
+    Console.newline(1);
+
+    if (config.hasStartupCommand()) {
+      Console.log("Starting up...");
+      BasicCommand startup = (BasicCommand) config.getStartupCommand();
+      startup.outputToSysOut(true);
+      startup.run();
+      if (startup.exitValue() != Command.SUCCESS) {
+        throw new GradleException(
+            "Startup command '" + startup + "' failed with exit code "
+            + startup.exitValue() + "!"
+        );
+      }
+      Console.log("Ready!");
+    }
+
+    Console.newline(2);
+
+    config.parseBody();
+  }
+
   @Input
   public GatorGradleConfig getConfig() {
     return config;

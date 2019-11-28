@@ -29,7 +29,7 @@ public class GatorGradleGradeTask extends GatorGradleTask {
   // because of Java serialization limitations, along with
   // how gradle implements logging, these must be static
   private static int totalTasks;
-  
+
 
   /**
    * Static handler to call when a subtask completes.
@@ -55,34 +55,7 @@ public class GatorGradleGradeTask extends GatorGradleTask {
   @TaskAction
   public void grade() {
 
-    config.parseHeader();
-
-    // ensure GatorGrader and dependencies are installed
-    String dep = DependencyManager.manage();
-    if (!dep.isEmpty()) {
-      throw new GradleException(dep);
-    }
-
-    Console.newline(1);
-
-    if (config.hasStartupCommand()) {
-      Console.log("Starting up...");
-      BasicCommand startup = (BasicCommand) config.getStartupCommand();
-      startup.outputToSysOut(true);
-      startup.run();
-      if (startup.exitValue() != Command.SUCCESS) {
-        throw new GradleException(
-            "Startup command '" + startup + "' failed with exit code "
-            + startup.exitValue() + "!"
-        );
-      }
-      Console.log("Ready!");
-    }
-
-    Console.newline(2);
-
-    config.parseBody();
-
+    super.act();
 
     // get a progress logger
     ProgressLoggerWrapper progLog =
@@ -91,6 +64,7 @@ public class GatorGradleGradeTask extends GatorGradleTask {
     // start task submission
     progLog.started();
     initTasks(config.size(), this.getLogger());
+    
 
     if (totalTasks > 0) {
       // submit commands to executor
