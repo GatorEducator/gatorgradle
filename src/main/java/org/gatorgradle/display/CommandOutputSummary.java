@@ -138,17 +138,20 @@ public class CommandOutputSummary {
 
     // reflection
     builder.append("\"reflection\":");
-    builder.append("\"").append(
-        String.join(
-          "\n",
-          Files.readAllLines(
-              Paths.get(
-                  GatorGradleConfig.get().getReflectionPath()
-              )
+    try {
+      builder.append("\"").append(
+          String.join(
+            "\n",
+            Files.readAllLines(
+                Paths.get(
+                    GatorGradleConfig.get().getReflectionPath()
+                )
+            )
           )
-        )
-    );
-
+      );
+    } catch (IOException IOException) {
+      IOException.printStackTrace();
+    }
     builder.append("\"").append(",");
     // end reflection
 
@@ -225,6 +228,16 @@ public class CommandOutputSummary {
   }
 
   /**
+   * Use the internal member variables to call the previous uploadOutputSummary.
+   */
+  public void uploadOutputSummary() {
+    List<CheckResult> failed = completedChecks.stream()
+                               .filter(result -> result.outcome == false)
+                               .collect(Collectors.toList());
+    uploadOutputSummary(failed, completedChecks);
+  }
+
+  /**
    * Output the compiled summary to the project's Logger.
    */
   public void showOutputSummary() {
@@ -255,25 +268,6 @@ public class CommandOutputSummary {
           StringUtil.color(StringUtil.BAD, "Grading checks failed -- scroll up for failures"));
     }
   }
-
-  /**
-   * Return the completed checks.
-   */
-  public List<CheckResult> getCompletedchecks() {
-    return completedChecks;
-  }
-
-
-  /**
-   * Return the failed checks.
-   */
-  public List<CheckResult> getFailed() {
-    List<CheckResult> failed = completedChecks.stream()
-                               .filter(result -> result.outcome == false)
-                               .collect(Collectors.toList());
-    return failed;
-  }
-
 
   private CheckResult parseGatorGraderCommand(GatorGraderCommand cmd, boolean includeDiagnostic) {
     CheckResult result = null;
