@@ -208,16 +208,6 @@ public class GatorGradleConfig implements Iterable<Command> {
       gatorgraderRevision = file.getHeader("version").asString();
     }
 
-    if (file.hasHeader("reportendpoint")) {
-      reportEndpoint = file.getHeader("reportendpoint").asString();
-    } else if (file.hasHeader("endpoint")) {
-      reportEndpoint = file.getHeader("endpoint").asString();
-    } else if (file.hasHeader("report")) {
-      reportEndpoint = file.getHeader("report").asString();
-    } else if (file.hasHeader("lambda")) {
-      reportEndpoint = file.getHeader("lambda").asString();
-    }
-
     if (file.hasHeader("reflection")) {
       reflectionPath = file.getHeader("reflection").asString();
     }
@@ -298,10 +288,6 @@ public class GatorGradleConfig implements Iterable<Command> {
 
   public Command getStartupCommand() {
     return startupCommand;
-  }
-
-  public String getReportEndpoint() {
-    return reportEndpoint;
   }
 
   public String getReflectionPath() {
