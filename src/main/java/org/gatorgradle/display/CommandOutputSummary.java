@@ -186,9 +186,14 @@ public class CommandOutputSummary {
 
     HttpURLConnection con = null;
     try {
-      String endpoint = GatorGradleConfig.get().getReportEndpoint();
+      // get report endpoint and api key from environment variable
+      String endpoint = System.getenv("ENDPOINT");
+      String apikey = System.getenv("API_KEY");
       if (endpoint == null || endpoint.isEmpty()) {
         log.info("No report endpoint specified, not uploading results.");
+        return;
+      } else if (apikey == null || apikey.isEmpty()) {
+        log.info("No API key specified, not uploading results.");
         return;
       }
       URL url = new URL(endpoint);
@@ -196,6 +201,7 @@ public class CommandOutputSummary {
       con.setRequestMethod("POST");
       con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
       con.setRequestProperty("Accept", "application/json");
+      con.setRequestProperty("x-api-key", apikey);
       con.setUseCaches(false);
       con.setDoInput(true);
       con.setDoOutput(true);
