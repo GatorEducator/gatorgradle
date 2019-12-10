@@ -225,6 +225,10 @@ public class CommandOutputSummary {
         log.info("Got data upload response: {}", response.toString());
       }
 
+      if (con.getResponseCode() == 200) {
+        System.out.println("Upload success");
+      }
+
     } catch (MalformedURLException ex) {
       log.error("Failed to upload data; report endpoint specified in configuration is malformed.");
     } catch (IOException ex) {
