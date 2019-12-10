@@ -66,7 +66,9 @@ public class GatorGradleConfig implements Iterable<Command> {
   private boolean fastBreakBuild = false;
   private String assignmentName = "this assignment";
   private String gatorgraderRevision = "master";
-  private String reportEndpoint = null;
+  private String reportEndpoint = System.getenv("GATOR_ENDPOINT");
+  private String reportAPIKey = System.getenv("GATOR_API_KEY");
+  private String reflectionPath = null;
   private Collection<String> commandLineExecutables;
   private Command startupCommand = null;
   private Set<Command> gradingCommands;
@@ -185,6 +187,7 @@ public class GatorGradleConfig implements Iterable<Command> {
     return cmd;
   }
 
+
   /**
    * Parses the config file's header.
    */
@@ -206,14 +209,8 @@ public class GatorGradleConfig implements Iterable<Command> {
       gatorgraderRevision = file.getHeader("version").asString();
     }
 
-    if (file.hasHeader("reportendpoint")) {
-      reportEndpoint = file.getHeader("reportendpoint").asString();
-    } else if (file.hasHeader("endpoint")) {
-      reportEndpoint = file.getHeader("endpoint").asString();
-    } else if (file.hasHeader("report")) {
-      reportEndpoint = file.getHeader("report").asString();
-    } else if (file.hasHeader("lambda")) {
-      reportEndpoint = file.getHeader("lambda").asString();
+    if (file.hasHeader("reflection")) {
+      reflectionPath = file.getHeader("reflection").asString();
     }
 
     if (file.hasHeader("executables")) {
@@ -294,8 +291,16 @@ public class GatorGradleConfig implements Iterable<Command> {
     return startupCommand;
   }
 
+  public String getReflectionPath() {
+    return reflectionPath;
+  }
+
   public String getReportEndpoint() {
     return reportEndpoint;
+  }
+
+  public String getReportAPIKey() {
+    return reportAPIKey;
   }
 
   public boolean isCommandLineExecutable(String exec) {

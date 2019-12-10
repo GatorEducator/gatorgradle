@@ -4,13 +4,15 @@ import java.io.File;
 import java.util.Locale;
 
 import org.gatorgradle.config.GatorGradleConfig;
-import org.gatorgradle.task.GatorGradleTask;
+import org.gatorgradle.task.GatorGradleGradeTask;
+import org.gatorgradle.task.GatorGradleReportTask;
 import org.gatorgradle.util.Console;
 
 import org.gradle.api.GradleException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
+import org.gradle.api.Task;
 
 /**
  * GatorGradlePlugin applies the plugin to a project, registers
@@ -76,10 +78,18 @@ public class GatorGradlePlugin implements Plugin<Project> {
         GatorGradlePlugin.class.getPackage().getImplementationVersion());
 
     // create gatorgradle 'grade' task
-    project.getTasks().create("grade", GatorGradleTask.class, task -> {
+    Task gradeTask = project.getTasks().create("grade", GatorGradleGradeTask.class, task -> {
       // default grade task uses config from above and project dir as grade
       task.setConfig(config);
       task.setWorkingDir(project.getProjectDir());
     });
+
+    // create gatorgradle 'report' task
+    Task reportTask = project.getTasks().create("report", GatorGradleReportTask.class, task -> {
+      // default grade task uses config from above and project dir as grade
+      task.setConfig(config);
+      task.setWorkingDir(project.getProjectDir());
+    });
+    reportTask.dependsOn(gradeTask);
   }
 }
