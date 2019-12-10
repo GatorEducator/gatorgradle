@@ -66,7 +66,8 @@ public class GatorGradleConfig implements Iterable<Command> {
   private boolean fastBreakBuild = false;
   private String assignmentName = "this assignment";
   private String gatorgraderRevision = "master";
-  private String reportEndpoint = null;
+  private String reportEndpoint = System.getenv("GATOR_ENDPOINT");
+  private String reportAPIKey = System.getenv("GATOR_API_KEY");
   private String reflectionPath = null;
   private Collection<String> commandLineExecutables;
   private Command startupCommand = null;
@@ -292,6 +293,14 @@ public class GatorGradleConfig implements Iterable<Command> {
 
   public String getReflectionPath() {
     return reflectionPath;
+  }
+
+  public String getReportEndpoint() {
+    return reportEndpoint;
+  }
+
+  public String getReportAPIKey() {
+    return reportAPIKey;
   }
 
   public boolean isCommandLineExecutable(String exec) {
