@@ -226,7 +226,7 @@ public class CommandOutputSummary {
       }
 
       if (con.getResponseCode() == 200) {
-        System.out.println("Upload success");
+        System.out.println("Upload successfully");
       }
 
     } catch (MalformedURLException ex) {
