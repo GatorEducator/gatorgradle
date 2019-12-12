@@ -2,13 +2,13 @@ package org.gatorgradle.task;
 
 import javax.inject.Inject;
 
-import org.gatorgradle.task.GatorGradleTask;
 import org.gatorgradle.command.BasicCommand;
 import org.gatorgradle.command.Command;
 import org.gatorgradle.config.GatorGradleConfig;
 import org.gatorgradle.display.CommandOutputSummary;
 import org.gatorgradle.internal.DependencyManager;
 import org.gatorgradle.internal.ProgressLoggerWrapper;
+import org.gatorgradle.task.GatorGradleTask;
 import org.gatorgradle.util.Console;
 
 import org.gradle.api.GradleException;
@@ -64,7 +64,7 @@ public class GatorGradleGradeTask extends GatorGradleTask {
     // start task submission
     progLog.started();
     initTasks(config.size(), this.getLogger());
-    
+
 
     if (totalTasks > 0) {
       // submit commands to executor
