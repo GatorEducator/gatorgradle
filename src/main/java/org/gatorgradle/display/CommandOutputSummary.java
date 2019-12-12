@@ -188,7 +188,7 @@ public class CommandOutputSummary {
     try {
       // get report endpoint and api key from environment variable
       String endpoint = GatorGradleConfig.get().getReportEndpoint();
-      String apikey = GatorGradleConfig.get().getReportAPIKey();
+      String apikey = GatorGradleConfig.get().getReportApiKey();
       if (endpoint == null || endpoint.isEmpty()) {
         log.error("No report endpoint specified, not uploading results.");
         return;
