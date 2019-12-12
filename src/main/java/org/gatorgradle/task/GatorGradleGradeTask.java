@@ -14,8 +14,8 @@ import org.gatorgradle.util.Console;
 import org.gradle.api.GradleException;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.tasks.TaskAction;
-import org.gradle.workers.WorkerExecutor;
 import org.gradle.workers.IsolationMode;
+import org.gradle.workers.WorkerExecutor;
 
 public class GatorGradleGradeTask extends GatorGradleTask {
   // The executor to use to execute the gradin
