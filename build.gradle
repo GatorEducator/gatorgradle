@@ -2,7 +2,7 @@ plugins {
     id "maven"
     id "java-gradle-plugin"
     id "com.gradle.plugin-publish" version "0.10.1"
-    id "ru.vyarus.quality" version "3.4.0"
+    id "ru.vyarus.quality" version "4.0.0"
 }
 
 group = "${artifact_group}"
