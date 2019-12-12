@@ -152,8 +152,8 @@ public class CommandOutputSummary {
           )
 
       );
-    } catch (IOException IOException) {
-      IOException.printStackTrace();
+    } catch (IOException exception) {
+      exception.printStackTrace();
     }
     builder.append("\"").append(",");
     // end reflection
