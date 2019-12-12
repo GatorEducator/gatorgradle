@@ -35,10 +35,10 @@ import org.gradle.workers.WorkerExecutor;
 
 public class GatorGradleTask extends DefaultTask {
 
-  protected GatorGradleConfig config;
+  protected GatorGradleConfig config = null;
   protected File workingDir;
 
-  protected static CommandOutputSummary summary;
+  static CommandOutputSummary summary;
 
   public void setConfig(GatorGradleConfig config) {
     this.config = config;
