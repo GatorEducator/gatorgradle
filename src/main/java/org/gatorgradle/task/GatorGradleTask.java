@@ -35,7 +35,7 @@ import org.gradle.workers.WorkerExecutor;
 
 public class GatorGradleTask extends DefaultTask {
 
-  protected GatorGradleConfig config = null;
+  protected GatorGradleConfig config;
   protected File workingDir;
 
   static CommandOutputSummary summary;
@@ -48,7 +48,7 @@ public class GatorGradleTask extends DefaultTask {
    * Dependency management.
    */
   protected void act() {
-    config.parseHeader();
+    getConfig().parseHeader();
 
     // ensure GatorGrader and dependencies are installed
     String dep = DependencyManager.manage();
@@ -58,9 +58,9 @@ public class GatorGradleTask extends DefaultTask {
 
     Console.newline(1);
 
-    if (config.hasStartupCommand()) {
+    if (getConfig().hasStartupCommand()) {
       Console.log("Starting up...");
-      BasicCommand startup = (BasicCommand) config.getStartupCommand();
+      BasicCommand startup = (BasicCommand) getConfig().getStartupCommand();
       startup.outputToSysOut(true);
       startup.run();
       if (startup.exitValue() != Command.SUCCESS) {
@@ -74,12 +74,22 @@ public class GatorGradleTask extends DefaultTask {
 
     Console.newline(2);
 
-    config.parseBody();
+    getConfig().parseBody();
   }
 
+  /**
+    * Ensure we got a configuration.
+    *
+    * @return configuration
+    */
   @Input
   public GatorGradleConfig getConfig() {
-    return config;
+    if (config == null) {
+      throw new GradleException(
+          "GatorGradle grade task's configuration was not specified correctly!");
+    } else {
+      return config;
+    }
   }
 
   public void setWorkingDir(File dir) {

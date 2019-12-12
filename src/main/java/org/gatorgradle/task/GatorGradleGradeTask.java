@@ -59,16 +59,16 @@ public class GatorGradleGradeTask extends GatorGradleTask {
 
     // get a progress logger
     ProgressLoggerWrapper progLog =
-        new ProgressLoggerWrapper(super.getProject(), config.getAssignmentName());
+        new ProgressLoggerWrapper(super.getProject(), super.getConfig().getAssignmentName());
 
     // start task submission
     progLog.started();
-    initTasks(config.size(), this.getLogger());
+    initTasks(super.getConfig().size(), this.getLogger());
 
 
     if (totalTasks > 0) {
       // submit commands to executor
-      for (Command cmd : config) {
+      for (Command cmd : super.getConfig()) {
         // configure command
         cmd.setCallback((Command.Callback) GatorGradleGradeTask::completedTask);
         if (cmd.getWorkingDir() == null) {
