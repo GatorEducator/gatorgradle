@@ -16,6 +16,14 @@ the GatorGrader checks, use the `grade` task, like so:
 gradle grade
 ```
 
+To run the GatorGrader checks and collect grade report to a configured endpoint,
+first store the endpoint and API key in environment variables with `GATOR_ENDPOINT`
+and `GATOR_API_KEY`, then use the `report` task, like so:
+
+```bash
+gradle report
+```
+
 ## Installing Dependencies
 
 GatorGradle requires that [Git](https://git-scm.com/), a version of
