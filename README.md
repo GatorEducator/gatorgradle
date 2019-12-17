@@ -56,6 +56,8 @@ version: v0.2.0
 executables: cat, bash
 # Specify a script or executable to run on startup
 startup: ./config/startup.sh
+# Specify the path to the reflection file
+reflection: writing/reflection.md
 ---
 # Form paths with these tree-like structures: they will
 # be used to determine where and to what file a given check is tested against
