@@ -3,7 +3,8 @@ language: Java
 
 env:
   global:
-    - secure: "HdVCJBmyB+7BTLWHg1vJX5ydX5/QJ2nvFn9Li60/u2vMe41LAc3KOc/Y6IGNhNE+poW9ywRkyckJM6zSCxrsxsyHXro0oJk1KDYIpXc6565UqcjazrIR7EM84OpdgG20ObA7jApsiywy9qFs4mEHV/A/J5RdDPxQS6xchUgfIM2HQ1ZvJwDSj6V9baLadJ5VnPLYj5UVVjg8DToqrUM8zrZqX7QrwcwCoJpva1OJR6VhBUbk4ETsRkv9QR1YNOCDmiKbS7q3obc/DjSrkmHQryYKK0eMVgwBiPTPrCW1UPH6ALM/IwvqTdGax2yYQYXgDXHMoHFMrJQ6U1GYyYL2eJtZSK0vfUQMrFb+wINkn1VYo6FoUZPlSf/kOoVPk2wkq590KEKBaY+o/qmsrYJQqp3faXlSegsUCSzq/h6NtHKdyTFpt6a/nFD4FsFagcMKfpJVEQJfwkwtNrUSme59HLDT7TWBs9IRBehfp2k+4E2zjB6q4jp3guoayflUZhCNoGXJmT6pJoKP49AO6Ub1YbxZn7IQZCAfd3FEviTvJxDfuADYlFWSSb1snEcPsm6eaV0Se5+PoTnX21hKT+ldnWdBw5Audx9ILDAuEzygWmWP2V4IqAmKsws2kpuN2pH7YCiVamg4qqyDZcWZBGAyBKOUfEpbEd+liniBQAiCqZA="
+    - GRADLE_VERSION="6.0.1"
+    - secure: "39Bm0xjDe5zdqwmqin4ZoUjWU/35ds9lElyj5tc7Qn50YSSIfoGaXWWQccU/Udg5DPLauRO9ZlzWagfxaNiJbmahuSRRN//1XTYbSYy3BRxzqceRxLV8lvHwUzZLq1eXgGS8Yss3GyimWV8pL42iz9qQ6Lge3GVVsiA1hjvOKmANk4PnuY7aqxK2TbGcZiaLBP5KE1WcPx8Tu13mmgyymAEskdIS+oa+ZLQNDa/WXuZPe9tFNBVABBnYoEqMZKRJSeDEmr90wpIHUu4JCkj0B+vXVIj52jH0tCn0gmTlMNYJT+KO2zGuRmmTaMSPxS2584/AwboybEhgIgLSoNeYulsBlAisraZdcExnMoaJZWK+YHgJgXHoocuVG1FnefqAZiKAu110HA29bS6GJtBIuWm31eQT6LvMlmYXy/KDf3xbW77YubqAZN5NcnibB8+JsAOXpOKqjt/Q6Ua85YzM5XwzBPQowt6b8eJYJRajPZLR/gMXRhWGm/Gimr8P/F4ICIJP5oAbbrefAywmzgtE+esL9GYJmUfbhU3JpMH76SYhv7hptY5xzslYnKVT4ya12E3UTYEiCMNVI9JE+6p+RM7iT+4sDTeOhOBD0Ds82vNm2uCF1YrKXu+Kj2ZsPPzC5cZu6cvRNOv5zaYsJCbV3uB5HyZxkTrwGRx7yf0wp5w="
 
 # LATER: install junit?
 # Step 1: install mdl for checking Markdown
@@ -14,12 +15,12 @@ before_install:
   # Install the Markdown linting tool called mdl
   - gem install mdl
   # Download the Gradle bin zip file
-  - wget https://services.gradle.org/distributions/gradle-5.4.1-bin.zip
-  - unzip -d $HOME gradle-5.4.1-bin.zip
+  - wget "https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip"
+  - unzip -d $HOME "gradle-${GRADLE_VERSION}-bin.zip"
   # Delete the downloaded zip file; probably don't need this but just to be sure
-  - rm -rf gradle-5.4.1-bin.zip
+  - rm -rf "gradle-${GRADLE_VERSION}-bin.zip"
   # Add gradle bin to path at the beginning to ensure it overwrites old gradle
-  - export PATH="$HOME/gradle-5.4.1/bin:$PATH"
+  - export PATH="$HOME/gradle-${GRADLE_VERSION}/bin:$PATH"
 
 # Step: Delete old files
 before_cache:
@@ -28,9 +29,8 @@ before_cache:
 # Step: Set the cache directories
 cache:
   directories:
-    - $HOME/.gradle/caches/4.9
-    - $HOME/.gradle/caches/jars-3
-    - $HOME/.gradle/caches/modules-2
+    - $HOME/.gradle/caches/modules-2/
+    - $HOME/.gradle/wrapper/
 
 # GOAL: need to run unit tests
 script:

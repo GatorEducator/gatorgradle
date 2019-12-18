@@ -1,13 +1,10 @@
 package org.gatorgradle.display;
 
 import java.util.Locale;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.gatorgradle.util.Console;
+import org.gatorgradle.command.Command;
 import org.gatorgradle.util.StringUtil;
 
 public class CheckResult {
@@ -46,14 +43,18 @@ public class CheckResult {
   public Boolean outcome;
   public String diagnostic;
 
+  public Command command;
+
   /**
    * Construct a CheckResult.
    *
+   * @param command    the command run
    * @param check      the check completed
    * @param outcome    the outcome of the check
    * @param diagnostic the diagnostic output from the check
    **/
-  public CheckResult(String check, Boolean outcome, String diagnostic) {
+  public CheckResult(Command command, String check, Boolean outcome, String diagnostic) {
+    this.command = command;
     this.check = check;
     this.outcome = outcome;
     this.diagnostic = diagnostic;
@@ -66,11 +67,13 @@ public class CheckResult {
    * <p>This method assumes the json passed represents only one
    * result, and any duplicates will overwrite values.
    *
-   * @param json the json to parse
+   * @param command the command run
+   * @param json    the json to parse
    * @throws MalformedJsonException if the json given is not valid for a CheckResult
    *
    */
-  public CheckResult(String json) throws MalformedJsonException {
+  public CheckResult(Command command, String json) throws MalformedJsonException {
+    this.command = command;
     if (json == null) {
       throw new MalformedJsonException("Null JSON text", null);
     }
@@ -100,6 +103,26 @@ public class CheckResult {
     this.diagnostic = matcher.group(1);
   }
 
+  /**
+   * Tests equality, dependent on all member variables.
+   *
+   * @param otherObj the object to compare to
+   *
+   */
+  public boolean equals(Object otherObj) {
+    if (otherObj instanceof CheckResult) {
+      CheckResult other = (CheckResult) otherObj;
+      return this.check != null && this.check.equals(other.check)
+        && this.outcome != null && this.outcome.equals(other.outcome)
+        && this.diagnostic != null && this.diagnostic.equals(other.diagnostic)
+        && this.command != null && this.command.equals(other.command);
+    }
+    return false;
+  }
+
+  public int hashCode() {
+    return 17 * check.hashCode() + (outcome ? 5 : 7) + 73 * diagnostic.hashCode();
+  }
 
   /**
    * Returns a string representation of this result.
@@ -120,5 +143,16 @@ public class CheckResult {
       }
       return output;
     }
+  }
+
+  /**
+   * Returns a string representation of this result.
+   *
+   * @return a string
+   **/
+  public String jsonReport() {
+    return "{\"check\":\"" + StringUtil.jsonEscape(check) + "\",\"outcome\":"
+      + StringUtil.jsonEscape(outcome.toString().toLowerCase(Locale.ENGLISH))
+      + ",\"diagnostic\":\"" + StringUtil.jsonEscape(diagnostic) + "\"}";
   }
 }
