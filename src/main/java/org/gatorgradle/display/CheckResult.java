@@ -136,7 +136,11 @@ public class CheckResult {
   public String textReport(boolean includeDiagnostic) {
     if (outcome) {
       return PASS_SYMBOL + INDENT + check;
-    } else {
+    } else if (check.contains("--reach")) {
+      outcome = True;
+      return REACH_SYMBOL + INDENT + check;
+    }
+    else {
       String output = FAIL_SYMBOL + INDENT + check;
       if (includeDiagnostic) {
         output += "\n " + INDENT + FIX_SYMBOL + INDENT + StringUtil.color(StringUtil.FIX,
