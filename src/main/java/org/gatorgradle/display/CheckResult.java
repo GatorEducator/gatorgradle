@@ -39,8 +39,8 @@ public class CheckResult {
       StringUtil.color(StringUtil.BAD, FAIL_SYMBOL_RAW);
   public static final String FIX_SYMBOL =
       StringUtil.color("\u001B[1;33m", FIX_SYMBOL_RAW);
-  public static final String FIX_SYMBOL =
-      StringUtil.color("\u001B[33m", REACH_SYMBOL_RAW);
+  public static final String REACH_SYMBOL =
+      StringUtil.color("\u001B[36m", REACH_SYMBOL_RAW);
 
   public String check;
   public Boolean outcome;
