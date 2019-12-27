@@ -8,24 +8,21 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Scanner;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import org.gatorgradle.GatorGradlePlugin;
 import org.gatorgradle.command.BasicCommand;
 import org.gatorgradle.command.Command;
 import org.gatorgradle.command.GatorGraderCommand;
 import org.gatorgradle.config.GatorGradleConfig;
-import org.gatorgradle.task.GatorGradleTask;
 import org.gatorgradle.util.StringUtil;
 
 import org.gradle.api.GradleException;
-import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
 
 public class CommandOutputSummary {
@@ -134,6 +131,28 @@ public class CommandOutputSummary {
     builder.append("\"").append(GatorGradleConfig.get().getAssignmentName());
     builder.append("\"").append(",");
 
+    // reflection
+    builder.append("\"reflection\":");
+    try {
+      builder.append("\"").append(
+          StringUtil.jsonEscape(
+            String.join(
+              "\n",
+              Files.readAllLines(
+                  Paths.get(
+                      GatorGradleConfig.get().getReflectionPath()
+                  )
+              )
+            )
+          )
+
+      );
+    } catch (IOException exception) {
+      exception.printStackTrace();
+    }
+    builder.append("\"").append(",");
+    // end reflection
+
     // report
     builder.append("\"report\":{");
 
@@ -162,9 +181,14 @@ public class CommandOutputSummary {
 
     HttpURLConnection con = null;
     try {
+      // get report endpoint and api key from environment variable
       String endpoint = GatorGradleConfig.get().getReportEndpoint();
+      String apikey = GatorGradleConfig.get().getReportApiKey();
       if (endpoint == null || endpoint.isEmpty()) {
-        log.info("No report endpoint specified, not uploading results.");
+        log.error("No report endpoint specified, not uploading results.");
+        return;
+      } else if (apikey == null || apikey.isEmpty()) {
+        log.error("No API key specified, not uploading results.");
         return;
       }
       URL url = new URL(endpoint);
@@ -172,6 +196,7 @@ public class CommandOutputSummary {
       con.setRequestMethod("POST");
       con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
       con.setRequestProperty("Accept", "application/json");
+      con.setRequestProperty("x-api-key", apikey);
       con.setUseCaches(false);
       con.setDoInput(true);
       con.setDoOutput(true);
@@ -181,6 +206,7 @@ public class CommandOutputSummary {
       try (OutputStream os = con.getOutputStream()) {
         byte[] input = resultListJson.getBytes(StandardCharsets.UTF_8);
         os.write(input, 0, input.length);
+        log.info("Compiled JSON to send:{}", resultListJson);
       }
 
       // get response
@@ -194,6 +220,10 @@ public class CommandOutputSummary {
         log.info("Got data upload response: {}", response.toString());
       }
 
+      if (con.getResponseCode() == 200) {
+        System.out.println("Upload successfully");
+      }
+
     } catch (MalformedURLException ex) {
       log.error("Failed to upload data; report endpoint specified in configuration is malformed.");
     } catch (IOException ex) {
@@ -203,6 +233,16 @@ public class CommandOutputSummary {
         con.disconnect();
       }
     }
+  }
+
+  /**
+   * Use the internal member variables to call the previous uploadOutputSummary.
+   */
+  public void uploadOutputSummary() {
+    List<CheckResult> failed = completedChecks.stream()
+                               .filter(result -> result.outcome == false)
+                               .collect(Collectors.toList());
+    uploadOutputSummary(failed, completedChecks);
   }
 
   /**
@@ -230,8 +270,6 @@ public class CommandOutputSummary {
             + " of checks for " + GatorGradleConfig.get().getAssignmentName() + "!",
         isFailure ? "\u001B[1;31m" : "\u001B[1;32m",
         isFailure ? "\u001B[1;35m" : "\u001B[1;32m", log);
-
-    uploadOutputSummary(failed, completedChecks);
 
     if (isFailure && GatorGradleConfig.get().shouldBreakBuild()) {
       throw new GradleException(

@@ -16,6 +16,14 @@ the GatorGrader checks, use the `grade` task, like so:
 gradle grade
 ```
 
+To run the GatorGrader checks and collect grade report to a configured endpoint,
+first store the endpoint and API key in environment variables with `GATOR_ENDPOINT`
+and `GATOR_API_KEY`, then use the `report` task, like so:
+
+```bash
+gradle report
+```
+
 ## Installing Dependencies
 
 GatorGradle requires that [Git](https://git-scm.com/), a version of
@@ -56,6 +64,8 @@ version: v0.2.0
 executables: cat, bash
 # Specify a script or executable to run on startup
 startup: ./config/startup.sh
+# Specify the path to the reflection file
+reflection: writing/reflection.md
 ---
 # Form paths with these tree-like structures: they will
 # be used to determine where and to what file a given check is tested against

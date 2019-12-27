@@ -1,30 +1,21 @@
 package org.gatorgradle.config;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import org.gatorgradle.GatorGradlePlugin;
 import org.gatorgradle.command.BasicCommand;
 import org.gatorgradle.command.Command;
 import org.gatorgradle.command.GatorGraderCommand;
-import org.gatorgradle.util.Console;
 
 import org.gradle.api.GradleException;
 
@@ -66,7 +57,9 @@ public class GatorGradleConfig implements Iterable<Command> {
   private boolean fastBreakBuild = false;
   private String assignmentName = "this assignment";
   private String gatorgraderRevision = "master";
-  private String reportEndpoint = null;
+  private String reportEndpoint = System.getenv("GATOR_ENDPOINT");
+  private String reportApiKey = System.getenv("GATOR_API_KEY");
+  private String reflectionPath = null;
   private Collection<String> commandLineExecutables;
   private Command startupCommand = null;
   private Set<Command> gradingCommands;
@@ -185,6 +178,7 @@ public class GatorGradleConfig implements Iterable<Command> {
     return cmd;
   }
 
+
   /**
    * Parses the config file's header.
    */
@@ -206,14 +200,8 @@ public class GatorGradleConfig implements Iterable<Command> {
       gatorgraderRevision = file.getHeader("version").asString();
     }
 
-    if (file.hasHeader("reportendpoint")) {
-      reportEndpoint = file.getHeader("reportendpoint").asString();
-    } else if (file.hasHeader("endpoint")) {
-      reportEndpoint = file.getHeader("endpoint").asString();
-    } else if (file.hasHeader("report")) {
-      reportEndpoint = file.getHeader("report").asString();
-    } else if (file.hasHeader("lambda")) {
-      reportEndpoint = file.getHeader("lambda").asString();
+    if (file.hasHeader("reflection")) {
+      reflectionPath = file.getHeader("reflection").asString();
     }
 
     if (file.hasHeader("executables")) {
@@ -294,8 +282,16 @@ public class GatorGradleConfig implements Iterable<Command> {
     return startupCommand;
   }
 
+  public String getReflectionPath() {
+    return reflectionPath;
+  }
+
   public String getReportEndpoint() {
     return reportEndpoint;
+  }
+
+  public String getReportApiKey() {
+    return reportApiKey;
   }
 
   public boolean isCommandLineExecutable(String exec) {
