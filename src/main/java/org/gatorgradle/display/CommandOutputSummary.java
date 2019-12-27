@@ -301,7 +301,8 @@ public class CommandOutputSummary {
             cmd,
             "Contains --reach",
             true,
-            "this might work");
+            "this might work"
+          );
       } else {
         if (!includeDiagnostic) {
           log.error(cmd.toString() + " errored: \'" + ex.getMessage() + "\'");
