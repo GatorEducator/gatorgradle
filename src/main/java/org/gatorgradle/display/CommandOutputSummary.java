@@ -296,6 +296,8 @@ public class CommandOutputSummary {
             false,
             "The " + unrec + " check is not supported"
         );
+      } else if (output.contains("--reach")) {
+        result = new CheckResult("This is a reach goal.");
       } else {
         if (!includeDiagnostic) {
           log.error(cmd.toString() + " errored: \'" + ex.getMessage() + "\'");
