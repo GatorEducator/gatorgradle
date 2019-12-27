@@ -297,7 +297,11 @@ public class CommandOutputSummary {
             "The " + unrec + " check is not supported"
         );
       } else if (output.contains("--reach")) {
-        result = new CheckResult("This is a reach goal.");
+        result = new CheckResult(
+            cmd,
+            "Contains --reach",
+            true,
+            "this might work");
       } else {
         if (!includeDiagnostic) {
           log.error(cmd.toString() + " errored: \'" + ex.getMessage() + "\'");
