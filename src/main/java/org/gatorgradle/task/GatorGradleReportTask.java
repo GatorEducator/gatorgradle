@@ -14,7 +14,9 @@ public class GatorGradleReportTask extends GatorGradleTask {
   @TaskAction
   public void report() {
     if (summary == null) {
-      throw new GradleException(StringUtil.color(StringUtil.BAD, "Grading not run -- try gradle --continue grade report"));
+      throw new GradleException(
+          StringUtil.color(
+              StringUtil.BAD, "Grading not run -- try gradle --continue grade report"));
     }
 
     summary.uploadOutputSummary();
