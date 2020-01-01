@@ -1,6 +1,7 @@
 package org.gatorgradle.task;
 
 import org.gatorgradle.task.GatorGradleTask;
+import org.gatorgradle.util.StringUtil;
 
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.GradleException;
@@ -13,7 +14,7 @@ public class GatorGradleReportTask extends GatorGradleTask {
   @TaskAction
   public void report() {
     if (summary == null) {
-      throw new GradleException("No report made! Try gradle --continue grade report");
+      throw new GradleException(StringUtil.color(StringUtil.BAD, "No report made! Try gradle --continue grade report"));
     }
 
     summary.uploadOutputSummary();
