@@ -3,8 +3,8 @@ package org.gatorgradle.task;
 import org.gatorgradle.task.GatorGradleTask;
 import org.gatorgradle.util.StringUtil;
 
-import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.GradleException;
+import org.gradle.api.tasks.TaskAction;
 
 public class GatorGradleReportTask extends GatorGradleTask {
 
