@@ -90,6 +90,7 @@ public class GatorGradleConfig implements Iterable<Command> {
    * @param breakBuild     should the build fail on check failures
    * @param fastBreakBuild should the build immediately fail on check failures
    * @param assignmentName the assignment name
+   * @param usernameEnvVar should the report get user info from env var
    * @param commands       the list of commands to run
    */
   public GatorGradleConfig(boolean breakBuild, boolean fastBreakBuild, String assignmentName,
