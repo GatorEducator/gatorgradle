@@ -197,8 +197,8 @@ public class GatorGradleConfig implements Iterable<Command> {
       fastBreakBuild = file.getHeader("fastfail").asBoolean();
     }
 
-    if (file.hasHeader("usernameEnvVar")) {
-      usernameEnvVar = file.getHeader("usernameEnvVar").asBoolean();
+    if (file.hasHeader("username-envvar")) {
+      usernameEnvVar = file.getHeader("username-envvar").asBoolean();
     }
 
     if (file.hasHeader("revision")) {
