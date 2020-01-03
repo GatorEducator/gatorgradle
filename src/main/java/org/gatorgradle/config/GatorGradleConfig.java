@@ -59,6 +59,7 @@ public class GatorGradleConfig implements Iterable<Command> {
   private String gatorgraderRevision = "master";
   private String reportEndpoint = System.getenv("GATOR_ENDPOINT");
   private String reportApiKey = System.getenv("GATOR_API_KEY");
+  private boolean usernameEnvVar = false;
   private String reflectionPath = null;
   private Collection<String> commandLineExecutables;
   private Command startupCommand = null;
@@ -92,11 +93,12 @@ public class GatorGradleConfig implements Iterable<Command> {
    * @param commands       the list of commands to run
    */
   public GatorGradleConfig(boolean breakBuild, boolean fastBreakBuild, String assignmentName,
-      Collection<Command> commands) {
+      boolean usernameEnvVar, Collection<Command> commands) {
     this();
     this.breakBuild = breakBuild;
     this.fastBreakBuild = fastBreakBuild;
     this.assignmentName = assignmentName;
+    this.usernameEnvVar = usernameEnvVar;
     this.gradingCommands = new HashSet<>(commands);
   }
 
@@ -194,6 +196,10 @@ public class GatorGradleConfig implements Iterable<Command> {
       fastBreakBuild = file.getHeader("fastfail").asBoolean();
     }
 
+    if (file.hasHeader("usernameEnvVar")) {
+      usernameEnvVar = file.getHeader("usernameEnvVar").asBoolean();
+    }
+
     if (file.hasHeader("revision")) {
       gatorgraderRevision = file.getHeader("revision").asString();
     } else if (file.hasHeader("version")) {
@@ -264,6 +270,10 @@ public class GatorGradleConfig implements Iterable<Command> {
 
   public boolean shouldFastBreakBuild() {
     return fastBreakBuild;
+  }
+
+  public boolean shouldUsernameEnvVar() {
+    return usernameEnvVar;
   }
 
   public String getAssignmentName() {
