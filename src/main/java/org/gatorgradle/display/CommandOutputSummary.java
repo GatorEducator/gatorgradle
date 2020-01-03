@@ -118,7 +118,7 @@ public class CommandOutputSummary {
 
     if (GatorGradleConfig.get().hasIdCommand() == true) {
       BasicCommand getUserId = (BasicCommand) GatorGradleConfig.get().getIdCommand();
-      getUserId.run()
+      getUserId.run();
       if (getUserId.exitValue() == Command.SUCCESS) {
         userId = getUserId.getOutput().trim();
       }
