@@ -90,6 +90,6 @@ public class GatorGradlePlugin implements Plugin<Project> {
       task.setConfig(config);
       task.setWorkingDir(project.getProjectDir());
     });
-    reportTask.dependsOn(gradeTask);
+    reportTask.mustRunAfter(gradeTask);
   }
 }
