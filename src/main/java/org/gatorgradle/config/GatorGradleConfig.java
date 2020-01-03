@@ -196,7 +196,7 @@ public class GatorGradleConfig implements Iterable<Command> {
     }
 
     if (file.hasHeader("idCommand")) {
-      startupCommand = makeCommand(null, file.getHeader("startup").asString(), true);
+      idGeneratorCommand = makeCommand(null, file.getHeader("idCommand").asString(), true);
     }
 
     if (file.hasHeader("revision")) {
@@ -271,8 +271,12 @@ public class GatorGradleConfig implements Iterable<Command> {
     return fastBreakBuild;
   }
 
-  public boolean shouldUsernameEnvVar() {
-    return usernameEnvVar;
+  public boolean hasIdCommand() {
+    return idGeneratorCommand != null;
+  }
+
+  public Command getIdCommand() {
+    return idGeneratorCommand;
   }
 
   public String getAssignmentName() {
