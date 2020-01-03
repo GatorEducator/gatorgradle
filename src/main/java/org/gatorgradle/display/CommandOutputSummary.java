@@ -114,15 +114,16 @@ public class CommandOutputSummary {
     StringBuilder builder = new StringBuilder();
     builder.append("{");
 
-    String userEmail = "unknown";
+    String userID = "unknown";
+    String userAttribute = "unknown";
     BasicCommand getGitUser = new BasicCommand("git", "config", "--global", "user.email");
     getGitUser.run();
     if (getGitUser.exitValue() == Command.SUCCESS) {
-      userEmail = getGitUser.getOutput().trim();
+      userID = getGitUser.getOutput().trim();
     }
 
     builder.append("\"user\":");
-    builder.append("\"").append(userEmail).append("\"").append(",");
+    builder.append("\"").append(userID).append("\"").append(",");
 
     builder.append("\"time\":");
     builder.append("\"").append(Instant.now()).append("\"").append(",");
