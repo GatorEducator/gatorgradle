@@ -59,7 +59,7 @@ public class GatorGradleConfig implements Iterable<Command> {
   private String gatorgraderRevision = "master";
   private String reportEndpoint = System.getenv("GATOR_ENDPOINT");
   private String reportApiKey = System.getenv("GATOR_API_KEY");
-  private boolean usernameEnvVar = false;
+  private Command idGeneratorCommand = null;
   private String reflectionPath = null;
   private Collection<String> commandLineExecutables;
   private Command startupCommand = null;
@@ -90,16 +90,14 @@ public class GatorGradleConfig implements Iterable<Command> {
    * @param breakBuild     should the build fail on check failures
    * @param fastBreakBuild should the build immediately fail on check failures
    * @param assignmentName the assignment name
-   * @param usernameEnvVar should the report get user info from env var
    * @param commands       the list of commands to run
    */
   public GatorGradleConfig(boolean breakBuild, boolean fastBreakBuild, String assignmentName,
-      boolean usernameEnvVar, Collection<Command> commands) {
+      Collection<Command> commands) {
     this();
     this.breakBuild = breakBuild;
     this.fastBreakBuild = fastBreakBuild;
     this.assignmentName = assignmentName;
-    this.usernameEnvVar = usernameEnvVar;
     this.gradingCommands = new HashSet<>(commands);
   }
 
@@ -197,8 +195,8 @@ public class GatorGradleConfig implements Iterable<Command> {
       fastBreakBuild = file.getHeader("fastfail").asBoolean();
     }
 
-    if (file.hasHeader("username-envvar")) {
-      usernameEnvVar = file.getHeader("username-envvar").asBoolean();
+    if (file.hasHeader("idCommand")) {
+      startupCommand = makeCommand(null, file.getHeader("startup").asString(), true);
     }
 
     if (file.hasHeader("revision")) {
