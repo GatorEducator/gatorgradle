@@ -114,22 +114,24 @@ public class CommandOutputSummary {
     StringBuilder builder = new StringBuilder();
     builder.append("{");
 
-    String userInfo = "unknown";
-    String userAttribute = "unknown";
-    if (GatorGradleConfig.get().shouldUsernameEnvVar() == true) {
-      userInfo = System.getenv("TRAVIS_REPO_SLUG");
-      userAttribute = "repo";
+    String userId = "unknown";
+
+    if (GatorGradleConfig.get().hasIdCommand() == true) {
+      BasicCommand getUserId = (BasicCommand) GatorGradleConfig.get().getIdCommand();
+      getUserId.run()
+      if (getUserId.exitValue() == Command.SUCCESS) {
+        userId = getUserId.getOutput().trim();
+      }
     } else {
       BasicCommand getGitUser = new BasicCommand("git", "config", "--global", "user.email");
       getGitUser.run();
       if (getGitUser.exitValue() == Command.SUCCESS) {
-        userInfo = getGitUser.getOutput().trim();
+        userId = getGitUser.getOutput().trim();
       }
-      userAttribute = "user";
     }
 
-    builder.append("\"" + userAttribute + "\":");
-    builder.append("\"").append(userInfo).append("\"").append(",");
+    builder.append("\"userId\":");
+    builder.append("\"").append(userId).append("\"").append(",");
 
     builder.append("\"time\":");
     builder.append("\"").append(Instant.now()).append("\"").append(",");
