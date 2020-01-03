@@ -7,7 +7,7 @@ plugins {
 
 group = "${artifact_group}"
 version = "${artifact_release}.${artifact_patch}"
-def build = "git rev-list --count master".execute().text
+def build = "git rev-list --count master".execute().text.trim()
 
 println("\u001B[1;36mVERSION ${version}  --  BUILD ${build}\u001B[0m")
 
