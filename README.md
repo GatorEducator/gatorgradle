@@ -21,7 +21,7 @@ first store the endpoint and API key in environment variables with `GATOR_ENDPOI
 and `GATOR_API_KEY`, then use the `report` task, like so:
 
 ```bash
-gradle report
+gradle --continue grade report
 ```
 
 ## Installing Dependencies
