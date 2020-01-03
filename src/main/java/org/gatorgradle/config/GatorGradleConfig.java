@@ -59,7 +59,7 @@ public class GatorGradleConfig implements Iterable<Command> {
   private String gatorgraderRevision = "master";
   private String reportEndpoint = System.getenv("GATOR_ENDPOINT");
   private String reportApiKey = System.getenv("GATOR_API_KEY");
-  private Command idGeneratorCommand = null;
+  private Command idCommand = null;
   private String reflectionPath = null;
   private Collection<String> commandLineExecutables;
   private Command startupCommand = null;
@@ -195,8 +195,8 @@ public class GatorGradleConfig implements Iterable<Command> {
       fastBreakBuild = file.getHeader("fastfail").asBoolean();
     }
 
-    if (file.hasHeader("idCommand")) {
-      idGeneratorCommand = makeCommand(null, file.getHeader("idCommand").asString(), true);
+    if (file.hasHeader("idcommand")) {
+      idCommand = makeCommand(null, file.getHeader("idcommand").asString(), true);
     }
 
     if (file.hasHeader("revision")) {
@@ -272,11 +272,11 @@ public class GatorGradleConfig implements Iterable<Command> {
   }
 
   public boolean hasIdCommand() {
-    return idGeneratorCommand != null;
+    return idCommand != null;
   }
 
   public Command getIdCommand() {
-    return idGeneratorCommand;
+    return idCommand;
   }
 
   public String getAssignmentName() {
