@@ -1,7 +1,0 @@
-org.gatorgradle
-org.gatorgradle.command
-org.gatorgradle.config
-org.gatorgradle.display
-org.gatorgradle.internal
-org.gatorgradle.task
-org.gatorgradle.util
