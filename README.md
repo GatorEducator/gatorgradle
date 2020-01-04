@@ -58,8 +58,9 @@ break: true
 fastfail: false
 # Specify an indentation level in spaces to be used in this file
 indent: 4
-# Should we collect user info from the environment variable?
-username-envvar: true
+# Command to get user info/id
+# default as git user name
+idcommand: echo $TRAVIS_REPO_SLUG
 # Specify a reference to checkout to in GatorGrader
 version: v0.2.0
 # Specify 'executables' that can be run as checks
