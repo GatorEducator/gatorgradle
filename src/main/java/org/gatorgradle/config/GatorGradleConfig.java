@@ -179,8 +179,6 @@ public class GatorGradleConfig implements Iterable<Command> {
     }
 
     if (file.hasHeader("idcommand")) {
-      // idCommand = makeCommand(null, file.getHeader("idcommand").asString(), true);
-      // System.out.println(idCommand);
       idCommand = file.getHeader("idcommand").asString();
     }
 
