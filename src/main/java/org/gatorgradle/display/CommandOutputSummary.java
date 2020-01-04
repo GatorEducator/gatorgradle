@@ -126,7 +126,6 @@ public class CommandOutputSummary {
         getUserId = new BasicCommand(
             "sh", "-c", GatorGradleConfig.get().getIdCommand());
       }
-      getUserId.outputToSysOut(true);
       getUserId.run();
       if (getUserId.exitValue() == Command.SUCCESS) {
         userId = getUserId.getOutput().trim();
