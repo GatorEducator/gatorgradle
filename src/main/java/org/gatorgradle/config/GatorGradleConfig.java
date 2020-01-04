@@ -85,23 +85,6 @@ public class GatorGradleConfig implements Iterable<Command> {
   }
 
   /**
-   * Create a config that will use the given values.
-   *
-   * @param breakBuild     should the build fail on check failures
-   * @param fastBreakBuild should the build immediately fail on check failures
-   * @param assignmentName the assignment name
-   * @param commands       the list of commands to run
-   */
-  public GatorGradleConfig(boolean breakBuild, boolean fastBreakBuild, String assignmentName,
-      Collection<Command> commands) {
-    this();
-    this.breakBuild = breakBuild;
-    this.fastBreakBuild = fastBreakBuild;
-    this.assignmentName = assignmentName;
-    this.gradingCommands = new HashSet<>(commands);
-  }
-
-  /**
    * Utility method to convert a line of text to a Command.
    *
    * @param  path the path in the config file this line is in the context of
