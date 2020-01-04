@@ -195,8 +195,6 @@ public class CommandOutputSummary {
 
     String resultListJson = builder.toString();
 
-    System.out.println(resultListJson);
-
     log.info("Result JSON: {}", resultListJson);
 
     HttpURLConnection con = null;
