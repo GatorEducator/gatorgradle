@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
@@ -117,7 +118,13 @@ public class CommandOutputSummary {
     String userId = "unknown";
 
     if (GatorGradleConfig.get().hasIdCommand() == true) {
-      BasicCommand getUserId = new BasicCommand("sh", "-c", GatorGradleConfig.get().getIdCommand());
+      if (System.getProperty("os.name").toLowerCase(Locale.ENGLISH) == "windows") {
+        BasicCommand getUserId = new BasicCommand(
+            "sh", "/C", GatorGradleConfig.get().getIdCommand());
+      } else {
+        BasicCommand getUserId = new BasicCommand(
+            "sh", "-c", GatorGradleConfig.get().getIdCommand());
+      }
       getUserId.outputToSysOut(true);
       getUserId.run();
       if (getUserId.exitValue() == Command.SUCCESS) {
