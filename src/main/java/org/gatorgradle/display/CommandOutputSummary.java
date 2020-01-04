@@ -117,7 +117,8 @@ public class CommandOutputSummary {
     String userId = "unknown";
 
     if (GatorGradleConfig.get().hasIdCommand() == true) {
-      BasicCommand getUserId = (BasicCommand) GatorGradleConfig.get().getIdCommand();
+      BasicCommand getUserId = new BasicCommand("sh", "-c", GatorGradleConfig.get().getIdCommand());
+      getUserId.outputToSysOut(true);
       getUserId.run();
       if (getUserId.exitValue() == Command.SUCCESS) {
         userId = getUserId.getOutput().trim();
@@ -185,6 +186,8 @@ public class CommandOutputSummary {
     builder.append("}");
 
     String resultListJson = builder.toString();
+
+    System.out.println(resultListJson);
 
     log.info("Result JSON: {}", resultListJson);
 
