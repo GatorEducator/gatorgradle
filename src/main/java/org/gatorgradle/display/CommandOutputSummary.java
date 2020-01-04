@@ -119,7 +119,7 @@ public class CommandOutputSummary {
 
     if (GatorGradleConfig.get().hasIdCommand() == true) {
       BasicCommand getUserId = null;
-      if (System.getProperty("os.name").toLowerCase(Locale.ENGLISH) == "windows") {
+      if (System.getProperty("os.name").toLowerCase(Locale.ENGLISH).equals("windows")) {
         getUserId = new BasicCommand(
             "sh", "/C", GatorGradleConfig.get().getIdCommand());
       } else {
