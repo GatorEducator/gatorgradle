@@ -118,11 +118,12 @@ public class CommandOutputSummary {
     String userId = "unknown";
 
     if (GatorGradleConfig.get().hasIdCommand() == true) {
+      BasicCommand getUserId = null;
       if (System.getProperty("os.name").toLowerCase(Locale.ENGLISH) == "windows") {
-        BasicCommand getUserId = new BasicCommand(
+        getUserId = new BasicCommand(
             "sh", "/C", GatorGradleConfig.get().getIdCommand());
       } else {
-        BasicCommand getUserId = new BasicCommand(
+        getUserId = new BasicCommand(
             "sh", "-c", GatorGradleConfig.get().getIdCommand());
       }
       getUserId.outputToSysOut(true);
