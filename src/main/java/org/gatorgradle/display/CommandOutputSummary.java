@@ -164,8 +164,8 @@ public class CommandOutputSummary {
           )
 
       );
-    } catch (IOException exception) {
-      exception.printStackTrace();
+    } catch (IOException ex) {
+      log.error("Exception while reading reflection file: {}", ex.toString());
     }
     builder.append("\"").append(",");
     // end reflection
