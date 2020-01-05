@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -128,6 +129,9 @@ public class CommandOutputSummary {
     getUserId.run();
     if (getUserId.exitValue() == Command.SUCCESS) {
       userId = getUserId.getOutput().trim();
+    } else {
+      // Get Host Name
+      userId = InetAddress.getLocalHost().getHostName();
     }
 
     builder.append("\"userId\":");
