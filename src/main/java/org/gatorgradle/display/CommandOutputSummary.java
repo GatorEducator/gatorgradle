@@ -7,6 +7,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
+import java.net.UnknownHostException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -130,8 +131,11 @@ public class CommandOutputSummary {
     if (getUserId.exitValue() == Command.SUCCESS) {
       userId = getUserId.getOutput().trim();
     } else {
-      // Get Host Name
-      userId = InetAddress.getLocalHost().getHostName();
+      try {
+        userId = InetAddress.getLocalHost().getHostName();
+      } catch (UnknownHostException ex) {
+        log.error("Exception while getting local host name: {}", ex.toString());
+      }
     }
 
     builder.append("\"userId\":");
