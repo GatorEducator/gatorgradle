@@ -7,8 +7,8 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
-import java.net.UnknownHostException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -19,11 +19,11 @@ import java.util.Locale;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
+import org.gatorgradle.GatorGradlePlugin;
 import org.gatorgradle.command.BasicCommand;
 import org.gatorgradle.command.Command;
 import org.gatorgradle.command.GatorGraderCommand;
 import org.gatorgradle.config.GatorGradleConfig;
-import org.gatorgradle.GatorGradlePlugin;
 import org.gatorgradle.util.StringUtil;
 
 import org.gradle.api.GradleException;
