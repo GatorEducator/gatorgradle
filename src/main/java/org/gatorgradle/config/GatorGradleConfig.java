@@ -59,7 +59,7 @@ public class GatorGradleConfig implements Iterable<Command> {
   private String gatorgraderRevision = "master";
   private String reportEndpoint = System.getenv("GATOR_ENDPOINT");
   private String reportApiKey = System.getenv("GATOR_API_KEY");
-  private String idCommand = null;
+  private String idCommand = "git config --global user.email";
   private String reflectionPath = null;
   private Collection<String> commandLineExecutables;
   private Command startupCommand = null;
@@ -252,10 +252,6 @@ public class GatorGradleConfig implements Iterable<Command> {
 
   public boolean shouldFastBreakBuild() {
     return fastBreakBuild;
-  }
-
-  public boolean hasIdCommand() {
-    return idCommand != null;
   }
 
   public String getIdCommand() {
