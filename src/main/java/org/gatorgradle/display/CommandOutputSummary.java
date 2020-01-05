@@ -21,6 +21,7 @@ import org.gatorgradle.command.BasicCommand;
 import org.gatorgradle.command.Command;
 import org.gatorgradle.command.GatorGraderCommand;
 import org.gatorgradle.config.GatorGradleConfig;
+import org.gatorgradle.GatorGradlePlugin;
 import org.gatorgradle.util.StringUtil;
 
 import org.gradle.api.GradleException;
@@ -117,7 +118,7 @@ public class CommandOutputSummary {
 
     String userId = "unknown";
     BasicCommand getUserId = null;
-    if (System.getProperty("os.name").toLowerCase(Locale.ENGLISH).equals("windows")) {
+    if (GatorGradlePlugin.OS.equals(GatorGradlePlugin.WINDOWS)) {
       getUserId = new BasicCommand(
           "sh", "/C", GatorGradleConfig.get().getIdCommand());
     } else {
@@ -128,8 +129,6 @@ public class CommandOutputSummary {
     if (getUserId.exitValue() == Command.SUCCESS) {
       userId = getUserId.getOutput().trim();
     }
-
-
 
     builder.append("\"userId\":");
     builder.append("\"").append(userId).append("\"").append(",");
