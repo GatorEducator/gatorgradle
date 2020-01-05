@@ -116,27 +116,20 @@ public class CommandOutputSummary {
     builder.append("{");
 
     String userId = "unknown";
-
-    if (GatorGradleConfig.get().hasIdCommand() == true) {
-      BasicCommand getUserId = null;
-      if (System.getProperty("os.name").toLowerCase(Locale.ENGLISH).equals("windows")) {
-        getUserId = new BasicCommand(
-            "sh", "/C", GatorGradleConfig.get().getIdCommand());
-      } else {
-        getUserId = new BasicCommand(
-            "sh", "-c", GatorGradleConfig.get().getIdCommand());
-      }
-      getUserId.run();
-      if (getUserId.exitValue() == Command.SUCCESS) {
-        userId = getUserId.getOutput().trim();
-      }
+    BasicCommand getUserId = null;
+    if (System.getProperty("os.name").toLowerCase(Locale.ENGLISH).equals("windows")) {
+      getUserId = new BasicCommand(
+          "sh", "/C", GatorGradleConfig.get().getIdCommand());
     } else {
-      BasicCommand getGitUser = new BasicCommand("git", "config", "--global", "user.email");
-      getGitUser.run();
-      if (getGitUser.exitValue() == Command.SUCCESS) {
-        userId = getGitUser.getOutput().trim();
-      }
+      getUserId = new BasicCommand(
+          "sh", "-c", GatorGradleConfig.get().getIdCommand());
     }
+    getUserId.run();
+    if (getUserId.exitValue() == Command.SUCCESS) {
+      userId = getUserId.getOutput().trim();
+    }
+
+
 
     builder.append("\"userId\":");
     builder.append("\"").append(userId).append("\"").append(",");
