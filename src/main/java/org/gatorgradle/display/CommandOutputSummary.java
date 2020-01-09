@@ -5,10 +5,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -130,11 +128,7 @@ public class CommandOutputSummary {
     if (getUserId.exitValue() == Command.SUCCESS) {
       userId = getUserId.getOutput().trim();
     } else {
-      try {
-        userId = InetAddress.getLocalHost().getHostName();
-      } catch (UnknownHostException ex) {
-        log.error("Exception while getting local host name: {}", ex.toString());
-      }
+      log.error("Exception while collecting user info");
     }
 
     builder.append("\"userId\":");
