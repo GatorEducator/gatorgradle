@@ -157,7 +157,9 @@ public class CommandOutputSummary {
         )
       );
     } catch (IOException ex) {
-      log.error("Failed to read {}, not uploading results.", GatorGradleConfig.get().getReflectionPath());
+      log.error(
+          "Failed to read {}, not uploading results.",
+          GatorGradleConfig.get().getReflectionPath());
       throw new GradleException("Exception while reading reflection file", ex);
     }
     builder.append("\"").append(reflection).append("\"").append(",");
@@ -235,8 +237,8 @@ public class CommandOutputSummary {
       }
 
     } catch (MalformedURLException ex) {
-      log.error("Failed to upload data; report endpoint specified in configuration is malformed.");
-      throw new GradleException("Failed to upload data; report endpoint specified in configuration is malformed");
+      log.error("Failed to upload data; configured report endpoint is malformed.");
+      throw new GradleException("Failed to upload data; configured report endpoint is malformed");
     } catch (IOException ex) {
       log.error("Exception while uploading check data: {}", ex.toString());
       throw new GradleException("Exception while uploading check data", ex);
