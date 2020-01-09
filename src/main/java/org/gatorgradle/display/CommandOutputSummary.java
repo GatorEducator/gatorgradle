@@ -128,7 +128,8 @@ public class CommandOutputSummary {
     if (getUserId.exitValue() == Command.SUCCESS) {
       userId = getUserId.getOutput().trim();
     } else {
-      log.error("Exception while collecting user info");
+      log.error("No user information collected, not uploading results.");
+      return;
     }
 
     builder.append("\"userId\":");
