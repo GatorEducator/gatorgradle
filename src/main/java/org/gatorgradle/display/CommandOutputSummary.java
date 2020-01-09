@@ -115,7 +115,7 @@ public class CommandOutputSummary {
     StringBuilder builder = new StringBuilder();
     builder.append("{");
 
-    String userId = "unknown";
+    String userId;
     BasicCommand getUserId = null;
     if (GatorGradlePlugin.OS.equals(GatorGradlePlugin.WINDOWS)) {
       getUserId = new BasicCommand(
@@ -128,8 +128,8 @@ public class CommandOutputSummary {
     if (getUserId.exitValue() == Command.SUCCESS) {
       userId = getUserId.getOutput().trim();
     } else {
-      log.error("ERROR: User ID command failed, not uploading results.");
-      return;
+      log.error("User ID command failed, not uploading results.");
+      throw new GradleException("User ID command failed");
     }
 
     builder.append("\"userId\":");
@@ -144,24 +144,23 @@ public class CommandOutputSummary {
 
     // reflection
     builder.append("\"reflection\":");
+    String reflection = "";
     try {
-      builder.append("\"").append(
-          StringUtil.jsonEscape(
-            String.join(
-              "\n",
-              Files.readAllLines(
-                  Paths.get(
-                      GatorGradleConfig.get().getReflectionPath()
-                  )
+      reflection = StringUtil.jsonEscape(
+        String.join(
+          "\n",
+          Files.readAllLines(
+              Paths.get(
+                  GatorGradleConfig.get().getReflectionPath()
               )
-            )
           )
-
+        )
       );
     } catch (IOException ex) {
-      log.error("Exception while reading reflection file: {}", ex.toString());
+      log.error("Failed to read {}, not uploading results.", GatorGradleConfig.get().getReflectionPath());
+      throw new GradleException("Exception while reading reflection file", ex);
     }
-    builder.append("\"").append(",");
+    builder.append("\"").append(reflection).append("\"").append(",");
     // end reflection
 
     // report
@@ -197,10 +196,10 @@ public class CommandOutputSummary {
       String apikey = GatorGradleConfig.get().getReportApiKey();
       if (endpoint == null || endpoint.isEmpty()) {
         log.error("No report endpoint specified, not uploading results.");
-        return;
+        throw new GradleException("No report endpoint specified");
       } else if (apikey == null || apikey.isEmpty()) {
         log.error("No API key specified, not uploading results.");
-        return;
+        throw new GradleException("No API key specified");
       }
       URL url = new URL(endpoint);
       con = (HttpURLConnection) url.openConnection();
@@ -237,8 +236,10 @@ public class CommandOutputSummary {
 
     } catch (MalformedURLException ex) {
       log.error("Failed to upload data; report endpoint specified in configuration is malformed.");
+      throw new GradleException("Failed to upload data; report endpoint specified in configuration is malformed");
     } catch (IOException ex) {
       log.error("Exception while uploading check data: {}", ex.toString());
+      throw new GradleException("Exception while uploading check data", ex);
     } finally {
       if (con != null) {
         con.disconnect();
@@ -309,7 +310,7 @@ public class CommandOutputSummary {
         );
       } else {
         if (!includeDiagnostic) {
-          log.error(cmd.toString() + " errored: \'" + ex.getMessage() + "\'");
+          log.error("{} errored: \'{}\'", cmd.toString(), ex.getMessage());
         }
         result = new CheckResult(
             cmd,
