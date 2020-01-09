@@ -113,7 +113,7 @@ public class CommandOutputSummary {
    */
   public void uploadOutputSummary(List<CheckResult> failed, List<CheckResult> all) {
     StringBuilder builder = new StringBuilder();
-    builder.append("{");
+    builder.append('{');
 
     String userId;
     BasicCommand getUserId = null;
@@ -133,14 +133,14 @@ public class CommandOutputSummary {
     }
 
     builder.append("\"userId\":");
-    builder.append("\"").append(userId).append("\"").append(",");
+    builder.append('\"').append(userId).append('\"').append(',');
 
     builder.append("\"time\":");
-    builder.append("\"").append(Instant.now()).append("\"").append(",");
+    builder.append('\"').append(Instant.now()).append('\"').append(',');
 
     builder.append("\"assignment\":");
-    builder.append("\"").append(GatorGradleConfig.get().getAssignmentName());
-    builder.append("\"").append(",");
+    builder.append('\"').append(GatorGradleConfig.get().getAssignmentName());
+    builder.append('\"').append(',');
 
     // reflection
     builder.append("\"reflection\":");
@@ -162,19 +162,19 @@ public class CommandOutputSummary {
           GatorGradleConfig.get().getReflectionPath());
       throw new GradleException("Exception while reading reflection file", ex);
     }
-    builder.append("\"").append(reflection).append("\"").append(",");
+    builder.append('\"').append(reflection).append('\"').append(',');
     // end reflection
 
     // report
     builder.append("\"report\":{");
 
     builder.append("\"numberOfChecks\":");
-    builder.append(Integer.toString(all.size())).append(",");
+    builder.append(Integer.toString(all.size())).append(',');
 
     builder.append("\"numberOfFailures\":");
-    builder.append(Integer.toString(failed.size())).append(",");
+    builder.append(Integer.toString(failed.size())).append(',');
 
-    builder.append("\"results\":").append("[");
+    builder.append("\"results\":").append('[');
     builder.append(
         String.join(
           ",",
@@ -182,10 +182,10 @@ public class CommandOutputSummary {
           .collect(Collectors.toList())
         )
     );
-    builder.append("]").append("}");
+    builder.append(']').append('}');
     // end report
 
-    builder.append("}");
+    builder.append('}');
 
     String resultListJson = builder.toString();
 

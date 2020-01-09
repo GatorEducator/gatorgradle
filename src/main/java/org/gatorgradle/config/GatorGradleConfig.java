@@ -23,7 +23,7 @@ import org.gradle.api.GradleException;
  * GatorGradleConfig holds the configuration for this assignment.
  * TODO: make this configurable via DSL blocks in build.gradle
  */
-public class GatorGradleConfig implements Iterable<Command> {
+public final class GatorGradleConfig implements Iterable<Command> {
 
   private static GatorGradleConfig singleton;
 
