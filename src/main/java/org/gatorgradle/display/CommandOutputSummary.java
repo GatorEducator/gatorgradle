@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
+import org.gatorgradle.GatorGradlePlugin;
 import org.gatorgradle.command.BasicCommand;
 import org.gatorgradle.command.Command;
 import org.gatorgradle.command.GatorGraderCommand;
@@ -95,9 +96,9 @@ public class CommandOutputSummary {
 
   private void printResult(CheckResult result, boolean includeDiagnostic) {
     // debug output for TAs
-    log.info("COMMAND: '{}'", result.command.toString());
-    log.info("EXIT VALUE: '{}'", result.command.exitValue());
-    log.info("OUTPUT:");
+    log.debug("COMMAND: '{}'", result.command.toString());
+    log.debug("EXIT VALUE: '{}'", result.command.exitValue());
+    log.debug("OUTPUT:");
 
     // actual output of the command should be parsed and colored, etc
     log.lifecycle(result.textReport(includeDiagnostic));
@@ -112,57 +113,66 @@ public class CommandOutputSummary {
    */
   public void uploadOutputSummary(List<CheckResult> failed, List<CheckResult> all) {
     StringBuilder builder = new StringBuilder();
-    builder.append("{");
+    builder.append('{');
 
-    String userEmail = "unknown";
-    BasicCommand getGitUser = new BasicCommand("git", "config", "--global", "user.email");
-    getGitUser.run();
-    if (getGitUser.exitValue() == Command.SUCCESS) {
-      userEmail = getGitUser.getOutput().trim();
+    String userId;
+    BasicCommand getUserId = null;
+    if (GatorGradlePlugin.OS.equals(GatorGradlePlugin.WINDOWS)) {
+      getUserId = new BasicCommand(
+          "sh", "/C", GatorGradleConfig.get().getIdCommand());
+    } else {
+      getUserId = new BasicCommand(
+          "sh", "-c", GatorGradleConfig.get().getIdCommand());
+    }
+    getUserId.run();
+    if (getUserId.exitValue() == Command.SUCCESS) {
+      userId = getUserId.getOutput().trim();
+    } else {
+      throw new GradleException("User ID command failed");
     }
 
-    builder.append("\"user\":");
-    builder.append("\"").append(userEmail).append("\"").append(",");
+    builder.append("\"userId\":");
+    builder.append('\"').append(userId).append('\"').append(',');
 
     builder.append("\"time\":");
-    builder.append("\"").append(Instant.now()).append("\"").append(",");
+    builder.append('\"').append(Instant.now()).append('\"').append(',');
 
     builder.append("\"assignment\":");
-    builder.append("\"").append(GatorGradleConfig.get().getAssignmentName());
-    builder.append("\"").append(",");
+    builder.append('\"').append(GatorGradleConfig.get().getAssignmentName());
+    builder.append('\"').append(',');
 
     // reflection
     builder.append("\"reflection\":");
+    String reflection = "";
     try {
-      builder.append("\"").append(
-          StringUtil.jsonEscape(
-            String.join(
-              "\n",
-              Files.readAllLines(
-                  Paths.get(
-                      GatorGradleConfig.get().getReflectionPath()
-                  )
+      reflection = StringUtil.jsonEscape(
+        String.join(
+          "\n",
+          Files.readAllLines(
+              Paths.get(
+                  GatorGradleConfig.get().getReflectionPath()
               )
-            )
           )
-
+        )
       );
-    } catch (IOException exception) {
-      exception.printStackTrace();
+    } catch (IOException ex) {
+      throw new GradleException(
+          "Exception while reading reflection file "
+          + GatorGradleConfig.get().getReflectionPath(), ex);
     }
-    builder.append("\"").append(",");
+    builder.append('\"').append(reflection).append('\"').append(',');
     // end reflection
 
     // report
     builder.append("\"report\":{");
 
     builder.append("\"numberOfChecks\":");
-    builder.append(Integer.toString(all.size())).append(",");
+    builder.append(Integer.toString(all.size())).append(',');
 
     builder.append("\"numberOfFailures\":");
-    builder.append(Integer.toString(failed.size())).append(",");
+    builder.append(Integer.toString(failed.size())).append(',');
 
-    builder.append("\"results\":").append("[");
+    builder.append("\"results\":").append('[');
     builder.append(
         String.join(
           ",",
@@ -170,26 +180,25 @@ public class CommandOutputSummary {
           .collect(Collectors.toList())
         )
     );
-    builder.append("]").append("}");
+    builder.append(']').append('}');
     // end report
 
-    builder.append("}");
+    builder.append('}');
 
     String resultListJson = builder.toString();
 
     log.info("Result JSON: {}", resultListJson);
 
     HttpURLConnection con = null;
+    // get report endpoint and api key from environment variable
+    String endpoint = GatorGradleConfig.get().getReportEndpoint();
+    String apikey = GatorGradleConfig.get().getReportApiKey();
+    log.info("Uploading report to {} with key {}", endpoint, apikey);
     try {
-      // get report endpoint and api key from environment variable
-      String endpoint = GatorGradleConfig.get().getReportEndpoint();
-      String apikey = GatorGradleConfig.get().getReportApiKey();
       if (endpoint == null || endpoint.isEmpty()) {
-        log.error("No report endpoint specified, not uploading results.");
-        return;
+        throw new GradleException("No report endpoint specified");
       } else if (apikey == null || apikey.isEmpty()) {
-        log.error("No API key specified, not uploading results.");
-        return;
+        throw new GradleException("No API key specified");
       }
       URL url = new URL(endpoint);
       con = (HttpURLConnection) url.openConnection();
@@ -206,7 +215,7 @@ public class CommandOutputSummary {
       try (OutputStream os = con.getOutputStream()) {
         byte[] input = resultListJson.getBytes(StandardCharsets.UTF_8);
         os.write(input, 0, input.length);
-        log.info("Compiled JSON to send:{}", resultListJson);
+        log.info("Compiled JSON to send: {}", resultListJson);
       }
 
       // get response
@@ -221,13 +230,15 @@ public class CommandOutputSummary {
       }
 
       if (con.getResponseCode() == 200) {
-        System.out.println("Upload successfully");
+        log.lifecycle("Report uploaded successfully");
       }
 
     } catch (MalformedURLException ex) {
-      log.error("Failed to upload data; report endpoint specified in configuration is malformed.");
+      throw new GradleException(
+          "Failed to upload data; configured report endpoint ("
+          + endpoint + ") is malformed", ex);
     } catch (IOException ex) {
-      log.error("Exception while uploading check data: {}", ex.toString());
+      throw new GradleException("Exception while uploading check data", ex);
     } finally {
       if (con != null) {
         con.disconnect();
@@ -298,7 +309,7 @@ public class CommandOutputSummary {
         );
       } else {
         if (!includeDiagnostic) {
-          log.error(cmd.toString() + " errored: \'" + ex.getMessage() + "\'");
+          log.error("{} errored: \'{}\'", cmd.toString(), ex.getMessage());
         }
         result = new CheckResult(
             cmd,
