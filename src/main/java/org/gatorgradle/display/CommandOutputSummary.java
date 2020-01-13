@@ -96,9 +96,9 @@ public class CommandOutputSummary {
 
   private void printResult(CheckResult result, boolean includeDiagnostic) {
     // debug output for TAs
-    log.info("COMMAND: '{}'", result.command.toString());
-    log.info("EXIT VALUE: '{}'", result.command.exitValue());
-    log.info("OUTPUT:");
+    log.debug("COMMAND: '{}'", result.command.toString());
+    log.debug("EXIT VALUE: '{}'", result.command.exitValue());
+    log.debug("OUTPUT:");
 
     // actual output of the command should be parsed and colored, etc
     log.lifecycle(result.textReport(includeDiagnostic));
@@ -128,7 +128,6 @@ public class CommandOutputSummary {
     if (getUserId.exitValue() == Command.SUCCESS) {
       userId = getUserId.getOutput().trim();
     } else {
-      log.error("User ID command failed, not uploading results.");
       throw new GradleException("User ID command failed");
     }
 
@@ -157,10 +156,9 @@ public class CommandOutputSummary {
         )
       );
     } catch (IOException ex) {
-      log.error(
-          "Failed to read {}, not uploading results.",
-          GatorGradleConfig.get().getReflectionPath());
-      throw new GradleException("Exception while reading reflection file", ex);
+      throw new GradleException(
+          "Exception while reading reflection file "
+          + GatorGradleConfig.get().getReflectionPath(), ex);
     }
     builder.append('\"').append(reflection).append('\"').append(',');
     // end reflection
@@ -192,15 +190,14 @@ public class CommandOutputSummary {
     log.info("Result JSON: {}", resultListJson);
 
     HttpURLConnection con = null;
+    // get report endpoint and api key from environment variable
+    String endpoint = GatorGradleConfig.get().getReportEndpoint();
+    String apikey = GatorGradleConfig.get().getReportApiKey();
+    log.info("Uploading report to {} with key {}", endpoint, apikey);
     try {
-      // get report endpoint and api key from environment variable
-      String endpoint = GatorGradleConfig.get().getReportEndpoint();
-      String apikey = GatorGradleConfig.get().getReportApiKey();
       if (endpoint == null || endpoint.isEmpty()) {
-        log.error("No report endpoint specified, not uploading results.");
         throw new GradleException("No report endpoint specified");
       } else if (apikey == null || apikey.isEmpty()) {
-        log.error("No API key specified, not uploading results.");
         throw new GradleException("No API key specified");
       }
       URL url = new URL(endpoint);
@@ -218,7 +215,7 @@ public class CommandOutputSummary {
       try (OutputStream os = con.getOutputStream()) {
         byte[] input = resultListJson.getBytes(StandardCharsets.UTF_8);
         os.write(input, 0, input.length);
-        log.info("Compiled JSON to send:{}", resultListJson);
+        log.info("Compiled JSON to send: {}", resultListJson);
       }
 
       // get response
@@ -233,14 +230,14 @@ public class CommandOutputSummary {
       }
 
       if (con.getResponseCode() == 200) {
-        System.out.println("Upload successfully");
+        log.lifecycle("Report uploaded successfully");
       }
 
     } catch (MalformedURLException ex) {
-      log.error("Failed to upload data; configured report endpoint is malformed.");
-      throw new GradleException("Failed to upload data; configured report endpoint is malformed");
+      throw new GradleException(
+          "Failed to upload data; configured report endpoint ("
+          + endpoint + ") is malformed", ex);
     } catch (IOException ex) {
-      log.error("Exception while uploading check data: {}", ex.toString());
       throw new GradleException("Exception while uploading check data", ex);
     } finally {
       if (con != null) {
