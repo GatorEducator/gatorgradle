@@ -139,8 +139,7 @@ public class CheckResult {
     } else if (check.contains("--reach")) {
       outcome = outcome;
       return REACH_SYMBOL + INDENT + check;
-    }
-    else {
+    } else {
       String output = FAIL_SYMBOL + INDENT + check;
       if (includeDiagnostic) {
         output += "\n " + INDENT + FIX_SYMBOL + INDENT + StringUtil.color(StringUtil.FIX,
