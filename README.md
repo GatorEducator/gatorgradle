@@ -58,6 +58,9 @@ break: true
 fastfail: false
 # Specify an indentation level in spaces to be used in this file
 indent: 4
+# Command to get user info/id
+# default is 'git config --global user.email'
+idcommand: echo $TRAVIS_REPO_SLUG
 # Specify a reference to checkout to in GatorGrader
 version: v0.2.0
 # Specify 'executables' that can be run as checks

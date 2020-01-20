@@ -23,7 +23,7 @@ import org.gradle.api.GradleException;
  * GatorGradleConfig holds the configuration for this assignment.
  * TODO: make this configurable via DSL blocks in build.gradle
  */
-public class GatorGradleConfig implements Iterable<Command> {
+public final class GatorGradleConfig implements Iterable<Command> {
 
   private static GatorGradleConfig singleton;
 
@@ -59,6 +59,7 @@ public class GatorGradleConfig implements Iterable<Command> {
   private String gatorgraderRevision = "master";
   private String reportEndpoint = System.getenv("GATOR_ENDPOINT");
   private String reportApiKey = System.getenv("GATOR_API_KEY");
+  private String idCommand = "git config --global user.email";
   private String reflectionPath = null;
   private Collection<String> commandLineExecutables;
   private Command startupCommand = null;
@@ -81,23 +82,6 @@ public class GatorGradleConfig implements Iterable<Command> {
   private GatorGradleConfig(Path configFile) {
     this();
     this.file = new ConfigMap(configFile);
-  }
-
-  /**
-   * Create a config that will use the given values.
-   *
-   * @param breakBuild     should the build fail on check failures
-   * @param fastBreakBuild should the build immediately fail on check failures
-   * @param assignmentName the assignment name
-   * @param commands       the list of commands to run
-   */
-  public GatorGradleConfig(boolean breakBuild, boolean fastBreakBuild, String assignmentName,
-      Collection<Command> commands) {
-    this();
-    this.breakBuild = breakBuild;
-    this.fastBreakBuild = fastBreakBuild;
-    this.assignmentName = assignmentName;
-    this.gradingCommands = new HashSet<>(commands);
   }
 
   /**
@@ -194,6 +178,12 @@ public class GatorGradleConfig implements Iterable<Command> {
       fastBreakBuild = file.getHeader("fastfail").asBoolean();
     }
 
+    if (file.hasHeader("idcommand")) {
+      idCommand = file.getHeader("idcommand").asString();
+    } else if (file.hasHeader("idcmd")) {
+      idCommand = file.getHeader("idcmd").asString();
+    }
+
     if (file.hasHeader("revision")) {
       gatorgraderRevision = file.getHeader("revision").asString();
     } else if (file.hasHeader("version")) {
@@ -264,6 +254,10 @@ public class GatorGradleConfig implements Iterable<Command> {
 
   public boolean shouldFastBreakBuild() {
     return fastBreakBuild;
+  }
+
+  public String getIdCommand() {
+    return idCommand;
   }
 
   public String getAssignmentName() {
