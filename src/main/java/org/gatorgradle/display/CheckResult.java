@@ -137,7 +137,6 @@ public class CheckResult {
     if (outcome) {
       return PASS_SYMBOL + INDENT + check;
     } else if (check.contains("--reach")) {
-      outcome = outcome;
       return REACH_SYMBOL + INDENT + check;
     } else {
       String output = FAIL_SYMBOL + INDENT + check;
