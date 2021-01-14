@@ -5,6 +5,7 @@ into a Gradle project.
 
 [![build](https://github.com/GatorEducator/gatorgradle/workflows/build/badge.svg?branch=master)](https://github.com/GatorEducator/gatorgradle/actions?query=workflow%3A%22build%22+branch%3Amaster)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/8267c156c2874fc39f89effbdfdb8f5b)](https://app.codacy.com/app/GatorEducator/gatorgradle?utm_source=github.com&utm_medium=referral&utm_content=GatorEducator/gatorgradle&utm_campaign=Badge_Grade_Dashboard)
+[![Known Vulnerabilities](https://snyk.io/test/github/GatorEducator/gatorgradle/badge.svg?targetFile=build.gradle)](https://snyk.io/test/github/GatorEducator/gatorgradle?targetFile=build.gradle)
 [![Javadocs](https://gatoreducator.github.io/gatorgradle/docs/docs-status-badge.svg)](https://gatoreducator.github.io/gatorgradle/docs)
 
 ## Running Checks

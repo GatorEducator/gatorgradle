@@ -3,6 +3,15 @@ name: build
 on: [push, pull_request]
 
 jobs:
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Run MDL
+        uses: actionshub/markdownlint@main
+
   build:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -26,5 +35,3 @@ jobs:
           job-id: ${{ matrix.java-version }}
           gradle-version: 6.8
           arguments: check build
-      - name: Run MDL
-        uses: actionshub/markdownlint@main
