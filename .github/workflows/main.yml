@@ -20,9 +20,11 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: ${{ matrix.java-version }}
-      - uses: burrunan/gradle-cache-action@v1
-        name: Check and Build
+      - name: Run Gradle
+        uses: burrunan/gradle-cache-action@v1
         with:
           job-id: ${{ matrix.java-version }}
           gradle-version: 6.8
           arguments: check build
+      - name: Run MDL
+        uses: actionshub/markdownlint@main

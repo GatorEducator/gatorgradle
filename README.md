@@ -3,7 +3,7 @@
 GatorGradle integrates [GatorGrader](https://github.com/GatorEducator/gatorgrader)
 into a Gradle project.
 
-[![Build Status](https://travis-ci.org/GatorEducator/gatorgradle.svg?branch=master)](https://travis-ci.org/GatorEducator/gatorgradle)
+[![build](https://github.com/GatorEducator/gatorgradle/workflows/build/badge.svg?branch=master)](https://github.com/GatorEducator/gatorgradle/actions?query=workflow%3A%22build%22+branch%3Amaster)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/8267c156c2874fc39f89effbdfdb8f5b)](https://app.codacy.com/app/GatorEducator/gatorgradle?utm_source=github.com&utm_medium=referral&utm_content=GatorEducator/gatorgradle&utm_campaign=Badge_Grade_Dashboard)
 [![Javadocs](https://gatoreducator.github.io/gatorgradle/docs/docs-status-badge.svg)](https://gatoreducator.github.io/gatorgradle/docs)
 
