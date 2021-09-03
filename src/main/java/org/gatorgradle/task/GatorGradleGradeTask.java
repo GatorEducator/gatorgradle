@@ -11,7 +11,6 @@ import org.gatorgradle.util.Console;
 import org.gradle.api.GradleException;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.tasks.TaskAction;
-import org.gradle.workers.IsolationMode;
 import org.gradle.workers.WorkerExecutor;
 
 public class GatorGradleGradeTask extends GatorGradleTask {
@@ -73,8 +72,7 @@ public class GatorGradleGradeTask extends GatorGradleTask {
         }
 
         // configure command executor
-        executor.submit(CommandExecutor.class, (conf) -> {
-          conf.setIsolationMode(IsolationMode.NONE);
+        executor.noIsolation().submit(CommandExecutor.class, (conf) -> {
           conf.setDisplayName(cmd.toString());
           conf.setParams(cmd);
         });
