@@ -5,22 +5,20 @@ import javax.inject.Inject;
 import org.gatorgradle.command.Command;
 import org.gatorgradle.display.CommandOutputSummary;
 import org.gatorgradle.internal.ProgressLoggerWrapper;
-import org.gatorgradle.task.GatorGradleTask;
 import org.gatorgradle.util.Console;
-
 import org.gradle.api.GradleException;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.tasks.TaskAction;
-import org.gradle.workers.IsolationMode;
+import org.gradle.workers.WorkQueue;
 import org.gradle.workers.WorkerExecutor;
 
 public class GatorGradleGradeTask extends GatorGradleTask {
-  // The executor to use to execute the gradin
-  private final WorkerExecutor executor;
+  // The executor to use to execute the grading
+  private final WorkQueue executor;
 
   @Inject
   public GatorGradleGradeTask(WorkerExecutor executor) {
-    this.executor = executor;
+    this.executor = executor.noIsolation();
   }
 
   // because of Java serialization limitations, along with
@@ -73,11 +71,7 @@ public class GatorGradleGradeTask extends GatorGradleTask {
         }
 
         // configure command executor
-        executor.submit(CommandExecutor.class, (conf) -> {
-          conf.setIsolationMode(IsolationMode.NONE);
-          conf.setDisplayName(cmd.toString());
-          conf.setParams(cmd);
-        });
+        executor.submit(CommandExecutor.class, params -> params.getCommand().set(cmd));
       }
 
       int percentComplete = 0;

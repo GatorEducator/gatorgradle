@@ -1,24 +1,19 @@
 package org.gatorgradle.task;
 
-import javax.inject.Inject;
-
 import org.gatorgradle.command.Command;
+import org.gradle.api.provider.Property;
+import org.gradle.workers.WorkAction;
+import org.gradle.workers.WorkParameters;
 
-import org.gradle.workers.WorkerExecutor;
+public abstract class CommandExecutor
+    implements WorkAction<CommandExecutor.CommandExecutorParameters> {
 
-public class CommandExecutor implements Runnable {
-  private Command command;
-
-  @Inject
-  public CommandExecutor(Command command) {
-    this.command = command;
+  @Override
+  public void execute() {
+    getParameters().getCommand().get().run();
   }
 
-  /**
-   * Implements the run method from Runnable. This method executes the gathered Commands.
-   */
-  @Override
-  public void run() {
-    command.run();
+  public static interface CommandExecutorParameters extends WorkParameters {
+    Property<Command> getCommand();
   }
 }
