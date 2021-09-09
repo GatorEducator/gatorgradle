@@ -33,7 +33,8 @@ Model](https://guides.github.com/introduction/flow/) to guide our engineering of
 this tool and we invite you to also follow it as you make a contribution. If you
 have a new feature or bug fix that you want the project maintainers to merge
 into GatorGradle, then you should make a [pull
-request](https://github.com/GatorEducator/gatorgradle/pulls) against the `develop` branch. Please follow the
-provided template when you are describing your pull request, bearing in mind
-that the project maintainers will not merge any pull requests that either do not
-adhere to the template or break any aspects of the automated build.
+request](https://github.com/GatorEducator/gatorgradle/pulls) against the
+`develop` branch. Please follow the provided template when you are describing
+your pull request, bearing in mind that the project maintainers will not merge
+any pull requests that either do not adhere to the template or break any aspects
+of the automated build.
