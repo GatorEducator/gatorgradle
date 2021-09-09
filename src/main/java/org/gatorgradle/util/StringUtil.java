@@ -1,6 +1,9 @@
 package org.gatorgradle.util;
 
-import java.lang.StringBuilder;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.gradle.api.logging.Logger;
 
@@ -136,5 +139,28 @@ public class StringUtil {
     escaped = escaped.replace("\t", "\\t");
     // escape other non-printing characters using uXXXX notation
     return escaped;
+  }
+
+  private static Pattern shellwords = Pattern.compile("(\"[^\"]+?\"|'[^']+?'|\\S*)\\s*");
+
+  /**
+   * Split the given String into shell words (words separated by spaces, where words can contain
+   * spaces if they are quoted)
+   *
+   * @param text the text to split
+   * @return the list of shell words
+   */
+  public static List<String> shellSplit(String text) {
+    List<String> splits = new ArrayList<>();
+    Matcher mtc = shellwords.matcher(text);
+    while (mtc.find()) {
+      String group = mtc.group(1);
+      char quote = group.charAt(0);
+      if ((quote == '"' || quote == '\'') && group.endsWith(String.valueOf(quote))) {
+        group = group.substring(1, group.length() - 1);
+      }
+      splits.add(group);
+    }
+    return splits;
   }
 }
