@@ -18,7 +18,10 @@ import org.gatorgradle.util.StringUtil;
 import org.gradle.api.GradleException;
 
 public class ConfigMap {
+
   public static final String KEYVAL_SEP = ":";
+  public static final String KEYVAL_SEP_REGEX = "(?<!\\)" + KEYVAL_SEP;
+  public static final String ESCAPED_KEYVAL_SEP_REGEX = "(?<!\\)\\" + KEYVAL_SEP;
   public static final String MARK_REGEX = "^-{3,}$";
 
   private static class Line {
@@ -167,7 +170,7 @@ public class ConfigMap {
 
       // parse header
       lines.subList(0, divider).forEach(line -> {
-        String[] spl = line.content.split(KEYVAL_SEP, 2);
+        String[] spl = line.content.split(KEYVAL_SEP_REGEX, 2);
         header.put(
             spl[0].trim().toLowerCase(Locale.ENGLISH),
             new Value(spl[1].trim(), line.number)
@@ -198,9 +201,9 @@ public class ConfigMap {
   private void parseBody(String path, List<Line> lines) {
     for (int i = 0; i < lines.size(); i++) {
       Line line = lines.get(i);
-      if (line.matches(".*\\S+" + KEYVAL_SEP + ".*")) {
+      if (line.matches(".*\\S+" + KEYVAL_SEP_REGEX + ".*")) {
         // line denotes a path (and maybe value after)
-        String[] controls = line.content.trim().split(KEYVAL_SEP, 2);
+        String[] controls = line.content.trim().split(KEYVAL_SEP_REGEX, 2);
         List<Line> subLines = new ArrayList<>();
         if (controls.length > 1 && controls[1].trim().length() > 0) {
           subLines.add(new Line(
@@ -214,7 +217,7 @@ public class ConfigMap {
         parseBody((path.isEmpty() ? "" : path + GatorGradlePlugin.F_SEP) + controls[0], subLines);
       } else {
         // line is a value, add it to the current path
-        addCheck(path, new Value(line.content.trim(), line.number));
+        addCheck(path, new Value(line.content.trim().replaceAll(ESCAPED_KEYVAL_SEP_REGEX, KEYVAL_SEP), line.number));
       }
     }
   }
