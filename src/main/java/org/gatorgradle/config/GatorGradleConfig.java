@@ -2,21 +2,18 @@ package org.gatorgradle.config;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.gatorgradle.command.BasicCommand;
 import org.gatorgradle.command.Command;
 import org.gatorgradle.command.GatorGraderCommand;
-
+import org.gatorgradle.util.StringUtil;
 import org.gradle.api.GradleException;
 
 /**
@@ -50,7 +47,6 @@ public final class GatorGradleConfig implements Iterable<Command> {
     return singleton;
   }
 
-  private static final Pattern commandPattern = Pattern.compile("([^\"]\\S*|\".+?\")\\s*");
   private static final String pureIndicator = "(pure)";
 
   private boolean breakBuild = false;
@@ -108,11 +104,8 @@ public final class GatorGradleConfig implements Iterable<Command> {
     if (path == null) {
       path = "";
     }
-    List<String> splits = new ArrayList<>();
-    Matcher mtc = commandPattern.matcher(line);
-    while (mtc.find()) {
-      splits.add(mtc.group(1).replace("\"", ""));
-    }
+
+    List<String> shellwords = StringUtil.shellSplit(line);
 
     // FIXME: there should be a better method of determining which path separator is used
     // in the config file -- it is independent of the OS.
@@ -124,9 +117,9 @@ public final class GatorGradleConfig implements Iterable<Command> {
       dir = path.substring(0, sep);
     }
     BasicCommand cmd;
-    if (pureIndicator.equals(splits.get(0)) || pure) {
-      if (pureIndicator.equals(splits.get(0))) {
-        splits.remove(0);
+    if (pureIndicator.equals(shellwords.get(0)) || pure) {
+      if (pureIndicator.equals(shellwords.get(0))) {
+        shellwords.remove(0);
       }
       cmd = new BasicCommand();
       cmd.outputToSysOut(false);
@@ -140,24 +133,24 @@ public final class GatorGradleConfig implements Iterable<Command> {
         }
         cmd.setWorkingDir(workDir);
       }
-    } else if (commandLineExecutables.contains(splits.get(0))) {
+    } else if (commandLineExecutables.contains(shellwords.get(0))) {
       cmd = new BasicCommand();
       cmd.outputToSysOut(false);
-      splits.add(path.length() > 0 ? path : ".");
+      shellwords.add(path.length() > 0 ? path : ".");
     } else {
       cmd = new GatorGraderCommand();
       cmd.outputToSysOut(false);
       if (name.length() > 0) {
-        splits.add("--file");
-        splits.add(name);
+        shellwords.add("--file");
+        shellwords.add(name);
       }
       if (path.length() > 0) {
-        splits.add("--directory");
-        splits.add(dir);
+        shellwords.add("--directory");
+        shellwords.add(dir);
       }
     }
 
-    cmd.with(splits);
+    cmd.with(shellwords);
 
     return cmd;
   }
