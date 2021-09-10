@@ -33,5 +33,5 @@ jobs:
         uses: burrunan/gradle-cache-action@v1
         with:
           job-id: ${{ matrix.java-version }}
-          gradle-version: 6.8
+          gradle-version: 7.2
           arguments: check build
