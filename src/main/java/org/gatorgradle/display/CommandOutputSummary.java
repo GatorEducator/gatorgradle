@@ -26,8 +26,6 @@ import org.gradle.api.GradleException;
 import org.gradle.api.logging.Logger;
 
 public class CommandOutputSummary {
-  private static final String YES = StringUtil.color(StringUtil.GOOD, "Yes");
-  private static final String NO = StringUtil.color(StringUtil.BAD, "No");
 
   private List<CheckResult> completedChecks;
   private final Logger log;
@@ -324,6 +322,7 @@ public class CommandOutputSummary {
           diagnostic.append(line).append("\n");
         }
       }
+      scan.close();
     } else {
       diagnostic.append("No diagnostic available");
     }
@@ -346,6 +345,7 @@ public class CommandOutputSummary {
           diagnostic.append(line).append("\n");
         }
       }
+      scan.close();
     } else {
       diagnostic.append("No diagnostic available");
     }
