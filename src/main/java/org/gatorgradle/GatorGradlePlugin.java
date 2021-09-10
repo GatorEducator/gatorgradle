@@ -58,6 +58,7 @@ public class GatorGradlePlugin implements Plugin<Project> {
    *
    * @param project the project to apply GatorGrader to
    */
+  @Override
   public void apply(final Project project) {
     Logger logger = project.getLogger();
     // set config file location, then generate config

@@ -61,6 +61,7 @@ public class ConfigMap {
       return content == null || content.trim().length() == 0;
     }
 
+    @Override
     public String toString() {
       return content;
     }
@@ -121,6 +122,7 @@ public class ConfigMap {
       return lineNumber;
     }
 
+    @Override
     public String toString() {
       return asString();
     }
@@ -273,6 +275,7 @@ public class ConfigMap {
    *
    * @return a descriptive string
    */
+  @Override
   public String toString() {
     StringBuilder builder = new StringBuilder();
     builder.append("HEADER:\n");

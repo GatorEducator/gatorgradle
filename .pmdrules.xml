@@ -10,4 +10,15 @@
 
 
 <rule ref="category/java/errorprone.xml/EmptyCatchBlock" />
+<rule ref="category/java/codestyle.xml/UnnecessaryImport" />
+<rule ref="category/java/bestpractices.xml/UnusedFormalParameter" />
+<rule ref="category/java/bestpractices.xml/UnusedPrivateMethod" />
+<rule ref="category/java/bestpractices.xml/LooseCoupling" />
+<rule ref="category/java/bestpractices.xml/UseCollectionIsEmpty" />
+<rule ref="category/java/bestpractices.xml/AvoidPrintStackTrace" />
+<rule ref="category/java/bestpractices.xml/SwitchStmtsShouldHaveDefault" />
+<rule ref="category/java/bestpractices.xml/DefaultLabelNotLastInSwitchStmt" />
+<rule ref="category/java/bestpractices.xml/ForLoopCanBeForeach" />
+<rule ref="category/java/bestpractices.xml/MissingOverride" />
+<rule ref="category/java/bestpractices.xml/PreserveStackTrace" />
 </ruleset>

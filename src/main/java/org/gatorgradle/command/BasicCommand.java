@@ -48,14 +48,17 @@ public class BasicCommand implements Command {
     return this;
   }
 
+  @Override
   public File getWorkingDir() {
     return workingDir;
   }
 
+  @Override
   public void setWorkingDir(final File dir) {
     this.workingDir = dir;
   }
 
+  @Override
   public void setCallback(final Callback callback) {
     this.callback = callback;
   }
@@ -69,6 +72,7 @@ public class BasicCommand implements Command {
    *
    * @return a descriptive string
    */
+  @Override
   public String toString() {
     List<String> strs = new ArrayList<>(command);
     strs.replaceAll(str -> str.matches("\\S+") ? str : "'" + str + "'");
@@ -93,6 +97,7 @@ public class BasicCommand implements Command {
    * @param cmd the object to test
    * @return true if the object represents the same textual command
    */
+  @Override
   public boolean equals(Object cmd) {
     if (cmd instanceof BasicCommand) {
       return command.equals(((BasicCommand) cmd).command);
@@ -106,6 +111,7 @@ public class BasicCommand implements Command {
    *
    * @return the hashcode
    */
+  @Override
   public int hashCode() {
     return command.stream()
         .map(str -> str.hashCode())
@@ -117,6 +123,7 @@ public class BasicCommand implements Command {
    *
    * @return the exit value
    */
+  @Override
   public int exitValue() {
     if (!fin) {
       throw new GradleException("Command not finished, no exit value available!");
@@ -129,6 +136,7 @@ public class BasicCommand implements Command {
    *
    * @return true if the command finished
    */
+  @Override
   public boolean finished() {
     return fin;
   }
@@ -138,6 +146,7 @@ public class BasicCommand implements Command {
    *
    * @return the Command that ran/is running
    */
+  @Override
   public BasicCommand waitFor() {
     if (thread != null) {
       try {
@@ -166,6 +175,7 @@ public class BasicCommand implements Command {
   }
 
   /** Execute the Command, blocking. */
+  @Override
   public void run() {
     fin = false;
     if (command.isEmpty()) {

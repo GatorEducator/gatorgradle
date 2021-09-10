@@ -247,12 +247,12 @@ public class CommandOutputSummary {
         completedChecks.stream()
             .filter(result -> result.outcome == false)
             .collect(Collectors.toList());
-    boolean isFailure = failed.size() > 0;
+    boolean isFailure = !failed.isEmpty();
 
     if (isFailure) {
       log.lifecycle("\n\n\u001B[1;33m-~-  \u001B[1;31mFAILURES  \u001B[1;33m-~-\u001B[0m\n");
-      for (int i = 0; i < failed.size(); i++) {
-        printResult(failed.get(i), true);
+      for (CheckResult result : failed) {
+        printResult(result, true);
       }
     }
 

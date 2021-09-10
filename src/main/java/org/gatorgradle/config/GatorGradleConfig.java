@@ -225,6 +225,7 @@ public final class GatorGradleConfig implements Iterable<Command> {
    *
    * @return a descriptive string
    */
+  @Override
   public String toString() {
     return file.toString()
         + "\n\nCOMMANDS:"
@@ -233,6 +234,7 @@ public final class GatorGradleConfig implements Iterable<Command> {
             gradingCommands.stream().map(cmd -> cmd.toString()).collect(Collectors.toList()));
   }
 
+  @Override
   public Iterator<Command> iterator() {
     return gradingCommands.iterator();
   }

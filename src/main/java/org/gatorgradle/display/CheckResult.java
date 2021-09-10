@@ -102,6 +102,7 @@ public class CheckResult {
    *
    * @param otherObj the object to compare to
    */
+  @Override
   public boolean equals(Object otherObj) {
     if (otherObj instanceof CheckResult) {
       CheckResult other = (CheckResult) otherObj;
@@ -117,6 +118,7 @@ public class CheckResult {
     return false;
   }
 
+  @Override
   public int hashCode() {
     return 17 * check.hashCode() + (outcome ? 5 : 7) + 73 * diagnostic.hashCode();
   }
