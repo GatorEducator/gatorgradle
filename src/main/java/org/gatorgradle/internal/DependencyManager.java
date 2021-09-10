@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.Comparator;
 
 import org.gatorgradle.GatorGradlePlugin;
@@ -13,16 +12,12 @@ import org.gatorgradle.command.BasicCommand;
 import org.gatorgradle.command.Command;
 import org.gatorgradle.config.GatorGradleConfig;
 import org.gatorgradle.util.Console;
-
 import org.gradle.api.GradleException;
 
 /**
- * Checks for, and (in the case of GatorGrader) downloads, installs, and
- * configures dependencies. The standard dependencies to handle include:
- * -- GatorGrader from GitHub
- * -- Python version 3
- * -- Pipenv
- * -- Git
+ * Checks for, and (in the case of GatorGrader) downloads, installs, and configures dependencies.
+ * The standard dependencies to handle are GatorGrader, Python 3, Pipenv, and Git.
+ *
  * @author Saejin Mahlau-Heinert
  */
 public class DependencyManager {
@@ -54,11 +49,19 @@ public class DependencyManager {
         throw new GradleException("Failed to run 'pipenv --venv'! Was GatorGrader installed?");
       }
       if (GatorGradlePlugin.OS.equals(GatorGradlePlugin.WINDOWS)) {
-        PYTHON_EXECUTABLE = query.getOutput().trim() + GatorGradlePlugin.F_SEP + "Scripts"
-            + GatorGradlePlugin.F_SEP + "python";
+        PYTHON_EXECUTABLE =
+            query.getOutput().trim()
+                + GatorGradlePlugin.F_SEP
+                + "Scripts"
+                + GatorGradlePlugin.F_SEP
+                + "python";
       } else {
-        PYTHON_EXECUTABLE = query.getOutput().trim() + GatorGradlePlugin.F_SEP + "bin"
-            + GatorGradlePlugin.F_SEP + "python";
+        PYTHON_EXECUTABLE =
+            query.getOutput().trim()
+                + GatorGradlePlugin.F_SEP
+                + "bin"
+                + GatorGradlePlugin.F_SEP
+                + "python";
       }
     }
     return PYTHON_EXECUTABLE;
@@ -146,12 +149,13 @@ public class DependencyManager {
         Files.walk(path)
             .sorted(Comparator.reverseOrder())
             .map(innerPath -> innerPath.toFile())
-            .forEach(file -> {
-              boolean deleted = file.delete();
-              if (!deleted) {
-                Console.error("Did not delete " + path + "!");
-              }
-            });
+            .forEach(
+                file -> {
+                  boolean deleted = file.delete();
+                  if (!deleted) {
+                    Console.error("Did not delete " + path + "!");
+                  }
+                });
       } catch (IOException ex) {
         Console.error("Failed to delete " + path + "!");
       }

@@ -11,9 +11,9 @@ public class StringUtil {
   /**
    * Clamps a string to the provided width, ending with \u2026.
    *
-   * @param  str   the string to clamp
-   * @param  width the width to clamp it to
-   * @return       the clamped string
+   * @param str the string to clamp
+   * @param width the width to clamp it to
+   * @return the clamped string
    */
   public static String clamp(String str, int width) {
     if (str.length() > width) {
@@ -25,9 +25,9 @@ public class StringUtil {
   /**
    * Makes provided string be the provided length.
    *
-   * @param  str   the string to clamp/pad
-   * @param  width the desired length
-   * @return       the modified string
+   * @param str the string to clamp/pad
+   * @param width the desired length
+   * @return the modified string
    */
   public static String width(String str, int width) {
     if (str.length() > width) {
@@ -41,8 +41,8 @@ public class StringUtil {
   /**
    * Generate the provided number of spaces.
    *
-   * @param  width the number of spaces to generate
-   * @return       a string of spaces
+   * @param width the number of spaces to generate
+   * @return a string of spaces
    */
   public static String spaces(int width) {
     return repeat(' ', width);
@@ -51,9 +51,9 @@ public class StringUtil {
   /**
    * Generate the provided number of string repetitions.
    *
-   * @param  str   the string to repeat
-   * @param  times the number of strings to repeat
-   * @return       a string of strings
+   * @param str the string to repeat
+   * @param times the number of strings to repeat
+   * @return a string of strings
    */
   public static String repeat(String str, int times) {
     StringBuilder spc = new StringBuilder(times * str.length());
@@ -66,9 +66,9 @@ public class StringUtil {
   /**
    * Generate the provided number of char repetitions.
    *
-   * @param  str   the char to repeat
-   * @param  times the number of chars to repeats
-   * @return       a string of chars
+   * @param str the char to repeat
+   * @param times the number of chars to repeats
+   * @return a string of chars
    */
   public static String repeat(char str, int times) {
     StringBuilder spc = new StringBuilder(times);
@@ -81,10 +81,10 @@ public class StringUtil {
   /**
    * Print a string with a border around it.
    *
-   * @param text      the text to print
-   * @param textCol   the color to use for the text
+   * @param text the text to print
+   * @param textCol the color to use for the text
    * @param borderCol the color to use for the border
-   * @param log       the logger to use
+   * @param log the logger to use
    */
   public static void border(String text, String textCol, String borderCol, Logger log) {
     char upleft = '\u250f'; // upper left corner
@@ -113,14 +113,13 @@ public class StringUtil {
   /**
    * Color a string.
    *
-   * @param with     the color to use for the text
+   * @param with the color to use for the text
    * @param contents the text to print
    * @return the colored string
    */
   public static String color(String with, String contents) {
     return with + contents + RESET;
   }
-
 
   /**
    * Escape all JSON special characters in a String.

@@ -22,7 +22,6 @@ import org.gatorgradle.command.Command;
 import org.gatorgradle.command.GatorGraderCommand;
 import org.gatorgradle.config.GatorGradleConfig;
 import org.gatorgradle.util.StringUtil;
-
 import org.gradle.api.GradleException;
 import org.gradle.api.logging.Logger;
 
@@ -50,9 +49,10 @@ public class CommandOutputSummary {
    * @param log the Logger to use
    */
   public CommandOutputSummary(List<BasicCommand> completedCommands, Logger log) {
-    this.completedChecks = completedCommands.stream()
-                           .map(cmd -> parseCommandOutput(cmd, false))
-                           .collect(Collectors.toList());
+    this.completedChecks =
+        completedCommands.stream()
+            .map(cmd -> parseCommandOutput(cmd, false))
+            .collect(Collectors.toList());
     this.log = log;
   }
 
@@ -62,7 +62,7 @@ public class CommandOutputSummary {
    * @param cmd the command to add
    */
   public void addCompletedCommand(Command cmd) {
-    CheckResult result = parseCommandOutput((BasicCommand)cmd, false);
+    CheckResult result = parseCommandOutput((BasicCommand) cmd, false);
     if (!completedChecks.contains(result)) {
       completedChecks.add(result);
       showInProgressSummary(result);
@@ -107,9 +107,8 @@ public class CommandOutputSummary {
   /**
    * Output the compiled summary to the project's configured endpoint, if existant.
    *
-   *
    * @param failed the failed check results
-   * @param all    the completed check results
+   * @param all the completed check results
    */
   public void uploadOutputSummary(List<CheckResult> failed, List<CheckResult> all) {
     StringBuilder builder = new StringBuilder();
@@ -118,11 +117,9 @@ public class CommandOutputSummary {
     String userId;
     BasicCommand getUserId = null;
     if (GatorGradlePlugin.OS.equals(GatorGradlePlugin.WINDOWS)) {
-      getUserId = new BasicCommand(
-          "sh", "/C", GatorGradleConfig.get().getIdCommand());
+      getUserId = new BasicCommand("sh", "/C", GatorGradleConfig.get().getIdCommand());
     } else {
-      getUserId = new BasicCommand(
-          "sh", "-c", GatorGradleConfig.get().getIdCommand());
+      getUserId = new BasicCommand("sh", "-c", GatorGradleConfig.get().getIdCommand());
     }
     getUserId.run();
     if (getUserId.exitValue() == Command.SUCCESS) {
@@ -145,20 +142,15 @@ public class CommandOutputSummary {
     builder.append("\"reflection\":");
     String reflection = "";
     try {
-      reflection = StringUtil.jsonEscape(
-        String.join(
-          "\n",
-          Files.readAllLines(
-              Paths.get(
-                  GatorGradleConfig.get().getReflectionPath()
-              )
-          )
-        )
-      );
+      reflection =
+          StringUtil.jsonEscape(
+              String.join(
+                  "\n",
+                  Files.readAllLines(Paths.get(GatorGradleConfig.get().getReflectionPath()))));
     } catch (IOException ex) {
       throw new GradleException(
-          "Exception while reading reflection file "
-          + GatorGradleConfig.get().getReflectionPath(), ex);
+          "Exception while reading reflection file " + GatorGradleConfig.get().getReflectionPath(),
+          ex);
     }
     builder.append('\"').append(reflection).append('\"').append(',');
     // end reflection
@@ -174,12 +166,7 @@ public class CommandOutputSummary {
 
     builder.append("\"results\":").append('[');
     builder.append(
-        String.join(
-          ",",
-          all.stream().map(res -> res.jsonReport())
-          .collect(Collectors.toList())
-        )
-    );
+        String.join(",", all.stream().map(res -> res.jsonReport()).collect(Collectors.toList())));
     builder.append(']').append('}');
     // end report
 
@@ -219,8 +206,8 @@ public class CommandOutputSummary {
       }
 
       // get response
-      try (BufferedReader br = new BufferedReader(
-          new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8))) {
+      try (BufferedReader br =
+          new BufferedReader(new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8))) {
         StringBuilder response = new StringBuilder();
         String responseLine = null;
         while ((responseLine = br.readLine()) != null) {
@@ -235,8 +222,7 @@ public class CommandOutputSummary {
 
     } catch (MalformedURLException ex) {
       throw new GradleException(
-          "Failed to upload data; configured report endpoint ("
-          + endpoint + ") is malformed", ex);
+          "Failed to upload data; configured report endpoint (" + endpoint + ") is malformed", ex);
     } catch (IOException ex) {
       throw new GradleException("Exception while uploading check data", ex);
     } finally {
@@ -246,25 +232,23 @@ public class CommandOutputSummary {
     }
   }
 
-  /**
-   * Use the internal member variables to call the previous uploadOutputSummary.
-   */
+  /** Use the internal member variables to call the previous uploadOutputSummary. */
   public void uploadOutputSummary() {
-    List<CheckResult> failed = completedChecks.stream()
-                               .filter(result -> result.outcome == false)
-                               .collect(Collectors.toList());
+    List<CheckResult> failed =
+        completedChecks.stream()
+            .filter(result -> result.outcome == false)
+            .collect(Collectors.toList());
     uploadOutputSummary(failed, completedChecks);
   }
 
-  /**
-   * Output the compiled summary to the project's Logger.
-   */
+  /** Output the compiled summary to the project's Logger. */
   public void showOutputSummary() {
     // log.lifecycle("\n\n  -~-  \u001B[1;36mBeginning check summary\u001B[1;0m  -~-\n\n");
     int totalChecks = getNumCompletedTasks();
-    List<CheckResult> failed = completedChecks.stream()
-                               .filter(result -> result.outcome == false)
-                               .collect(Collectors.toList());
+    List<CheckResult> failed =
+        completedChecks.stream()
+            .filter(result -> result.outcome == false)
+            .collect(Collectors.toList());
     boolean isFailure = failed.size() > 0;
 
     if (isFailure) {
@@ -276,11 +260,20 @@ public class CommandOutputSummary {
 
     int passedChecks = totalChecks - failed.size();
 
-    StringUtil.border("Passed " + passedChecks + "/" + totalChecks + " ("
-            + (Math.round((passedChecks * 100) / (float) totalChecks)) + "%)"
-            + " of checks for " + GatorGradleConfig.get().getAssignmentName() + "!",
+    StringUtil.border(
+        "Passed "
+            + passedChecks
+            + "/"
+            + totalChecks
+            + " ("
+            + (Math.round((passedChecks * 100) / (float) totalChecks))
+            + "%)"
+            + " of checks for "
+            + GatorGradleConfig.get().getAssignmentName()
+            + "!",
         isFailure ? "\u001B[1;31m" : "\u001B[1;32m",
-        isFailure ? "\u001B[1;35m" : "\u001B[1;32m", log);
+        isFailure ? "\u001B[1;35m" : "\u001B[1;32m",
+        log);
 
     if (isFailure && GatorGradleConfig.get().shouldBreakBuild()) {
       throw new GradleException(
@@ -301,22 +294,19 @@ public class CommandOutputSummary {
       if ((index = output.indexOf(unrec)) >= 0) {
         index += unrec.length();
         unrec = output.substring(index).trim();
-        result = new CheckResult(
-            cmd,
-            "Unrecognized GatorGrader check",
-            false,
-            "The " + unrec + " check is not supported"
-        );
+        result =
+            new CheckResult(
+                cmd,
+                "Unrecognized GatorGrader check",
+                false,
+                "The " + unrec + " check is not supported");
       } else {
         if (!includeDiagnostic) {
           log.error("{} errored: \'{}\'", cmd.toString(), ex.getMessage());
         }
-        result = new CheckResult(
-            cmd,
-            "Unknown GatorGrader check",
-            false,
-            "The check failed with an unknown error"
-        );
+        result =
+            new CheckResult(
+                cmd, "Unknown GatorGrader check", false, "The check failed with an unknown error");
       }
     }
     return result;
@@ -341,8 +331,7 @@ public class CommandOutputSummary {
         cmd,
         "The file " + cmd.last() + " passes " + cmd.executable(),
         cmd.exitValue() == Command.SUCCESS,
-        diagnostic.toString().trim()
-    );
+        diagnostic.toString().trim());
   }
 
   private CheckResult parsePureCommandOutput(BasicCommand cmd, boolean includeDiagnostic) {
@@ -364,8 +353,7 @@ public class CommandOutputSummary {
         cmd,
         cmd.toString() + " executes",
         cmd.exitValue() == Command.SUCCESS,
-        diagnostic.toString().trim()
-    );
+        diagnostic.toString().trim());
   }
 
   private CheckResult parseCommandOutput(BasicCommand cmd, boolean includeDiagnostic) {

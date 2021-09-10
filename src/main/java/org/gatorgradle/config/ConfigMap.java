@@ -14,7 +14,6 @@ import java.util.stream.Stream;
 
 import org.gatorgradle.GatorGradlePlugin;
 import org.gatorgradle.util.StringUtil;
-
 import org.gradle.api.GradleException;
 
 public class ConfigMap {
@@ -147,14 +146,13 @@ public class ConfigMap {
     this.path = path;
   }
 
-  /**
-   * Parses the config file.
-   */
+  /** Parses the config file. */
   public void parse() {
     try (Stream<String> strLines = Files.lines(path)) {
       final AtomicInteger lineNumber = new AtomicInteger(0);
       List<Line> lines =
-          strLines.map(str -> new Line(lineNumber.incrementAndGet(), str))
+          strLines
+              .map(str -> new Line(lineNumber.incrementAndGet(), str))
               .filter(line -> !line.isEmpty() && !line.content.trim().startsWith("#"))
               .collect(Collectors.toList());
       int divider = lines.isEmpty() ? 0 : lines.get(0).number;
@@ -169,13 +167,15 @@ public class ConfigMap {
       lines.removeIf(line -> line.content.matches(MARK_REGEX));
 
       // parse header
-      lines.subList(0, divider).forEach(line -> {
-        String[] spl = line.content.split(KEYVAL_SEP_REGEX, 2);
-        header.put(
-            spl[0].trim().toLowerCase(Locale.ENGLISH),
-            new Value(spl[1].trim(), line.number)
-        );
-      });
+      lines
+          .subList(0, divider)
+          .forEach(
+              line -> {
+                String[] spl = line.content.split(KEYVAL_SEP_REGEX, 2);
+                header.put(
+                    spl[0].trim().toLowerCase(Locale.ENGLISH),
+                    new Value(spl[1].trim(), line.number));
+              });
 
       if (hasHeader("indent")) {
         Value indent = getHeader("indent");
@@ -206,8 +206,9 @@ public class ConfigMap {
         String[] controls = line.content.trim().split(KEYVAL_SEP_REGEX, 2);
         List<Line> subLines = new ArrayList<>();
         if (controls.length > 1 && controls[1].trim().length() > 0) {
-          subLines.add(new Line(
-              line.number, StringUtil.repeat('\t', line.indentLevel + 1) + controls[1].trim()));
+          subLines.add(
+              new Line(
+                  line.number, StringUtil.repeat('\t', line.indentLevel + 1) + controls[1].trim()));
         }
 
         while (i + 1 < lines.size() && lines.get(i + 1).indentLevel > line.indentLevel) {
@@ -217,7 +218,10 @@ public class ConfigMap {
         parseBody((path.isEmpty() ? "" : path + GatorGradlePlugin.F_SEP) + controls[0], subLines);
       } else {
         // line is a value, add it to the current path
-        addCheck(path, new Value(line.content.trim().replaceAll(ESCAPED_KEYVAL_SEP_REGEX, KEYVAL_SEP), line.number));
+        addCheck(
+            path,
+            new Value(
+                line.content.trim().replaceAll(ESCAPED_KEYVAL_SEP_REGEX, KEYVAL_SEP), line.number));
       }
     }
   }
@@ -244,8 +248,8 @@ public class ConfigMap {
   /**
    * Get the values associated with the given path.
    *
-   * @param  path the path to get
-   * @return      a list of values
+   * @param path the path to get
+   * @return a list of values
    */
   public List<Value> getChecks(String path) {
     return body.get(path);
@@ -272,15 +276,22 @@ public class ConfigMap {
   public String toString() {
     StringBuilder builder = new StringBuilder();
     builder.append("HEADER:\n");
-    header.keySet().forEach(
-        key -> builder.append(key).append("=").append(getHeader(key)).append('\n'));
+    header
+        .keySet()
+        .forEach(key -> builder.append(key).append("=").append(getHeader(key)).append('\n'));
     builder.append("---\nBODY:\n");
-    body.keySet().forEach(key -> {
-      builder.append(key).append("=[");
-      builder.append(String.join(", ",
-          getChecks(key).stream().map(val -> val.asString()).toArray(size -> new String[size])));
-      builder.append("]\n");
-    });
+    body.keySet()
+        .forEach(
+            key -> {
+              builder.append(key).append("=[");
+              builder.append(
+                  String.join(
+                      ", ",
+                      getChecks(key).stream()
+                          .map(val -> val.asString())
+                          .toArray(size -> new String[size])));
+              builder.append("]\n");
+            });
     return builder.toString();
   }
 }

@@ -16,12 +16,10 @@ import org.gatorgradle.command.GatorGraderCommand;
 import org.gatorgradle.util.StringUtil;
 import org.gradle.api.GradleException;
 
-/**
- * GatorGradleConfig holds the configuration for this assignment.
- * TODO: make this configurable via DSL blocks in build.gradle
- */
+/** GatorGradleConfig holds the configuration for this assignment. */
 public final class GatorGradleConfig implements Iterable<Command> {
 
+  // TODO: make this configurable via DSL blocks in build.gradle
   private static GatorGradleConfig singleton;
 
   /**
@@ -39,8 +37,8 @@ public final class GatorGradleConfig implements Iterable<Command> {
   /**
    * Create the config by parsing the given file.
    *
-   * @param  configFile the file to be parsed
-   * @return            the config
+   * @param configFile the file to be parsed
+   * @return the config
    */
   public static GatorGradleConfig create(Path configFile) {
     singleton = new GatorGradleConfig(configFile);
@@ -83,9 +81,9 @@ public final class GatorGradleConfig implements Iterable<Command> {
   /**
    * Utility method to convert a line of text to a Command.
    *
-   * @param  path the path in the config file this line is in the context of
-   * @param  line a line to parse
-   * @return      a command
+   * @param path the path in the config file this line is in the context of
+   * @param line a line to parse
+   * @return a command
    */
   private Command makeCommand(String path, String line) {
     return makeCommand(path, line, false);
@@ -94,10 +92,10 @@ public final class GatorGradleConfig implements Iterable<Command> {
   /**
    * Utility method to convert a line of text to a Command.
    *
-   * @param  path the path in the config file this line is in the context of
-   * @param  line a line to parse
-   * @param  pure this command is a pure command (pass directly to shell)
-   * @return      a command
+   * @param path the path in the config file this line is in the context of
+   * @param line a line to parse
+   * @param pure this command is a pure command (pass directly to shell)
+   * @return a command
    */
   private Command makeCommand(String path, String line, boolean pure) {
     // need to deal with adding checkfiles and directories associated with path
@@ -127,9 +125,11 @@ public final class GatorGradleConfig implements Iterable<Command> {
         File workDir = new File(path);
         if (!workDir.isDirectory()) {
           throw new GradleException(
-              "Pure command '" + line + "' inside path '"
-              + path + "' must be in a directory context"
-          );
+              "Pure command '"
+                  + line
+                  + "' inside path '"
+                  + path
+                  + "' must be in a directory context");
         }
         cmd.setWorkingDir(workDir);
       }
@@ -155,10 +155,7 @@ public final class GatorGradleConfig implements Iterable<Command> {
     return cmd;
   }
 
-
-  /**
-   * Parses the config file's header.
-   */
+  /** Parses the config file's header. */
   public void parseHeader() {
     file.parse();
     assignmentName = file.getHeader("name").asString();
@@ -198,18 +195,15 @@ public final class GatorGradleConfig implements Iterable<Command> {
     }
   }
 
-  /**
-   * Parses the config file's body.
-   */
+  /** Parses the config file's body. */
   public void parseBody() {
 
-    file.getPaths().forEach(
-        path -> file.getChecks(path).forEach(val -> with(makeCommand(path, val.asString()))));
+    file.getPaths()
+        .forEach(
+            path -> file.getChecks(path).forEach(val -> with(makeCommand(path, val.asString()))));
   }
 
-  /**
-   * Parse the entire configuration file.
-   */
+  /** Parse the entire configuration file. */
   public void parse() {
     parseHeader();
     parseBody();
@@ -218,8 +212,8 @@ public final class GatorGradleConfig implements Iterable<Command> {
   /**
    * Add a command to this config.
    *
-   * @param  cmd the command to add
-   * @return     the current config after adding
+   * @param cmd the command to add
+   * @return the current config after adding
    */
   public GatorGradleConfig with(Command cmd) {
     gradingCommands.add(cmd);
@@ -232,9 +226,11 @@ public final class GatorGradleConfig implements Iterable<Command> {
    * @return a descriptive string
    */
   public String toString() {
-    return file.toString() + "\n\nCOMMANDS:"
-        + String.join("\n-> ",
-              gradingCommands.stream().map(cmd -> cmd.toString()).collect(Collectors.toList()));
+    return file.toString()
+        + "\n\nCOMMANDS:"
+        + String.join(
+            "\n-> ",
+            gradingCommands.stream().map(cmd -> cmd.toString()).collect(Collectors.toList()));
   }
 
   public Iterator<Command> iterator() {

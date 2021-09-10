@@ -6,8 +6,6 @@ import java.util.Locale;
 import org.gatorgradle.config.GatorGradleConfig;
 import org.gatorgradle.task.GatorGradleGradeTask;
 import org.gatorgradle.task.GatorGradleReportTask;
-import org.gatorgradle.util.Console;
-
 import org.gradle.api.GradleException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
@@ -15,16 +13,15 @@ import org.gradle.api.Task;
 import org.gradle.api.logging.Logger;
 
 /**
- * GatorGradlePlugin applies the plugin to a project, registers
- * the grade task, and sets up some sensible defaults.
- * TODO: allow DSL configuration block to specify
- *        CONFIG_FILE_LOCATION and GATORGRADER_HOME.
+ * GatorGradlePlugin applies the plugin to a project, registers the grade task, and sets up some
+ * sensible defaults.
  */
 public class GatorGradlePlugin implements Plugin<Project> {
   public static final String WINDOWS = "windows";
   public static final String LINUX = "linux";
   public static final String MACOS = "mac";
 
+  // TODO: allow DSL configuration block to specify CONFIG_FILE_LOCATION and GATORGRADER_HOME.
   public static final String GATORGRADER_HOME;
   public static final String CONFIG_FILE_LOCATION;
   public static final String USER_HOME;
@@ -74,22 +71,35 @@ public class GatorGradlePlugin implements Plugin<Project> {
           "GatorGradle grade task's configuration was not specified correctly!");
     }
 
-    logger.lifecycle("Configured GatorGradle {}",
+    logger.lifecycle(
+        "Configured GatorGradle {}",
         GatorGradlePlugin.class.getPackage().getImplementationVersion());
 
     // create gatorgradle 'grade' task
-    Task gradeTask = project.getTasks().create("grade", GatorGradleGradeTask.class, task -> {
-      // default grade task uses config from above and project dir as grade
-      task.setConfig(config);
-      task.setWorkingDir(project.getProjectDir());
-    });
+    Task gradeTask =
+        project
+            .getTasks()
+            .create(
+                "grade",
+                GatorGradleGradeTask.class,
+                task -> {
+                  // default grade task uses config from above and project dir as grade
+                  task.setConfig(config);
+                  task.setWorkingDir(project.getProjectDir());
+                });
 
     // create gatorgradle 'report' task
-    Task reportTask = project.getTasks().create("report", GatorGradleReportTask.class, task -> {
-      // default grade task uses config from above and project dir as grade
-      task.setConfig(config);
-      task.setWorkingDir(project.getProjectDir());
-    });
+    Task reportTask =
+        project
+            .getTasks()
+            .create(
+                "report",
+                GatorGradleReportTask.class,
+                task -> {
+                  // default grade task uses config from above and project dir as grade
+                  task.setConfig(config);
+                  task.setWorkingDir(project.getProjectDir());
+                });
     reportTask.mustRunAfter(gradeTask);
   }
 }

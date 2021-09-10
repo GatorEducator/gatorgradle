@@ -25,7 +25,6 @@ public class GatorGradleGradeTask extends GatorGradleTask {
   // how gradle implements logging, these must be static
   private static int totalTasks;
 
-
   /**
    * Static handler to call when a subtask completes.
    *
@@ -44,9 +43,7 @@ public class GatorGradleGradeTask extends GatorGradleTask {
     summary = new CommandOutputSummary(logger);
   }
 
-  /**
-   * Execute the grading checks assigned to this GatorGradleGradeTask.
-   */
+  /** Execute the grading checks assigned to this GatorGradleGradeTask. */
   @TaskAction
   public void grade() {
 
@@ -59,7 +56,6 @@ public class GatorGradleGradeTask extends GatorGradleTask {
     // start task submission
     progLog.started();
     initTasks(super.getConfig().size(), this.getLogger());
-
 
     if (totalTasks > 0) {
       // submit commands to executor
@@ -77,8 +73,14 @@ public class GatorGradleGradeTask extends GatorGradleTask {
       int percentComplete = 0;
       while (percentComplete < 100) {
         percentComplete = (summary.getNumCompletedTasks() * 100) / totalTasks;
-        progLog.progress("Finished " + summary.getNumCompletedTasks() + " / " + totalTasks
-            + " checks  >  " + percentComplete + "% complete!");
+        progLog.progress(
+            "Finished "
+                + summary.getNumCompletedTasks()
+                + " / "
+                + totalTasks
+                + " checks  >  "
+                + percentComplete
+                + "% complete!");
         try {
           Thread.sleep(100);
         } catch (InterruptedException ex) {
@@ -92,13 +94,20 @@ public class GatorGradleGradeTask extends GatorGradleTask {
       // this is impossible now because of the for loop above, FIXME
       if (summary.getNumCompletedTasks() != totalTasks) {
         // silent failure somewhere, break the build
-        throw new GradleException("Silent failure in task execution! Only completed "
-            + summary.getNumCompletedTasks() + " tasks but should have completed " + totalTasks);
+        throw new GradleException(
+            "Silent failure in task execution! Only completed "
+                + summary.getNumCompletedTasks()
+                + " tasks but should have completed "
+                + totalTasks);
       }
     }
 
-    progLog.progress("Finished " + summary.getNumCompletedTasks() + " / " + totalTasks
-        + " checks  >  100% complete!  >  Compiling Report...");
+    progLog.progress(
+        "Finished "
+            + summary.getNumCompletedTasks()
+            + " / "
+            + totalTasks
+            + " checks  >  100% complete!  >  Compiling Report...");
 
     // complete task submission
     progLog.completed();

@@ -31,8 +31,8 @@ public interface Command extends Runnable, Serializable {
   /**
    * Build a list of commands from the given string arrays.
    *
-   * @param  cmds The commands to make the list out of
-   * @return      the list of commands
+   * @param cmds The commands to make the list out of
+   * @return the list of commands
    */
   public static List<Command> list(String[]... cmds) {
     List<Command> commands = new ArrayList<>();

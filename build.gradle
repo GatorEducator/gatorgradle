@@ -2,6 +2,7 @@ plugins {
     id "java-gradle-plugin"
     id "maven-publish"
     id "pmd"
+    id "com.diffplug.spotless" version "5.15.0"
     id "com.gradle.plugin-publish" version "0.15.0"
     id "com.wagner.gitver" version "0.0.1"
 }
@@ -85,11 +86,30 @@ task _publishJavadocs(type: Exec) {
 
 /* Quality Control Configuration */
 
+spotless {
+  format "misc", {
+    target("*.gradle", ".gitignore")
+    trimTrailingWhitespace()
+    indentWithSpaces(2)
+    endWithNewline()
+  }
+  java {
+    googleJavaFormat("1.11.0")
+    trimTrailingWhitespace()
+    endWithNewline()
+    importOrder("java", "javax", "org", "com")
+  }
+}
 
 pmd {
   // incrementalAnalysis = true
   ruleSets = []
   ruleSetFiles = files(".pmdrules.xml")
+}
+
+task format {
+    dependsOn spotlessApply
+    doLast { print "Formatted!" }
 }
 
 tasks.withType(JavaCompile) {

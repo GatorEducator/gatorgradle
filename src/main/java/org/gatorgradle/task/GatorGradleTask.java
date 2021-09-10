@@ -8,7 +8,6 @@ import org.gatorgradle.config.GatorGradleConfig;
 import org.gatorgradle.display.CommandOutputSummary;
 import org.gatorgradle.internal.DependencyManager;
 import org.gatorgradle.util.Console;
-
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
 import org.gradle.api.tasks.Input;
@@ -25,9 +24,7 @@ public abstract class GatorGradleTask extends DefaultTask {
     this.config = config;
   }
 
-  /**
-   * Dependency management.
-   */
+  /** Dependency management. */
   protected void act() {
     getConfig().parseHeader();
 
@@ -46,9 +43,7 @@ public abstract class GatorGradleTask extends DefaultTask {
       startup.run();
       if (startup.exitValue() != Command.SUCCESS) {
         throw new GradleException(
-            "Startup command '" + startup + "' failed with exit code "
-            + startup.exitValue() + "!"
-        );
+            "Startup command '" + startup + "' failed with exit code " + startup.exitValue() + "!");
       }
       Console.log("Ready!");
     }
@@ -59,10 +54,10 @@ public abstract class GatorGradleTask extends DefaultTask {
   }
 
   /**
-    * Ensure we got a configuration.
-    *
-    * @return configuration
-    */
+   * Ensure we got a configuration.
+   *
+   * @return configuration
+   */
   @Input
   public GatorGradleConfig getConfig() {
     if (config == null) {
