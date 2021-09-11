@@ -162,4 +162,19 @@ public class StringUtil {
     }
     return splits;
   }
+
+  /**
+   * Surround the given string in quotes, either double or single, to ensure correct shellword
+   * parsing
+   *
+   * @param text the text to quote
+   * @return the text surrounded by either {@code "} or {@code '}
+   */
+  public static String enquote(String text) {
+    if (text.contains("'")) {
+      return "\"" + text + "\"";
+    } else {
+      return "'" + text + "'";
+    }
+  }
 }

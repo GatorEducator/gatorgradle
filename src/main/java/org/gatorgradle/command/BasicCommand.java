@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.gatorgradle.util.Console;
+import org.gatorgradle.util.StringUtil;
 import org.gradle.api.GradleException;
 import org.gradle.api.logging.Logging;
 
@@ -75,7 +76,7 @@ public class BasicCommand implements Command {
   @Override
   public String toString() {
     List<String> strs = new ArrayList<>(command);
-    strs.replaceAll(str -> str.matches("\\S+") ? str : "'" + str + "'");
+    strs.replaceAll(str -> str.matches("\\S+") ? str : StringUtil.enquote(str));
     return "[" + String.join(" ", strs) + "]";
   }
 
