@@ -1,9 +1,7 @@
 plugins {
-    id "java-gradle-plugin"
-    id "maven-publish"
     id "pmd"
-    id "com.diffplug.spotless" version "5.15.0"
-    id "com.gradle.plugin-publish" version "0.15.0"
+    id "com.diffplug.spotless" version "6.5.0"
+    id "com.gradle.plugin-publish" version "1.0.0-rc-1"
     id "com.wagner.gitver" version "0.0.1"
 }
 
@@ -16,13 +14,12 @@ println("\u001B[1;36mVERSION ${version}  --  BUILD ${build_number}\u001B[0m")
 /* GatorGradle Dependency Configuration */
 
 repositories {
-    mavenLocal()
     mavenCentral()
 }
 
-// dependencies {
-//     // implementation gradleApi()
-// }
+dependencies {
+    implementation gradleApi()
+}
 
 /* Plugin Specification */
 
