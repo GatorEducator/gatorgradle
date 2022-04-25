@@ -19,8 +19,8 @@ import org.gradle.api.GradleException;
 public class ConfigMap {
 
   public static final String KEYVAL_SEP = ":";
-  public static final String KEYVAL_SEP_REGEX = "(?<!\\)" + KEYVAL_SEP;
-  public static final String ESCAPED_KEYVAL_SEP_REGEX = "(?<!\\)\\" + KEYVAL_SEP;
+  public static final String KEYVAL_SEP_REGEX = "(?<!\\\\)" + KEYVAL_SEP;
+  public static final String ESCAPED_KEYVAL_SEP_REGEX = "(?<!\\\\)\\" + KEYVAL_SEP;
   public static final String MARK_REGEX = "^-{3,}$";
 
   private static class Line {
