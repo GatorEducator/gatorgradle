@@ -91,7 +91,7 @@ spotless {
     endWithNewline()
   }
   java {
-    googleJavaFormat("1.11.0")
+    googleJavaFormat("1.15.0")
     trimTrailingWhitespace()
     endWithNewline()
     importOrder("java", "javax", "org", "com")
