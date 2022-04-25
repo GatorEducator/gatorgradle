@@ -298,7 +298,7 @@ public class CommandOutputSummary {
       // test if the problem was an unsupported argument
       int index = -1;
       String unrec = "gatorgrader.py: error: unrecognized arguments:";
-      if ((index = output.indexOf(unrec)) >= 0) {
+      if (output != null && (index = output.indexOf(unrec)) >= 0) {
         index += unrec.length();
         unrec = output.substring(index).trim();
         result = new CheckResult(
