@@ -154,9 +154,11 @@ public class StringUtil {
     Matcher mtc = shellwords.matcher(text);
     while (mtc.find()) {
       String group = mtc.group(1);
-      char quote = group.charAt(0);
-      if ((quote == '"' || quote == '\'') && group.endsWith(String.valueOf(quote))) {
-        group = group.substring(1, group.length() - 1);
+      if (!group.isBlank()) {
+        char quote = group.charAt(0);
+        if ((quote == '"' || quote == '\'') && group.endsWith(String.valueOf(quote))) {
+          group = group.substring(1, group.length() - 1);
+        }
       }
       splits.add(group);
     }
