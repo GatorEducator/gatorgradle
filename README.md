@@ -32,9 +32,9 @@ GatorGradle requires that [Git](https://git-scm.com/), a version of
 [Pipenv](https://pipenv.readthedocs.io/en/latest) are installed -- it will
 automatically bootstrap a valid GatorGrader installation from there.
 Additionally, [Gradle 5.0+](https://gradle.org/) is required to actually use
-GatorGradle (GatorGradle is compatible with 4.0+ as well) . A complete example
-configuration of Gradle and GatorGradle is available in the
-[Java Sample Assignment](https://github.com/GatorEducator/java-assigment-starter)
+GatorGradle (GatorGradle is compatible with 4.0+ as well, but Gradle 7.3+ is
+recommended). A complete example configuration of Gradle and GatorGradle is
+available in the [Java Sample Assignment](https://github.com/GatorEducator/java-assigment-starter)
 repository.
 
 NOTE: GatorGradle will **ONLY** automatically install GatorGrader.
@@ -61,9 +61,9 @@ fastfail: false
 indent: 4
 # Command to get user info/id
 # default is 'git config --global user.email'
-idcommand: echo $TRAVIS_REPO_SLUG
-# Specify a reference to checkout to in GatorGrader
-version: v0.2.0
+idcommand: echo $GITHUB_REPOSITORY_OWNER
+# Specify a reference to checkout to in GatorGrader (must be before v1.1.0)
+version: v1.0.0
 # Specify 'executables' that can be run as checks
 executables: cat, bash
 # Specify a script or executable to run on startup
@@ -77,17 +77,16 @@ src/main:
     java:
         samplelab/SampleLabMain.java:
             # Specify checks by simply writing arguments to GatorGrader
-            --exists
-            --single 1 --language Java
-            --multi 3 --language Java
-            --fragment "println(" --count 2
-            --fragment "new DataClass(" --count 1
-            --regex "new\s+\S+?\(.*?\)" --count 2 --exact
+            ConfirmFileExists
+            CountSingleLineComments --count 1 --language Java
+            CountMultipleLineComments --count 3 --language Java
+            MatchFileFragment --fragment "println(" --count 2
+            --description "Create a new object" MatchFileRegex --regex "new\s+\S+?\(.*?\)" --count 2 --exact
         samplelab/DataClass.java:
-            --exists
-            --multi 1 --language Java
-            --single 1 --language Java
-            --fragment "int " --count 1
+            --description "Create DataClass.java" ConfirmFileExists
+            --description "Add a single-line comment" CountSingleLineComments --count 1 --language Java
+            --description "Add a multi-line comment" CountMultipleLineComments --count 1 --language Java
+            --description "Add an int member variable" MatchFileFragment --fragment "int " --count 1
 
 writing:
     # A pure check is simply a call-out to the OS to run
@@ -100,13 +99,13 @@ writing:
         # in executing 'mdl writing/reflection.md'
         mdl
         cat
-        --paragraphs 2
-        --words 6
+        --description "Write two paragraphs in writing/reflection.md" CountFileParagraphs --count 2
+        --description "Write at least 6 words in each paragraph in writing/reflection.md" CountParagraphWords --count 30
 
 # Any checks outside of the tree structure will not have
 # a file or directory based context; if a directory is needed
 # it will be the base project directory
---commits 18
+CountCommits --count 18
 ```
 
 ## Output Summary
@@ -160,14 +159,14 @@ of the grading.
 
 Including GatorGradle in your project is simple. If no extra configuration is
 required, simply insert the following code block at the beginning of your
-`build.gradle` to use version `0.5.1`. Find out what version is current by
+`build.gradle` to use version `1.0.0`. Find out what version is current by
 visiting the [Gradle Plugin Portal](https://plugins.gradle.org/plugin/org.gatored.gatorgradle).
 Other configuration and installation information is also available there,
 including a different script that will always use the most recent version!
 
 ```groovy
 plugins {
-  id "org.gatored.gatorgradle" version "0.5.1"
+  id "org.gatored.gatorgradle" version "1.0.0"
 }
 ```
 
