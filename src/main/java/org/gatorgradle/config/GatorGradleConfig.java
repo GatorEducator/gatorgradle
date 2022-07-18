@@ -50,7 +50,7 @@ public final class GatorGradleConfig implements Iterable<Command> {
   private boolean breakBuild = false;
   private boolean fastBreakBuild = false;
   private String assignmentName = "this assignment";
-  private String gatorgraderRevision = "master";
+  private String gatorgraderRevision = "v1.1.0"; // Default to last version before GatorGrader switched to Poetry
   private String reportEndpoint = System.getenv("GATOR_ENDPOINT");
   private String reportApiKey = System.getenv("GATOR_API_KEY");
   private String idCommand = "git config --global user.email";
@@ -105,7 +105,8 @@ public final class GatorGradleConfig implements Iterable<Command> {
 
     List<String> shellwords = StringUtil.shellSplit(line);
 
-    // FIXME: there should be a better method of determining which path separator is used
+    // FIXME: there should be a better method of determining which path separator is
+    // used
     // in the config file -- it is independent of the OS.
     int sep = Math.max(path.lastIndexOf("/"), path.lastIndexOf("\\"));
     String name = path;
