@@ -50,7 +50,8 @@ public final class GatorGradleConfig implements Iterable<Command> {
   private boolean breakBuild = false;
   private boolean fastBreakBuild = false;
   private String assignmentName = "this assignment";
-  private String gatorgraderRevision = "v1.1.0"; // Default to last version before GatorGrader switched to Poetry
+  // Default to last version before GatorGrader switched to Poetry
+  private String gatorgraderRevision = "v1.1.0";
   private String reportEndpoint = System.getenv("GATOR_ENDPOINT");
   private String reportApiKey = System.getenv("GATOR_API_KEY");
   private String idCommand = "git config --global user.email";

@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Locale;
 
 import org.gatorgradle.config.GatorGradleConfig;
+import org.gatorgradle.task.GatorGradleCleanTask;
 import org.gatorgradle.task.GatorGradleGradeTask;
 import org.gatorgradle.task.GatorGradleReportTask;
 import org.gradle.api.GradleException;
@@ -21,7 +22,8 @@ public class GatorGradlePlugin implements Plugin<Project> {
   public static final String LINUX = "linux";
   public static final String MACOS = "mac";
 
-  // TODO: allow DSL configuration block to specify CONFIG_FILE_LOCATION and GATORGRADER_HOME.
+  // TODO: allow DSL configuration block to specify CONFIG_FILE_LOCATION and
+  // GATORGRADER_HOME.
   public static final String GATORGRADER_HOME;
   public static final String CONFIG_FILE_LOCATION;
   public static final String USER_HOME;
@@ -43,10 +45,12 @@ public class GatorGradlePlugin implements Plugin<Project> {
       OS = "unsupported";
     }
 
-    // TODO: is this a sensible default for gg home? - probably only on linux and mac
+    // TODO: is this a sensible default for gg home? - probably only on linux and
+    // mac
     if (OS.equals(LINUX) || OS.equals(MACOS)) {
       GATORGRADER_HOME = USER_HOME + F_SEP + ".local" + F_SEP + "share" + F_SEP + "gatorgrader";
     } else {
+      //
       GATORGRADER_HOME = USER_HOME + F_SEP + ".gatorgrader";
     }
 
@@ -65,7 +69,6 @@ public class GatorGradlePlugin implements Plugin<Project> {
     // TODO: what should we do for config file location?
     GatorGradleConfig config =
         GatorGradleConfig.create(project.file(CONFIG_FILE_LOCATION).toPath());
-
     // ensure we got a configuration
     if (config == null) {
       throw new GradleException(
@@ -77,28 +80,30 @@ public class GatorGradlePlugin implements Plugin<Project> {
         GatorGradlePlugin.class.getPackage().getImplementationVersion());
 
     // create gatorgradle 'grade' task
-    Task gradeTask = project
-        .getTasks()
-        .create(
-            "grade",
-            GatorGradleGradeTask.class,
-            task -> {
-              // default grade task uses config from above and project dir as grade
-              task.setConfig(config);
-              task.setWorkingDir(project.getProjectDir());
-            });
+    Task gradeTask =
+        project
+            .getTasks()
+            .create(
+                "grade",
+                GatorGradleGradeTask.class,
+                task -> {
+                  // default grade task uses config from above and project dir as grade
+                  task.setConfig(config);
+                  task.setWorkingDir(project.getProjectDir());
+                });
 
     // create gatorgradle 'report' task
-    Task reportTask = project
-        .getTasks()
-        .create(
-            "report",
-            GatorGradleReportTask.class,
-            task -> {
-              // default grade task uses config from above and project dir as grade
-              task.setConfig(config);
-              task.setWorkingDir(project.getProjectDir());
-            });
+    Task reportTask =
+        project
+            .getTasks()
+            .create(
+                "report",
+                GatorGradleReportTask.class,
+                task -> {
+                  // default grade task uses config from above and project dir as grade
+                  task.setConfig(config);
+                  task.setWorkingDir(project.getProjectDir());
+                });
     reportTask.mustRunAfter(gradeTask);
 
     Task cleanTask = project.getTasks().create("cleanGatorGrader", GatorGradleCleanTask.class);
