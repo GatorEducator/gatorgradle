@@ -65,7 +65,7 @@ idcommand: echo $GITHUB_REPOSITORY_OWNER
 # Specify a reference to checkout to in GatorGrader (must be before v1.1.0)
 version: v1.0.0
 # Specify 'executables' that can be run as checks
-executables: cat, bash
+executables: cat, markdownlint-cli2
 # Specify a script or executable to run on startup
 startup: ./config/startup.sh
 # Specify the path to the reflection file
@@ -81,7 +81,7 @@ src/main:
             CountSingleLineComments --count 1 --language Java
             CountMultipleLineComments --count 3 --language Java
             MatchFileFragment --fragment "println(" --count 2
-            --description "Create a new object" MatchFileRegex --regex "new\s+\S+?\(.*?\)" --count 2 --exact
+            --description "Create exactly two new objects" MatchFileRegex --regex "new\s+\S+?\(.*?\)" --count 2 --exact
         samplelab/DataClass.java:
             --description "Create DataClass.java" ConfirmFileExists
             --description "Add a single-line comment" CountSingleLineComments --count 1 --language Java
@@ -92,12 +92,12 @@ writing:
     # A pure check is simply a call-out to the OS to run
     # whatever program you desire; the working directory
     # is set by the context (in this case, 'writing/')
-    (pure) ./writing-check.sh reflection.md param2
+    (pure) ../config/writing-check.sh reflection.md param2
     reflection.md:
-        # for checks that are 'executables', the context
+        # for checks that are 'executables' the context
         # is given after the executable: this check results
-        # in executing 'mdl writing/reflection.md'
-        mdl
+        # in executing 'markdownlint-cli2 writing/reflection.md'
+        markdownlint-cli2
         cat
         --description "Write two paragraphs in writing/reflection.md" CountFileParagraphs --count 2
         --description "Write at least 6 words in each paragraph in writing/reflection.md" CountParagraphWords --count 30
@@ -123,35 +123,38 @@ of the grading.
 ```text
 [...]
 
-✔  The file writing/reflection.md passes mdl
-✔  The SampleLabMain.java in src/main/java/samplelab has at least 1 of the 'new DataClass(' fragment
-✘  The reflection.md in writing has at least 6 word(s) in every paragraph
-✔  The DataClass.java in src/main/java/samplelab has at least 1 of the 'int ' fragment
-✔  The SampleLabMain.java in src/main/java/samplelab has at least 1 single-line Java comment(s)
-✔  Repository has at least 18 commit(s)
-✘  The SampleLabMain.java in src/main/java/samplelab has at least 2 of the 'new Date(' fragment
-✔  The DataClass.java in src/main/java/samplelab has at least 1 multiple-line Java comment(s)
-✔  The SampleLabMain.java in src/main/java/samplelab has at least 2 of the 'println(' fragment
+✔  Create DataClass.java
+✘  Write two paragraphs in writing/reflection.md
 ✘  The SampleLabMain.java in src/main/java/samplelab has at least 3 multiple-line Java comment(s)
-✘  The reflection.md in writing has at least 2 paragraph(s)
+✔  [../config/writing-check.sh reflection.md param2] executes
+✔  The file writing/reflection.md passes cat
+✔  Add a single-line comment
+✔  The SampleLabMain.java in src/main/java/samplelab has at least 1 single-line Java comment(s)
+✔  Add an int member variable
+✘  Write at least 6 words in each paragraph in writing/reflection.md
+✔  Add a multi-line comment
+✔  The SampleLabMain.java in src/main/java/samplelab has at least 2 of the 'println(' fragment
+✔  The file writing/reflection.md passes markdownlint-cli2
+✔  The repository has at least 18 commit(s)
+✔  The file SampleLabMain.java exists in the src/main/java/samplelab directory
+✘  Create exactly two new objects
 
 
 -~-  FAILURES  -~-
 
-✘  The reflection.md in writing has at least 6 word(s) in every paragraph
-   ➔  Found 4 word(s) in a paragraph of the specified file
-✘  The SampleLabMain.java in src/main/java/samplelab has at least 2 of the 'new Date(' fragment
-   ➔  Found 1 fragment(s) in the output or the specified file
+✘  Write two paragraphs in writing/reflection.md
+   ➔  Found 1 paragraph(s) in the reflection.md file
 ✘  The SampleLabMain.java in src/main/java/samplelab has at least 3 multiple-line Java comment(s)
-   ➔  Found 2 comment(s) in the specified file
-✘  The reflection.md in writing has at least 2 paragraph(s)
-   ➔  Found 1 paragraph(s) in the specified file
+   ➔  Found 2 comment(s) in the SampleLabMain.java or the output
+✘  Write at least 6 words in each paragraph in writing/reflection.md
+   ➔  Found 4 word(s) in the first paragraph of file reflection.md
+✘  Create exactly two new objects
+   ➔  Found 1 match(es) of the regular expression in output or SampleLabMain.java
 
 
-        ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-        ┃ Passed 7/11 (64%) of checks for gatorgrader-samplelab! ┃
-        ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
+        ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+        ┃ Passed 11/15 (73%) of checks for gatorgrader-samplelab! ┃
+        ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 ```
 
