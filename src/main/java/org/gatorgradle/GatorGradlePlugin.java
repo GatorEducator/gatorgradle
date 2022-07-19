@@ -91,6 +91,8 @@ public class GatorGradlePlugin implements Plugin<Project> {
                   task.setConfig(config);
                   task.setWorkingDir(project.getProjectDir());
                 });
+    gradeTask.setGroup("Grading");
+    gradeTask.setDescription("Generates a grade summary by running GatorGrader");
 
     // create gatorgradle 'report' task
     Task reportTask =
@@ -104,9 +106,13 @@ public class GatorGradlePlugin implements Plugin<Project> {
                   task.setConfig(config);
                   task.setWorkingDir(project.getProjectDir());
                 });
+    reportTask.setGroup("Grading");
+    reportTask.setDescription("Uploads a grade report");
     reportTask.mustRunAfter(gradeTask);
 
     Task cleanTask = project.getTasks().create("cleanGatorGrader", GatorGradleCleanTask.class);
+    cleanTask.setGroup("Grading");
+    cleanTask.setDescription("Uninstalls GatorGrader");
     // should this be done on `clean`?
     // project.getTasksByName("clean", false).forEach(t -> t.dependsOn(cleanTask));
     gradeTask.mustRunAfter(cleanTask);
