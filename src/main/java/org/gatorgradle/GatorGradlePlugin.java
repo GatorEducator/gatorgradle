@@ -107,7 +107,8 @@ public class GatorGradlePlugin implements Plugin<Project> {
     reportTask.mustRunAfter(gradeTask);
 
     Task cleanTask = project.getTasks().create("cleanGatorGrader", GatorGradleCleanTask.class);
-    project.getTasksByName("clean", false).forEach(t -> t.dependsOn(cleanTask));
+    // should this be done on `clean`?
+    // project.getTasksByName("clean", false).forEach(t -> t.dependsOn(cleanTask));
     gradeTask.mustRunAfter(cleanTask);
   }
 }
