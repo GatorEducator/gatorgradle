@@ -140,7 +140,7 @@ public class StringUtil {
     return escaped;
   }
 
-  private static Pattern shellwords = Pattern.compile("(\"[^\"]+?\"|'[^']+?'|\\S*)\\s*");
+  private static Pattern shellwords = Pattern.compile("(\"[^\"]*?\"|'[^']+?'|\\S+)(\\s+|$)");
 
   /**
    * Split the given String into shell words (words separated by spaces, where words can contain
@@ -154,7 +154,7 @@ public class StringUtil {
     Matcher mtc = shellwords.matcher(text);
     while (mtc.find()) {
       String group = mtc.group(1);
-      if (!group.isBlank()) {
+      if (!group.trim().isEmpty()) {
         char quote = group.charAt(0);
         if ((quote == '"' || quote == '\'') && group.endsWith(String.valueOf(quote))) {
           group = group.substring(1, group.length() - 1);
