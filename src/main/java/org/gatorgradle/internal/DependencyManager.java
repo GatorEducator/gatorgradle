@@ -1,16 +1,15 @@
 package org.gatorgradle.internal;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Comparator;
 
 import org.gatorgradle.GatorGradlePlugin;
 import org.gatorgradle.command.BasicCommand;
 import org.gatorgradle.command.Command;
 import org.gatorgradle.config.GatorGradleConfig;
+import org.gatorgradle.task.GatorGradleCleanTask;
 import org.gatorgradle.util.Console;
 import org.gradle.api.GradleException;
 
@@ -143,22 +142,7 @@ public class DependencyManager {
   private static boolean doGatorGrader() {
     boolean success = doGatorGraderMain();
     if (!success) {
-      Path path = Paths.get(GatorGradlePlugin.GATORGRADER_HOME);
-      Console.log("Deleting " + path);
-      try {
-        Files.walk(path)
-            .sorted(Comparator.reverseOrder())
-            .map(innerPath -> innerPath.toFile())
-            .forEach(
-                file -> {
-                  boolean deleted = file.delete();
-                  if (!deleted) {
-                    Console.error("Did not delete " + path + "!");
-                  }
-                });
-      } catch (IOException ex) {
-        Console.error("Failed to delete " + path + "!");
-      }
+      GatorGradleCleanTask.deleteGatorGraderInstallation();
     }
     return success;
   }
