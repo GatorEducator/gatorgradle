@@ -1,7 +1,6 @@
 package org.gatorgradle.util;
 
 import java.io.PrintStream;
-
 import java.util.stream.Stream;
 
 public class Console {
@@ -44,13 +43,14 @@ public class Console {
   /**
    * Log a message to a specified stream.
    *
-   * @param out  The stream to log to
+   * @param out The stream to log to
    * @param logs Any objects to log
    */
   public static void logToStream(PrintStream out, Object... logs) {
     if (logs.length > 0) {
-      out.println(String.join(
-          " ", Stream.of(logs).map(obj -> obj.toString()).toArray(size -> new String[size])));
+      out.println(
+          String.join(
+              " ", Stream.of(logs).map(obj -> obj.toString()).toArray(size -> new String[size])));
     }
   }
 }

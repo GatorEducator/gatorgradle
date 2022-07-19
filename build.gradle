@@ -1,55 +1,50 @@
 plugins {
-    id "maven"
-    id "java-gradle-plugin"
-    id "com.gradle.plugin-publish" version "0.10.1"
-    id "com.palantir.git-version" version "0.12.2"
-    id "ru.vyarus.quality" version "4.0.0"
+    id "pmd"
+    id "com.diffplug.spotless" version "6.8.0"
+    id "com.gradle.plugin-publish" version "1.0.0"
+    id "com.wagner.gitver" version "0.1.0"
 }
 
-def calculateVersion() {
-  def details = versionDetails()
-  def tag = details.lastTag.dropWhile { it == 'v' }
-  if (tag ==~ /([0-9]+)\.([0-9]+)\.([0-9]+)/) {
-      return tag
-  } else {
-    return '0.0.0'
-  }
-}
+/* Version Configuration */
 
 group = "org.gatored"
-version = calculateVersion()
-def build = "git rev-list --count master".execute().text.trim()
+def build_number = "git rev-list --count master".execute().text.trim()
+println("\u001B[1;36mVERSION ${version}  --  BUILD ${build_number}\u001B[0m")
 
-println("\u001B[1;36mVERSION ${version}  --  BUILD ${build}\u001B[0m")
+/* GatorGradle Dependency Configuration */
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation gradleApi()
+}
+
+/* Plugin Specification */
 
 pluginBundle {
     website = "https://gatoreducator.github.io/gatorgradle/"
     vcsUrl = "https://github.com/gatoreducator/gatorgradle"
-    description = "Gradle plugin for integrating the grading tool GatorGrader as a runnable, configurable task"
-    tags = ["grading", "allegheny", "gatorgrader", "mdl", "proselint"]
-
-    plugins {
-        gatorgradle {
-            id = "${group}.${name}"
-            description = "Integrates GatorGrader checking as a task, as used at Allegheny College."
-            displayName = "GatorGradle"
-      }
-  }
+    tags = ["grading", "allegheny", "gatorgrader"]
 }
 
 gradlePlugin {
     plugins {
         gatorgradle {
             id = "${group}.${name}"
+            description = "Integrates GatorGrader checking as a Gradle task, as used at Allegheny College."
+            displayName = "GatorGradle"
             implementationClass = "org.gatorgradle.GatorGradlePlugin"
         }
     }
 }
 
-uploadArchives {
+publishing {
     repositories {
-        mavenDeployer {
-            repository(url: "file://${System.properties['user.home']}/.m2/repository")
+        maven {
+            name = "mavenLocal"
+            url = "file://${System.properties['user.home']}/.m2/repository"
         }
     }
 }
@@ -57,9 +52,12 @@ uploadArchives {
 jar {
     manifest {
         attributes 'Implementation-Title': 'GatorGradle',
-                   'Implementation-Version': version
+                   'Implementation-Version': project.version,
+                   'Implementation-Build': build_number
     }
 }
+
+/* Publishing Tasks */
 
 task publishJavadocs(type: GradleBuild) {
     def docFolder = "docs/${version}"
@@ -80,46 +78,38 @@ task _publishJavadocs(type: Exec) {
     def docFolder = "docs/${version}"
     def date = new Date().format("MMMM d, YYYY", TimeZone.getTimeZone("UTC"))
 
-    commandLine "./scripts/publishJavadocs.sh", docFolder, status, version, build, date
+    commandLine "./scripts/publishJavadocs.sh", docFolder, status, version, build_number, date
 }
 
-quality {
-    checkstyleVersion = "8.16"
+/* Quality Control Configuration */
 
-    checkstyle = true
-    pmd = false;
-    spotbugs = true
-    codenarc = true
-
-    spotbugsEffort = "max"
-    spotbugsLevel = "low"
-
-    strict = true
+spotless {
+  format "misc", {
+    target("*.gradle", ".gitignore")
+    trimTrailingWhitespace()
+    indentWithSpaces(2)
+    endWithNewline()
+  }
+  java {
+    googleJavaFormat("1.7")
+    trimTrailingWhitespace()
+    endWithNewline()
+    importOrder("java", "javax", "org", "com")
+  }
 }
 
-afterEvaluate {
-    checkstyle {
-        ignoreFailures = false
-        maxErrors = 0
-        maxWarnings = 0
-    }
+pmd {
+  // incrementalAnalysis = true
+  ruleSets = []
+  ruleSetFiles = files(".pmdrules.xml")
 }
 
-dependencies {
-    compile gradleApi()
+task format {
+    dependsOn spotlessApply
+    doLast { print "Formatted!" }
 }
 
-repositories {
-    mavenLocal()
-    jcenter()
-    mavenCentral()
+tasks.withType(JavaCompile) {
+    //enable compilation in a separate daemon process
+    options.deprecation = true
 }
-
-/* tasks.whenTaskAdded { task ->
-    if (task.getName().contains("PluginMavenPublication")) {
-        task.setDependsOn([])
-        task.setMustRunAfter([])
-        task.setShouldRunAfter([])
-        task.setEnabled(false)
-    }
-} */

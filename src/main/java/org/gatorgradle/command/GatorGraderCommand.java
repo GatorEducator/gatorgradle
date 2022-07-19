@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.gatorgradle.GatorGradlePlugin;
-
 import org.gatorgradle.internal.DependencyManager;
 
 /**
@@ -25,11 +24,13 @@ public class GatorGraderCommand extends BasicCommand {
    * Create a command from a list of strings.
    *
    * @param command the list of arguments
-   **/
+   */
   public GatorGraderCommand(List<String> command) {
-    super(DependencyManager.getPython(),
+    super(
+        DependencyManager.getPython(),
         GatorGradlePlugin.GATORGRADER_HOME + GatorGradlePlugin.F_SEP + "gatorgrader.py",
-        WELCOME_FLAG, JSON_FLAG);
+        WELCOME_FLAG,
+        JSON_FLAG);
     super.with(command);
   }
 }

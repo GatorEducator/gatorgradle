@@ -5,28 +5,25 @@ import javax.inject.Inject;
 import org.gatorgradle.command.Command;
 import org.gatorgradle.display.CommandOutputSummary;
 import org.gatorgradle.internal.ProgressLoggerWrapper;
-import org.gatorgradle.task.GatorGradleTask;
 import org.gatorgradle.util.Console;
-
 import org.gradle.api.GradleException;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.tasks.TaskAction;
-import org.gradle.workers.IsolationMode;
+import org.gradle.workers.WorkQueue;
 import org.gradle.workers.WorkerExecutor;
 
 public class GatorGradleGradeTask extends GatorGradleTask {
-  // The executor to use to execute the gradin
-  private final WorkerExecutor executor;
+  // The executor to use to execute the grading
+  private final WorkQueue executor;
 
   @Inject
   public GatorGradleGradeTask(WorkerExecutor executor) {
-    this.executor = executor;
+    this.executor = executor.noIsolation();
   }
 
   // because of Java serialization limitations, along with
   // how gradle implements logging, these must be static
   private static int totalTasks;
-
 
   /**
    * Static handler to call when a subtask completes.
@@ -46,9 +43,7 @@ public class GatorGradleGradeTask extends GatorGradleTask {
     summary = new CommandOutputSummary(logger);
   }
 
-  /**
-   * Execute the grading checks assigned to this GatorGradleGradeTask.
-   */
+  /** Execute the grading checks assigned to this GatorGradleGradeTask. */
   @TaskAction
   public void grade() {
 
@@ -62,7 +57,6 @@ public class GatorGradleGradeTask extends GatorGradleTask {
     progLog.started();
     initTasks(super.getConfig().size(), this.getLogger());
 
-
     if (totalTasks > 0) {
       // submit commands to executor
       for (Command cmd : super.getConfig()) {
@@ -73,18 +67,20 @@ public class GatorGradleGradeTask extends GatorGradleTask {
         }
 
         // configure command executor
-        executor.submit(CommandExecutor.class, (conf) -> {
-          conf.setIsolationMode(IsolationMode.NONE);
-          conf.setDisplayName(cmd.toString());
-          conf.setParams(cmd);
-        });
+        executor.submit(CommandExecutor.class, params -> params.getCommand().set(cmd));
       }
 
       int percentComplete = 0;
       while (percentComplete < 100) {
         percentComplete = (summary.getNumCompletedTasks() * 100) / totalTasks;
-        progLog.progress("Finished " + summary.getNumCompletedTasks() + " / " + totalTasks
-            + " checks  >  " + percentComplete + "% complete!");
+        progLog.progress(
+            "Finished "
+                + summary.getNumCompletedTasks()
+                + " / "
+                + totalTasks
+                + " checks  >  "
+                + percentComplete
+                + "% complete!");
         try {
           Thread.sleep(100);
         } catch (InterruptedException ex) {
@@ -98,13 +94,20 @@ public class GatorGradleGradeTask extends GatorGradleTask {
       // this is impossible now because of the for loop above, FIXME
       if (summary.getNumCompletedTasks() != totalTasks) {
         // silent failure somewhere, break the build
-        throw new GradleException("Silent failure in task execution! Only completed "
-            + summary.getNumCompletedTasks() + " tasks but should have completed " + totalTasks);
+        throw new GradleException(
+            "Silent failure in task execution! Only completed "
+                + summary.getNumCompletedTasks()
+                + " tasks but should have completed "
+                + totalTasks);
       }
     }
 
-    progLog.progress("Finished " + summary.getNumCompletedTasks() + " / " + totalTasks
-        + " checks  >  100% complete!  >  Compiling Report...");
+    progLog.progress(
+        "Finished "
+            + summary.getNumCompletedTasks()
+            + " / "
+            + totalTasks
+            + " checks  >  100% complete!  >  Compiling Report...");
 
     // complete task submission
     progLog.completed();

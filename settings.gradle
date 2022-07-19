@@ -1,1 +1,6 @@
 rootProject.name = "gatorgradle"
+
+gradle.ext.gitver = [
+  includeCommits: false,
+  includeSnapshot: false
+]

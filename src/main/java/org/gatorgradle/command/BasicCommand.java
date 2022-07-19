@@ -8,10 +8,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import org.gatorgradle.util.Console;
-
+import org.gatorgradle.util.StringUtil;
 import org.gradle.api.GradleException;
 import org.gradle.api.logging.Logging;
 
@@ -50,14 +49,17 @@ public class BasicCommand implements Command {
     return this;
   }
 
+  @Override
   public File getWorkingDir() {
     return workingDir;
   }
 
+  @Override
   public void setWorkingDir(final File dir) {
     this.workingDir = dir;
   }
 
+  @Override
   public void setCallback(final Callback callback) {
     this.callback = callback;
   }
@@ -68,11 +70,13 @@ public class BasicCommand implements Command {
 
   /**
    * Builds a descriptive string by recreating the command run.
+   *
    * @return a descriptive string
    */
+  @Override
   public String toString() {
     List<String> strs = new ArrayList<>(command);
-    strs.replaceAll(str -> str.matches("\\S+") ? str : "'" + str + "'");
+    strs.replaceAll(str -> str.matches("\\S+") ? str : StringUtil.enquote(str));
     return "[" + String.join(" ", strs) + "]";
   }
 
@@ -91,9 +95,10 @@ public class BasicCommand implements Command {
   /**
    * Tests the object for equality.
    *
-   * @param  cmd the object to test
-   * @return     true if the object represents the same textual command
+   * @param cmd the object to test
+   * @return true if the object represents the same textual command
    */
+  @Override
   public boolean equals(Object cmd) {
     if (cmd instanceof BasicCommand) {
       return command.equals(((BasicCommand) cmd).command);
@@ -107,6 +112,7 @@ public class BasicCommand implements Command {
    *
    * @return the hashcode
    */
+  @Override
   public int hashCode() {
     return command.stream()
         .map(str -> str.hashCode())
@@ -118,6 +124,7 @@ public class BasicCommand implements Command {
    *
    * @return the exit value
    */
+  @Override
   public int exitValue() {
     if (!fin) {
       throw new GradleException("Command not finished, no exit value available!");
@@ -130,6 +137,7 @@ public class BasicCommand implements Command {
    *
    * @return true if the command finished
    */
+  @Override
   public boolean finished() {
     return fin;
   }
@@ -139,6 +147,7 @@ public class BasicCommand implements Command {
    *
    * @return the Command that ran/is running
    */
+  @Override
   public BasicCommand waitFor() {
     if (thread != null) {
       try {
@@ -153,7 +162,7 @@ public class BasicCommand implements Command {
   /**
    * Execute the Command.
    *
-   * @param  block should execution block until finished?
+   * @param block should execution block until finished?
    * @return the Command that ran/is running
    */
   public BasicCommand run(boolean block) {
@@ -166,10 +175,8 @@ public class BasicCommand implements Command {
     return this;
   }
 
-  /**
-   * Execute the Command, blocking.
-   *
-   */
+  /** Execute the Command, blocking. */
+  @Override
   public void run() {
     fin = false;
     if (command.isEmpty()) {
@@ -208,7 +215,7 @@ public class BasicCommand implements Command {
 
     } catch (Throwable thr) {
       Logging.getLogger(BasicCommand.class)
-        .error("Exception while running {}: {}", toString(), thr.toString());
+          .error("Exception while running {}: {}", toString(), thr.toString());
       exitVal = 127;
     } finally {
       fin = true;

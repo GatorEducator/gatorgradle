@@ -18,20 +18,18 @@
 
 package org.gatorgradle.internal;
 
-import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.gatorgradle.util.Console;
-
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
 
 /**
- * Wraps around Gradle's internal progress logger. Uses reflection
- * to provide as much compatibility to different Gradle versions
- * as possible. Note that Gradle's progress logger does not belong
- * to its public API.
+ * Wraps around Gradle's internal progress logger. Uses reflection to provide as much compatibility
+ * to different Gradle versions as possible. Note that Gradle's progress logger does not belong to
+ * its public API.
+ *
  * @author Michel Kraemer
  * @author Saejin Mahlau-Heinert
  */
@@ -41,6 +39,7 @@ public class ProgressLoggerWrapper {
 
   /**
    * Create a progress logger wrapper.
+   *
    * @param project the current Gradle project
    * @param description the description for the logging
    */
@@ -80,6 +79,7 @@ public class ProgressLoggerWrapper {
 
   /**
    * Invoke a method using reflection.
+   *
    * @param obj the object whose method should be invoked
    * @param method the name of the method to invoke
    * @param args the arguments to pass to the method
@@ -87,7 +87,7 @@ public class ProgressLoggerWrapper {
    * @throws NoSuchMethodException if the method was not found
    * @throws InvocationTargetException if the method could not be invoked
    * @throws IllegalAccessException if the method could not be accessed
-  */
+   */
   private static Object invoke(Object obj, String method, Object... args)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
     Class<?>[] argumentTypes = new Class[args.length];
@@ -100,8 +100,8 @@ public class ProgressLoggerWrapper {
   }
 
   /**
-   * Invoke a method using reflection but don't throw any exceptions.
-   *  Just log errors instead.
+   * Invoke a method using reflection but don't throw any exceptions. Just log errors instead.
+   *
    * @param obj the object whose method should be invoked
    * @param method the name of the method to invoke
    * @param args the arguments to pass to the method
@@ -118,22 +118,19 @@ public class ProgressLoggerWrapper {
     }
   }
 
-  /**
-   * Start an operation.
-   */
+  /** Start an operation. */
   public void started() {
     invokeIgnoreExceptions(progressLogger, "started");
   }
 
-  /**
-   * Complete an operation.
-   */
+  /** Complete an operation. */
   public void completed() {
     invokeIgnoreExceptions(progressLogger, "completed");
   }
 
   /**
    * Set the current operation's progress.
+   *
    * @param msg the progress message
    */
   public void progress(String msg) {

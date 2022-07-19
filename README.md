@@ -3,8 +3,9 @@
 GatorGradle integrates [GatorGrader](https://github.com/GatorEducator/gatorgrader)
 into a Gradle project.
 
-[![Build Status](https://travis-ci.org/GatorEducator/gatorgradle.svg?branch=master)](https://travis-ci.org/GatorEducator/gatorgradle)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/8267c156c2874fc39f89effbdfdb8f5b)](https://app.codacy.com/app/GatorEducator/gatorgradle?utm_source=github.com&utm_medium=referral&utm_content=GatorEducator/gatorgradle&utm_campaign=Badge_Grade_Dashboard)
+[![build](https://github.com/GatorEducator/gatorgradle/workflows/build/badge.svg?branch=master)](https://github.com/GatorEducator/gatorgradle/actions?query=workflow%3A%22build%22+branch%3Amaster)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/b9a2cb353e5042d0a28a1f0750385f48)](https://www.codacy.com/gh/GatorEducator/gatorgradle/dashboard?utm_source=github.com&utm_medium=referral&utm_content=GatorEducator/gatorgradle&utm_campaign=Badge_Grade)
+[![Known Vulnerabilities](https://snyk.io/test/github/GatorEducator/gatorgradle/badge.svg?targetFile=build.gradle)](https://snyk.io/test/github/GatorEducator/gatorgradle?targetFile=build.gradle)
 [![Javadocs](https://gatoreducator.github.io/gatorgradle/docs/docs-status-badge.svg)](https://gatoreducator.github.io/gatorgradle/docs)
 
 ## Running Checks
@@ -31,9 +32,9 @@ GatorGradle requires that [Git](https://git-scm.com/), a version of
 [Pipenv](https://pipenv.readthedocs.io/en/latest) are installed -- it will
 automatically bootstrap a valid GatorGrader installation from there.
 Additionally, [Gradle 5.0+](https://gradle.org/) is required to actually use
-GatorGradle (GatorGradle is compatible with 4.0+ as well) . A complete example
-configuration of Gradle and GatorGradle is available in the
-[Java Sample Assignment](https://github.com/GatorEducator/java-assigment-starter)
+GatorGradle (GatorGradle is compatible with 4.0+ as well, but Gradle 7.3+ is
+recommended). A complete example configuration of Gradle and GatorGradle is
+available in the [Java Sample Assignment](https://github.com/GatorEducator/java-assigment-starter)
 repository.
 
 NOTE: GatorGradle will **ONLY** automatically install GatorGrader.
@@ -60,11 +61,11 @@ fastfail: false
 indent: 4
 # Command to get user info/id
 # default is 'git config --global user.email'
-idcommand: echo $TRAVIS_REPO_SLUG
-# Specify a reference to checkout to in GatorGrader
-version: v0.2.0
+idcommand: echo $GITHUB_REPOSITORY_OWNER
+# Specify a reference to checkout to in GatorGrader (must be before v1.1.0)
+version: v1.0.0
 # Specify 'executables' that can be run as checks
-executables: cat, bash
+executables: cat, markdownlint-cli2
 # Specify a script or executable to run on startup
 startup: ./config/startup.sh
 # Specify the path to the reflection file
@@ -76,36 +77,35 @@ src/main:
     java:
         samplelab/SampleLabMain.java:
             # Specify checks by simply writing arguments to GatorGrader
-            --exists
-            --single 1 --language Java
-            --multi 3 --language Java
-            --fragment "println(" --count 2
-            --fragment "new DataClass(" --count 1
-            --regex "new\s+\S+?\(.*?\)" --count 2 --exact
+            ConfirmFileExists
+            CountSingleLineComments --count 1 --language Java
+            CountMultipleLineComments --count 3 --language Java
+            MatchFileFragment --fragment "println(" --count 2
+            --description "Create exactly two new objects" MatchFileRegex --regex "new\s+\S+?\(.*?\)" --count 2 --exact
         samplelab/DataClass.java:
-            --exists
-            --multi 1 --language Java
-            --single 1 --language Java
-            --fragment "int " --count 1
+            --description "Create DataClass.java" ConfirmFileExists
+            --description "Add a single-line comment" CountSingleLineComments --count 1 --language Java
+            --description "Add a multi-line comment" CountMultipleLineComments --count 1 --language Java
+            --description "Add an int member variable" MatchFileFragment --fragment "int " --count 1
 
 writing:
     # A pure check is simply a call-out to the OS to run
     # whatever program you desire; the working directory
     # is set by the context (in this case, 'writing/')
-    (pure) ./writing-check.sh reflection.md param2
+    (pure) ../config/writing-check.sh reflection.md param2
     reflection.md:
-        # for checks that are 'executables', the context
+        # for checks that are 'executables' the context
         # is given after the executable: this check results
-        # in executing 'mdl writing/reflection.md'
-        mdl
+        # in executing 'markdownlint-cli2 writing/reflection.md'
+        markdownlint-cli2
         cat
-        --paragraphs 2
-        --words 6
+        --description "Write two paragraphs in writing/reflection.md" CountFileParagraphs --count 2
+        --description "Write at least 6 words in each paragraph in writing/reflection.md" CountParagraphWords --count 30
 
 # Any checks outside of the tree structure will not have
 # a file or directory based context; if a directory is needed
 # it will be the base project directory
---commits 18
+CountCommits --count 18
 ```
 
 ## Output Summary
@@ -123,35 +123,38 @@ of the grading.
 ```text
 [...]
 
-✔  The file writing/reflection.md passes mdl
-✔  The SampleLabMain.java in src/main/java/samplelab has at least 1 of the 'new DataClass(' fragment
-✘  The reflection.md in writing has at least 6 word(s) in every paragraph
-✔  The DataClass.java in src/main/java/samplelab has at least 1 of the 'int ' fragment
-✔  The SampleLabMain.java in src/main/java/samplelab has at least 1 single-line Java comment(s)
-✔  Repository has at least 18 commit(s)
-✘  The SampleLabMain.java in src/main/java/samplelab has at least 2 of the 'new Date(' fragment
-✔  The DataClass.java in src/main/java/samplelab has at least 1 multiple-line Java comment(s)
-✔  The SampleLabMain.java in src/main/java/samplelab has at least 2 of the 'println(' fragment
+✔  Create DataClass.java
+✘  Write two paragraphs in writing/reflection.md
 ✘  The SampleLabMain.java in src/main/java/samplelab has at least 3 multiple-line Java comment(s)
-✘  The reflection.md in writing has at least 2 paragraph(s)
+✔  [../config/writing-check.sh reflection.md param2] executes
+✔  The file writing/reflection.md passes cat
+✔  Add a single-line comment
+✔  The SampleLabMain.java in src/main/java/samplelab has at least 1 single-line Java comment(s)
+✔  Add an int member variable
+✘  Write at least 6 words in each paragraph in writing/reflection.md
+✔  Add a multi-line comment
+✔  The SampleLabMain.java in src/main/java/samplelab has at least 2 of the 'println(' fragment
+✔  The file writing/reflection.md passes markdownlint-cli2
+✔  The repository has at least 18 commit(s)
+✔  The file SampleLabMain.java exists in the src/main/java/samplelab directory
+✘  Create exactly two new objects
 
 
 -~-  FAILURES  -~-
 
-✘  The reflection.md in writing has at least 6 word(s) in every paragraph
-   ➔  Found 4 word(s) in a paragraph of the specified file
-✘  The SampleLabMain.java in src/main/java/samplelab has at least 2 of the 'new Date(' fragment
-   ➔  Found 1 fragment(s) in the output or the specified file
+✘  Write two paragraphs in writing/reflection.md
+   ➔  Found 1 paragraph(s) in the reflection.md file
 ✘  The SampleLabMain.java in src/main/java/samplelab has at least 3 multiple-line Java comment(s)
-   ➔  Found 2 comment(s) in the specified file
-✘  The reflection.md in writing has at least 2 paragraph(s)
-   ➔  Found 1 paragraph(s) in the specified file
+   ➔  Found 2 comment(s) in the SampleLabMain.java or the output
+✘  Write at least 6 words in each paragraph in writing/reflection.md
+   ➔  Found 4 word(s) in the first paragraph of file reflection.md
+✘  Create exactly two new objects
+   ➔  Found 1 match(es) of the regular expression in output or SampleLabMain.java
 
 
-        ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-        ┃ Passed 7/11 (64%) of checks for gatorgrader-samplelab! ┃
-        ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
+        ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+        ┃ Passed 11/15 (73%) of checks for gatorgrader-samplelab! ┃
+        ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 ```
 
@@ -159,14 +162,14 @@ of the grading.
 
 Including GatorGradle in your project is simple. If no extra configuration is
 required, simply insert the following code block at the beginning of your
-`build.gradle` to use version `0.5.1`. Find out what version is current by
+`build.gradle` to use version `1.0.0`. Find out what version is current by
 visiting the [Gradle Plugin Portal](https://plugins.gradle.org/plugin/org.gatored.gatorgradle).
 Other configuration and installation information is also available there,
 including a different script that will always use the most recent version!
 
 ```groovy
 plugins {
-  id "org.gatored.gatorgradle" version "0.5.1"
+  id "org.gatored.gatorgradle" version "1.0.0"
 }
 ```
 

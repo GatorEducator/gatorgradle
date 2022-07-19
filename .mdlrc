@@ -1,1 +1,1 @@
-style "gradle/config/mdl/style.rb"
+style '.mdl.rb'

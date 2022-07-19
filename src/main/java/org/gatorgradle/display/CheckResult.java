@@ -14,8 +14,8 @@ public class CheckResult {
     }
 
     public MalformedJsonException(String reason, String json) {
-      super("Failed to parse json -- " + reason
-          + (json != null ? ":\n---\n" + json + "\n---" : ""));
+      super(
+          "Failed to parse json -- " + reason + (json != null ? ":\n---\n" + json + "\n---" : ""));
     }
   }
 
@@ -32,12 +32,9 @@ public class CheckResult {
   public static final String FAIL_SYMBOL_RAW = "\u2718"; // heavy cross (✘)
   public static final String FIX_SYMBOL_RAW = "\u2794"; // right arrow (➔)
 
-  public static final String PASS_SYMBOL =
-      StringUtil.color(StringUtil.GOOD, PASS_SYMBOL_RAW);
-  public static final String FAIL_SYMBOL =
-      StringUtil.color(StringUtil.BAD, FAIL_SYMBOL_RAW);
-  public static final String FIX_SYMBOL =
-      StringUtil.color("\u001B[1;33m", FIX_SYMBOL_RAW);
+  public static final String PASS_SYMBOL = StringUtil.color(StringUtil.GOOD, PASS_SYMBOL_RAW);
+  public static final String FAIL_SYMBOL = StringUtil.color(StringUtil.BAD, FAIL_SYMBOL_RAW);
+  public static final String FIX_SYMBOL = StringUtil.color("\u001B[1;33m", FIX_SYMBOL_RAW);
 
   public String check;
   public Boolean outcome;
@@ -48,11 +45,11 @@ public class CheckResult {
   /**
    * Construct a CheckResult.
    *
-   * @param command    the command run
-   * @param check      the check completed
-   * @param outcome    the outcome of the check
+   * @param command the command run
+   * @param check the check completed
+   * @param outcome the outcome of the check
    * @param diagnostic the diagnostic output from the check
-   **/
+   */
   public CheckResult(Command command, String check, Boolean outcome, String diagnostic) {
     this.command = command;
     this.check = check;
@@ -61,16 +58,15 @@ public class CheckResult {
   }
 
   /**
-   * Parses the given JSON string, setting check, outcome,
-   * and diagnostic member variables when found accordingly.
+   * Parses the given JSON string, setting check, outcome, and diagnostic member variables when
+   * found accordingly.
    *
-   * <p>This method assumes the json passed represents only one
-   * result, and any duplicates will overwrite values.
+   * <p>This method assumes the json passed represents only one result, and any duplicates will
+   * overwrite values.
    *
    * @param command the command run
-   * @param json    the json to parse
+   * @param json the json to parse
    * @throws MalformedJsonException if the json given is not valid for a CheckResult
-   *
    */
   public CheckResult(Command command, String json) throws MalformedJsonException {
     this.command = command;
@@ -86,14 +82,12 @@ public class CheckResult {
     }
     this.check = matcher.group(1);
 
-
     matcher.usePattern(OUTCOME_REGEX);
     matcher.reset();
     if (!matcher.matches()) {
       throw new MalformedJsonException("Could not find 'outcome' key in", json);
     }
     this.outcome = Boolean.parseBoolean(matcher.group(1));
-
 
     matcher.usePattern(DIAGNOSTIC_REGEX);
     matcher.reset();
@@ -107,19 +101,24 @@ public class CheckResult {
    * Tests equality, dependent on all member variables.
    *
    * @param otherObj the object to compare to
-   *
    */
+  @Override
   public boolean equals(Object otherObj) {
     if (otherObj instanceof CheckResult) {
       CheckResult other = (CheckResult) otherObj;
-      return this.check != null && this.check.equals(other.check)
-        && this.outcome != null && this.outcome.equals(other.outcome)
-        && this.diagnostic != null && this.diagnostic.equals(other.diagnostic)
-        && this.command != null && this.command.equals(other.command);
+      return this.check != null
+          && this.check.equals(other.check)
+          && this.outcome != null
+          && this.outcome.equals(other.outcome)
+          && this.diagnostic != null
+          && this.diagnostic.equals(other.diagnostic)
+          && this.command != null
+          && this.command.equals(other.command);
     }
     return false;
   }
 
+  @Override
   public int hashCode() {
     return 17 * check.hashCode() + (outcome ? 5 : 7) + 73 * diagnostic.hashCode();
   }
@@ -129,17 +128,24 @@ public class CheckResult {
    *
    * @param includeDiagnostic include diagnostic?
    * @return a string
-   **/
+   */
   public String textReport(boolean includeDiagnostic) {
     if (outcome) {
       return PASS_SYMBOL + INDENT + check;
     } else {
       String output = FAIL_SYMBOL + INDENT + check;
       if (includeDiagnostic) {
-        output += "\n " + INDENT + FIX_SYMBOL + INDENT + StringUtil.color(StringUtil.FIX,
-            diagnostic.trim().replaceAll("\\n", "\n")
-            .replaceAll("\n", "\n" + INDENT + INDENT + CONTINUE_SYMBOL_RAW + INDENT)
-        );
+        output +=
+            "\n "
+                + INDENT
+                + FIX_SYMBOL
+                + INDENT
+                + StringUtil.color(
+                    StringUtil.FIX,
+                    diagnostic
+                        .trim()
+                        .replaceAll("\\n", "\n")
+                        .replaceAll("\n", "\n" + INDENT + INDENT + CONTINUE_SYMBOL_RAW + INDENT));
       }
       return output;
     }
@@ -149,10 +155,14 @@ public class CheckResult {
    * Returns a string representation of this result.
    *
    * @return a string
-   **/
+   */
   public String jsonReport() {
-    return "{\"check\":\"" + StringUtil.jsonEscape(check) + "\",\"outcome\":"
-      + StringUtil.jsonEscape(outcome.toString().toLowerCase(Locale.ENGLISH))
-      + ",\"diagnostic\":\"" + StringUtil.jsonEscape(diagnostic) + "\"}";
+    return "{\"check\":\""
+        + StringUtil.jsonEscape(check)
+        + "\",\"outcome\":"
+        + StringUtil.jsonEscape(outcome.toString().toLowerCase(Locale.ENGLISH))
+        + ",\"diagnostic\":\""
+        + StringUtil.jsonEscape(diagnostic)
+        + "\"}";
   }
 }
