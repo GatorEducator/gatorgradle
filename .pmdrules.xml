@@ -10,7 +10,6 @@
 
 
 <rule ref="category/java/errorprone.xml/EmptyCatchBlock" />
-<rule ref="category/java/codestyle.xml/UnnecessaryImport" />
 <rule ref="category/java/bestpractices.xml/UnusedFormalParameter" />
 <rule ref="category/java/bestpractices.xml/UnusedPrivateMethod" />
 <rule ref="category/java/bestpractices.xml/LooseCoupling" />
