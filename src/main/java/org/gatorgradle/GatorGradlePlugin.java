@@ -78,6 +78,8 @@ public class GatorGradlePlugin implements Plugin<Project> {
     logger.lifecycle(
         "Configured GatorGradle {}",
         GatorGradlePlugin.class.getPackage().getImplementationVersion());
+    logger.error("GatorGradle is now deprecated and has been replaced by GatorGrader!");
+    logger.error("Visit https://github.com/GatorEducator/gatorgrade to learn more.");
 
     // create gatorgradle 'grade' task
     Task gradeTask =
